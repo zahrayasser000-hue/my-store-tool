@@ -4,7 +4,7 @@ import google.generativeai as genai
 import streamlit.components.v1 as components
 
 # --- 1. إعدادات الصفحة ---
-st.set_page_config(page_title="ALI Growth Engine V12", layout="wide", page_icon="https://i.postimg.cc/xCt20gWj/image.png")
+st.set_page_config(page_title="ALI Growth Engine V12.1", layout="wide", page_icon="https://i.postimg.cc/xCt20gWj/image.png")
 
 # --- 2. التصميم (CSS) ---
 st.markdown("""
@@ -27,13 +27,32 @@ if 'html_code' not in st.session_state: st.session_state.html_code = ""
 if 'image_prompts' not in st.session_state: st.session_state.image_prompts = []
 if 'video_scripts' not in st.session_state: st.session_state.video_scripts = ""
 if 'marketing_strategy' not in st.session_state: st.session_state.marketing_strategy = ""
+if 'active_model' not in st.session_state: st.session_state.active_model = None
 
-# --- 4. دوال الذكاء الاصطناعي ---
-def generate_html_page(api_key, product_name):
+# --- 4. دوال الذكاء الاصطناعي (مع الرادار التلقائي لمعالجة خطأ 404) ---
+def get_working_model(api_key):
+    # إذا كان قد وجد الموديل مسبقاً، استخدمه فوراً لتسريع الأداة
+    if st.session_state.active_model: return st.session_state.active_model
+    
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        prompt = f"""أنت خبير برمجة واجهات (Front-end) ومسوق إلكتروني محترف.
+        # البحث التلقائي عن الموديل المتاح في حسابك
+        for m in genai.list_models():
+            if 'generateContent' in m.supported_generation_methods:
+                if 'flash' in m.name.lower():
+                    st.session_state.active_model = m.name
+                    return m.name
+        st.session_state.active_model = "gemini-pro"
+        return "gemini-pro"
+    except:
+        return "gemini-pro" # الخطة البديلة الآمنة جداً
+
+def generate_html_page(api_key, product_name):
+    try:
+        model_name = get_working_model(api_key)
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel(model_name)
+        prompt = f"""أنت خبير برمجة واجهات ومسوق إلكتروني.
         المطلوب: برمجة صفحة هبوط كاملة (HTML & CSS مدمج) لمنتج: {product_name}.
         1. لغة الصفحة: العربية (RTL) بخط 'Cairo'.
         2. التصميم: حديث وسريع التجاوب (Responsive).
@@ -48,8 +67,9 @@ def generate_html_page(api_key, product_name):
 
 def generate_image_prompts(api_key, product_name):
     try:
+        model_name = get_working_model(api_key)
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel(model_name)
         prompt = f"""اكتب 3 برومتات (Prompts) احترافية باللغة الإنجليزية لتوليد صور لمنتج: "{product_name}".
         1. صورة الهيرو (Hero Shot)
         2. صورة نمط الحياة (Lifestyle Shot)
@@ -62,15 +82,16 @@ def generate_image_prompts(api_key, product_name):
 
 def ask_ai(api_key, prompt):
     try:
+        model_name = get_working_model(api_key)
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel(model_name)
         response = model.generate_content(f"أجب بالعربية الفصحى فقط: {prompt}")
         return response.text
     except Exception as e: return f"خطأ في الاتصال: {str(e)}"
 
 # --- 5. القائمة الجانبية ---
 with st.sidebar:
-    st.title("🏗️ محرك علي V12.0")
+    st.title("🏗️ محرك علي V12.1")
     api_key = st.text_input("🔑 API Key", type="password")
     product_name = st.text_input("📦 اسم المنتج")
     
@@ -82,7 +103,7 @@ with st.sidebar:
     uploaded_file = st.file_uploader("📊 ارفع ملف الإكسل (المالية)", type=['xlsx', 'csv'])
 
 # --- 6. الواجهة الرئيسية ---
-st.markdown('<div class="main-header"><h1>ALI Growth Engine - الأتمتة الكاملة</h1></div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header"><h1>ALI Growth Engine - الأتمتة الكاملة (مستقر)</h1></div>', unsafe_allow_html=True)
 
 if not api_key:
     st.warning("الرجاء إدخال API Key في القائمة الجانبية للبدء.")
@@ -94,7 +115,7 @@ else:
         st.subheader("بناء صفحة الهبوط (HTML)")
         if st.button("🚀 توليد/تحديث صفحة الهبوط"):
             if product_name:
-                with st.spinner("جاري برمجة وتصميم الصفحة..."):
+                with st.spinner("الرادار يبحث عن الموديل المناسب... جاري برمجة الصفحة..."):
                     st.session_state.html_code = generate_html_page(api_key, product_name)
             else: st.error("أدخل اسم المنتج أولاً!")
             
@@ -104,7 +125,7 @@ else:
             with st.expander("💻 عرض كود الـ HTML للنسخ"):
                 st.code(st.session_state.html_code, language='html')
 
-    # --- التبويب 2: سكريبتات الفيديو (الجديد) ---
+    # --- التبويب 2: سكريبتات الفيديو ---
     with tabs[1]:
         st.subheader("توليد 5 سكريبتات للفيديوهات الترويجية (UGC)")
         if st.button("🎬 توليد السكريبتات الـ 5"):
@@ -148,13 +169,12 @@ else:
         if st.session_state.marketing_strategy:
             st.markdown(st.session_state.marketing_strategy)
 
-    # --- التبويب 5: التحليل المالي (لم يتغير فيه شيء سوى حمايته من الاختفاء) ---
+    # --- التبويب 5: التحليل المالي ---
     with tabs[4]:
         if uploaded_file:
             try:
                 df = pd.read_excel(uploaded_file) if uploaded_file.name.endswith('.xlsx') else pd.read_csv(uploaded_file)
                 
-                # المعادلة كما هي لم تتغير
                 break_even_dr = (C + CPL) / P
                 st.info(f"💡 نقطة التعادل المحسوبة: **{round(break_even_dr * 100, 2)}%** من نسبة التسليم (DR).")
 
@@ -183,4 +203,4 @@ else:
             except Exception as e:
                 st.error(f"خطأ في قراءة ملف البيانات: {str(e)}")
         else:
-            st.info("ارفع ملف البيانات المالي لعرض التحليل (بمجرد رفع الملف والتبديل بين الأعمدة، لن تختفي بيانات الأقسام الأخرى أبداً!).")
+            st.info("ارفع ملف البيانات المالي لعرض التحليل. بيانات الأقسام الأخرى محفوظة ولن تختفي.")
