@@ -4,9 +4,9 @@ import google.generativeai as genai
 import streamlit.components.v1 as components
 
 # --- 1. إعدادات الصفحة ---
-st.set_page_config(page_title="ALI Growth Engine V17", layout="wide", page_icon="https://i.postimg.cc/xCt20gWj/image.png")
+st.set_page_config(page_title="ALI Growth Engine V18", layout="wide", page_icon="https://i.postimg.cc/xCt20gWj/image.png")
 
-# --- 2. التصميم (CSS) ---
+# --- 2. التصميم (CSS) لحل مشاكل التداخل ---
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
@@ -16,9 +16,11 @@ html, body, [data-testid="stAppViewContainer"], .main {
     text-align: right !important;
 }
 .main-header { background: #182848; color: white; padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
-.image-prompt-box { background: #f0f2f6; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #ffbd45; }
+.image-prompt-box { background: #f0f2f6; padding: 15px; border-radius: 10px; margin-bottom: 10px; border-left: 5px solid #ffbd45; direction: ltr; text-align: left; }
 .stDataFrame div[data-testid="stTable"] { direction: ltr !important; }
 .stDataFrame td, .stDataFrame th { text-align: center !important; }
+/* تحسين شكل صناديق النصوص لمنع التداخل */
+div.stTextArea textarea { font-family: 'Cairo', sans-serif !important; font-size: 16px; direction: rtl; line-height: 1.6; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -29,7 +31,7 @@ if 'video_scripts' not in st.session_state: st.session_state.video_scripts = ""
 if 'marketing_strategy' not in st.session_state: st.session_state.marketing_strategy = ""
 if 'active_model' not in st.session_state: st.session_state.active_model = None
 
-# --- 4. دوال الذكاء الاصطناعي (محدثة بنظام الربط) ---
+# --- 4. دوال الذكاء الاصطناعي ---
 def get_working_model(api_key):
     if st.session_state.active_model: return st.session_state.active_model
     try:
@@ -49,36 +51,40 @@ def generate_strategy(api_key, product_name):
         model = genai.GenerativeModel(model_name)
         prompt = f"""أنت خبير أبحاث تسويقية من مدرسة Agora العملاقة.
         المطلوب: دراسة سوق لمنتج: {product_name}.
-        ⚠️ ركز على: 1. الآلية الفريدة، 2. الحجة التي لا تقهر، 3. المعتقدات الأساسية، 4. فجوات السوق."""
+        ⚠️ ركز على: 1. الآلية الفريدة، 2. الحجة التي لا تقهر، 3. المعتقدات الأساسية، 4. فجوات السوق.
+        اكتب باللغة العربية الفصحى بشكل منظم وواضح."""
         return model.generate_content(prompt).text
     except Exception as e: return f"خطأ: {str(e)}"
 
-# تم تمرير الاستراتيجية كمتغير داخل الدالة لربط العقول
 def generate_html_page(api_key, product_name, strategy_text):
     try:
         model_name = get_working_model(api_key)
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel(model_name)
         
-        prompt = f"""أنت أعظم مبرمج ومصمم لصفحات الهبوط البصرية (Visual-First Landing Pages).
+        prompt = f"""أنت أعظم مبرمج ومصمم لصفحات الهبوط البصرية (Visual-First).
         المطلوب: برمجة كود HTML و CSS متكامل لصفحة هبوط لمنتج: {product_name}.
         
-        🧠 **[هام جداً]: يجب أن تُبنى نصوص وأفكار الصفحة حصرياً على نتائج هذه الاستراتيجية التسويقية (طريقة Agora):**
-        {strategy_text}
-        استخدم "الآلية الفريدة" في قسم المكونات، و"الحجة" في قسم المشكلة والحل، و"المعتقدات" كفوائد.
+        🧠 **[هام جداً]: ابنِ النصوص بناءً على هذه الاستراتيجية:** {strategy_text}
         
-        ⚠️ قوانين التصميم الصارمة (Visuals > Text):
-        - النصوص لا تتعدى 15% من الصفحة. الباقي صور، فيديوهات، و GIF (استخدم روابط وهمية Placeholders).
-        - التصميم للموبايل أولاً (Mobile First) بعرض أقصى 480px.
+        ⚠️ قوانين التصميم الإلزامية:
+        - ابدأ الكود بـ <html lang="ar" dir="rtl"> إجبارياً.
+        - النصوص عربية فقط، بخط 'Cairo'، وقليلة جداً (عناوين فقط). الباقي مساحات للصور والفيديوهات (استخدم Placeholders).
+        - التصميم (Mobile First) بعرض أقصى 480px متمركز في المنتصف.
         
-        ⚠️ الأقسام الـ 7 الإلزامية:
-        1. <section id="hero">: فيديو خلفية، تحته عنوان مبني على "الحجة القوية"، وزر طلب نابض.
-        2. <section id="pas-framework">: 2 صور GIF (واحدة للمشكلة والأخرى للحل) مبنية على الاستراتيجية، مع جمل قصيرة جداً.
-        3. <section id="unique-mechanism">: صورة مقطعية (Diagram Placeholder). اكتب تحتها "الآلية الفريدة" التي استخرجتها من الاستراتيجية بـ 3 نقاط.
-        4. <section id="fab-framework">: شبكة من 4 صور مربعة تبرز "النتائج العاطفية" بناءً على معتقدات العميل.
-        5. <section id="social-proof">: 3 حاويات فيديوهات (ريلز) لتقييمات تدعم الحجة التي لا تقهر.
-        6. <section id="risk-reversal">: ختم ضمان ذهبي كبير جداً (Risk Reversal).
-        7. <section id="urgency-cta">: عداد تنازلي GIF، وزر عائم بالأسفل (Sticky CTA).
+        ⚠️ الأقسام الـ 12 الإلزامية (لا تحذف أي قسم):
+        1. <section id="hero">: فيديو خلفية مع عنوان خطاف مبني على الحجة، وزر طلب.
+        2. <section id="problem">: صورة GIF توضح المشكلة والألم مع عنوان قصير.
+        3. <section id="solution">: صورة GIF توضح الحل بالمنتج مع عنوان جذاب.
+        4. <section id="unique-mechanism">: صورة مقطعية تشرح الآلية الفريدة (Agora).
+        5. <section id="benefits-grid">: شبكة من 4 صور مربعة تبرز النتائج العاطفية (FAB).
+        6. <section id="comparison">: جدول أو صورتين متجاورتين (نحن مقابل الآخرين).
+        7. <section id="ingredients">: 3 أيقونات تشرح المكونات أو جودة الصناعة.
+        8. <section id="social-proof">: 3 حاويات (فيديوهات ريلز طولية) لآراء العملاء.
+        9. <section id="expert-authority">: صورة لخبير/طبيب/مؤثر مع اقتباس قصير يعزز الثقة.
+        10. <section id="how-to-use">: 3 خطوات بسيطة مصورة (GIFs أو أيقونات) لطريقة الاستخدام.
+        11. <section id="risk-reversal">: ختم ضمان ذهبي كبير جداً لضمان الاسترجاع.
+        12. <section id="urgency-cta">: عداد تنازلي GIF، وزر عائم بالأسفل (Sticky CTA) يتحرك ببطء.
         
         أعطني فقط كود الـ HTML والـ CSS المدمج داخل علامتي ```html و ```."""
         
@@ -99,12 +105,10 @@ def generate_video_scripts(api_key, product_name, strategy_text):
         اكتب 5 سكريبتات مفصلة لفيديوهات (UGC) قصيرة لمنتج: {product_name}.
         المنصات: تيك توك، انستجرام ريلز، يوتيوب شورتس، سناب شات، فيسبوك.
         
-        🧠 **[هام جداً]: يجب أن تُبنى حوارات السكريبتات وزواياها حصرياً على هذه الاستراتيجية التسويقية:**
-        {strategy_text}
-        استخدم "الآلية الفريدة" كعنصر الجذب الرئيسي في منتصف الفيديو.
+        🧠 **اعتمد في كتابتك على هذه الاستراتيجية:** {strategy_text}
         
-        ⚠️ الإطار الإلزامي: (انتباه Attention، اهتمام Interest، رغبة Desire، إجراء Action).
-        ركز على المشكلة في أول 3 ثواني، والنتيجة العاطفية في المنتصف."""
+        ⚠️ الإطار الإلزامي: (AIDA). ركز على المشكلة في أول 3 ثواني، والنتيجة العاطفية في المنتصف.
+        اكتب باللغة العربية، ونسق النص ليكون واضحاً وسهل القراءة."""
         return model.generate_content(prompt).text
     except Exception as e: return f"خطأ: {str(e)}"
 
@@ -125,7 +129,7 @@ def generate_image_prompts(api_key, product_name):
 
 # --- 5. القائمة الجانبية ---
 with st.sidebar:
-    st.title("🏗️ محرك علي V17.0")
+    st.title("🏗️ محرك علي V18.0")
     api_key = st.text_input("🔑 API Key", type="password")
     product_name = st.text_input("📦 اسم المنتج")
     st.markdown("---")
@@ -136,43 +140,44 @@ with st.sidebar:
     uploaded_file = st.file_uploader("📊 ارفع ملف الإكسل", type=['xlsx', 'csv'])
 
 # --- 6. الواجهة الرئيسية ---
-st.markdown('<div class="main-header"><h1>ALI Growth Engine - محرك الربط الاستراتيجي (V17)</h1></div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header"><h1>ALI Growth Engine - المحرك البصري بـ 12 قسماً (V18)</h1></div>', unsafe_allow_html=True)
 
 if not api_key:
     st.warning("الرجاء إدخال API Key في القائمة الجانبية للبدء.")
 else:
-    tabs = st.tabs(["🎯 الاستراتيجية (الأساس)", "📱 صفحة الهبوط (Visual)", "🎬 سكريبتات الفيديو", "🖼️ استوديو الصور", "💰 التحليل المالي"])
+    tabs = st.tabs(["🎯 الاستراتيجية", "📱 صفحة الهبوط (12 قسم)", "🎬 سكريبتات الفيديو", "🖼️ استوديو الصور", "💰 التحليل المالي"])
     
     with tabs[0]:
         st.subheader("دراسة السوق وبناء الحجة (Agora)")
-        if st.button("🧠 استخراج الاستراتيجية (إلزامي للخطوات القادمة)"):
+        if st.button("🧠 استخراج الاستراتيجية"):
             if product_name:
                 with st.spinner("جاري التحليل واستخراج الآلية الفريدة..."):
                     st.session_state.marketing_strategy = generate_strategy(api_key, product_name)
             else: st.error("أدخل اسم المنتج!")
-        if st.session_state.marketing_strategy: st.markdown(st.session_state.marketing_strategy)
+        if st.session_state.marketing_strategy:
+            # استخدام st.text_area لحل مشكلة التداخل وجعل التصفح خفيفاً
+            st.text_area("نتائج الاستراتيجية (قابلة للنسخ والتمرير):", value=st.session_state.marketing_strategy, height=400)
 
     with tabs[1]:
-        st.subheader("بناء صفحة هبوط بصرية مبنية على الاستراتيجية")
+        st.subheader("بناء صفحة هبوط بصرية متكاملة (12 قسم)")
         if st.button("🚀 توليد الصفحة المتكاملة"):
             if product_name:
-                # التحقق الذكي: إذا لم تكن الاستراتيجية موجودة، يولدها أولاً ثم يولد الصفحة
                 if not st.session_state.marketing_strategy:
                     with st.spinner("جاري بناء الاستراتيجية كأساس لتصميم الصفحة..."):
                         st.session_state.marketing_strategy = generate_strategy(api_key, product_name)
                 
-                with st.spinner("جاري برمجة وتصميم الصفحة البصرية بناءً على الاستراتيجية..."):
+                with st.spinner("جاري برمجة وتصميم الصفحة بـ 12 قسماً بصرياً..."):
                     st.session_state.html_code = generate_html_page(api_key, product_name, st.session_state.marketing_strategy)
             else: st.error("أدخل اسم المنتج!")
         
         if st.session_state.html_code:
-            st.success("✅ الصفحة جاهزة! نصوصها مبنية حرفياً على معتقدات وحجة الاستراتيجية.")
+            st.success("✅ الصفحة جاهزة بـ 12 قسماً!")
             components.html(st.session_state.html_code, height=750, scrolling=True)
             with st.expander("💻 عرض كود الـ HTML للنسخ"):
                 st.code(st.session_state.html_code, language='html')
 
     with tabs[2]:
-        st.subheader("توليد 5 سكريبتات فيديو مبنية على الاستراتيجية")
+        st.subheader("توليد 5 سكريبتات فيديو")
         if st.button("🎬 توليد السكريبتات"):
             if product_name:
                 if not st.session_state.marketing_strategy:
@@ -182,7 +187,9 @@ else:
                 with st.spinner("جاري كتابة السكريبتات التسويقية..."):
                     st.session_state.video_scripts = generate_video_scripts(api_key, product_name, st.session_state.marketing_strategy)
             else: st.error("أدخل اسم المنتج!")
-        if st.session_state.video_scripts: st.markdown(st.session_state.video_scripts)
+        if st.session_state.video_scripts:
+            # استخدام st.text_area لحل مشكلة التداخل وجعل التصفح خفيفاً
+            st.text_area("السكريبتات الـ 5 (قابلة للنسخ والتمرير):", value=st.session_state.video_scripts, height=500)
 
     with tabs[3]:
         st.subheader("أوامر توليد الصور")
@@ -194,7 +201,6 @@ else:
         if st.session_state.image_prompts and len(st.session_state.image_prompts) >= 3:
             for i, p in enumerate(st.session_state.image_prompts):
                 st.markdown(f'<div class="image-prompt-box"><strong>البرومت {i+1}:</strong><br>{p}</div>', unsafe_allow_html=True)
-                st.code(p, language="text")
 
     with tabs[4]:
         if uploaded_file:
