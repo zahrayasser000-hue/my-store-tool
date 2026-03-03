@@ -61,32 +61,36 @@ def generate_html_page(api_key, product_name, strategy_text, product_color):
         genai.configure(api_key=api_key)
         model = genai.GenerativeModel(model_name)
         
-        prompt = f"""أنت أعظم مبرمج ومصمم لصفحات الهبوط البصرية (Visual-First).
+        prompt = f"""أنت أعظم مبرمج ومصمم لصفحات الهبوط البصرية (Visual-First) وخبير Copywriting بمستوى دان كينيدي.
         المطلوب: برمجة كود HTML و CSS متكامل لصفحة هبوط لمنتج: {product_name}.
         ألوان الهوية المطلوبة للمنتج: {product_color}.
         
-        🧠 **[هام جداً]: ابنِ النصوص بناءً على هذه الاستراتيجية:** {strategy_text}
+        🧠 **[قانون تسويقي صارم جداً]:** يجب أن تُبنى جميع النصوص (العناوين، الفقرات، وزوايا البيع) حرفياً وبذكاء تسويقي عالي بناءً على هذا التقرير الاستراتيجي:
+        --- بداية التقرير ---
+        {strategy_text}
+        --- نهاية التقرير ---
+        ⚠️ تأكد من دمج (الآلية الفريدة، الحجة التي لا تقهر، وفجوات السوق) داخل نصوص الصفحة لكسر كل اعتراضات العميل الشرائية. لا تكتب نصوصاً عشوائية، بل اجعل كل كلمة تخدم زاوية بيع من التقرير.
         
         ⚠️ قوانين التصميم الإلزامية (تحديث CRO):
         - ابدأ الكود بـ <html lang="ar" dir="rtl"> إجبارياً.
         - تناسق الألوان: صمم الـ CSS بحيث تكون ألوان الأزرار، الخلفيات، والعناصر متوافقة تماماً وبشكل أنيق مع الألوان المحددة: ({product_color}).
-        - شريط الثقة: أضف <div id="top-trust-bar"> في أعلى الصفحة تماماً يحتوي على: "🚚 التوصيل بالمجان | 💵 الدفع عند الاستلام | 🛡️ ضمان استرجاع". اجعله صغيراً وأنيقاً.
-        - حجم العنوان: في قسم الهيرو، اجعل العنوان الرئيسي صغيراً نسبياً (font-size: 20px إلى 24px) لكي لا يأخذ مساحة، مما يسمح للفيديو/الصورة بالظهور بحجم كبير وواضح.
+        - شريط الثقة: أضف <div id="top-trust-bar"> في أعلى الصفحة تماماً.
         - التصميم (Mobile First) بعرض أقصى 480px متمركز في المنتصف.
         
-        ⚠️ الأقسام الـ 12 الإلزامية (استخدم صور/فيديوهات Placeholders كالعادة):
-        1. <section id="hero">: فيديو خلفية (البطل)، تحته العنوان الصغير، وزر طلب.
-        2. <section id="problem">: صورة GIF توضح المشكلة.
-        3. <section id="solution">: صورة GIF توضح الحل.
-        4. <section id="unique-mechanism">: صورة تشرح الآلية الفريدة (Agora).
-        5. <section id="benefits-grid">: 4 صور مربعة للنتائج.
-        6. <section id="comparison">: صورتين متجاورتين للمقارنة.
-        7. <section id="ingredients">: 3 أيقونات للخصائص.
-        8. <section id="social-proof">: 3 فيديوهات ريلز لآراء العملاء.
-        9. <section id="expert-authority">: اقتباس لخبير.
-        10. <section id="how-to-use">: 3 خطوات مصورة.
-        11. <section id="risk-reversal">: ختم ضمان ضخم.
-        12. <section id="urgency-cta">: زر عائم بالأسفل (Sticky CTA).
+        ⚠️ الأقسام الـ 13 الإلزامية (يجب أن تتسلسل بهذا الترتيب لتشكيل قمع مبيعات متكامل، استخدم روابط وهمية للصور/الفيديوهات):
+        1. <section id="hero">: فيديو خلفية (البطل)، تحته العنوان الصغير الجذاب (مستوحى من الحجة التي لا تقهر)، وزر طلب.
+        2. <section id="trust-icons"> (القسم 13 الجديد): قسم الأيقونات السريعة أسفل الهيرو (مثل: جودة أصلية 100%، آمن ومجرب، توصيل سريع). 3 أو 4 أيقونات دائرية صغيرة.
+        3. <section id="problem">: صورة GIF توضح المشكلة (اضرب على ألم العميل المذكور في التقرير).
+        4. <section id="solution">: صورة GIF توضح الحل.
+        5. <section id="unique-mechanism">: صورة تشرح الآلية الفريدة (Agora) المذكورة في التقرير.
+        6. <section id="benefits-grid">: 4 صور مربعة للنتائج المرغوبة.
+        7. <section id="comparison">: صورتين متجاورتين للمقارنة (توضح فجوة السوق للماسكات التقليدية).
+        8. <section id="ingredients">: 3 أيقونات للخصائص والمكونات.
+        9. <section id="social-proof">: 3 فيديوهات ريلز لآراء العملاء.
+        10. <section id="expert-authority">: اقتباس لخبير يثبت المعتقدات الأساسية.
+        11. <section id="how-to-use">: 3 خطوات مصورة بسيطة.
+        12. <section id="risk-reversal">: ختم ضمان ضخم يزيل المخاطرة تماماً.
+        13. <section id="urgency-cta">: زر عائم بالأسفل (Sticky CTA) مع عداد ندرة.
         
         أعطني فقط كود الـ HTML والـ CSS المدمج داخل علامتي ```html و ```."""
         
@@ -145,7 +149,7 @@ st.markdown('<div class="main-header"><h1>ALI Growth Engine - CRO Optimized (V19
 if not api_key:
     st.warning("الرجاء إدخال API Key في القائمة الجانبية للبدء.")
 else:
-    tabs = st.tabs(["🎯 الاستراتيجية", "📱 صفحة الهبوط (12 قسم)", "🎬 سكريبتات الفيديو", "🖼️ استوديو الصور", "💰 التحليل المالي"])
+    tabs = st.tabs(["🎯 الاستراتيجية", "📱 صفحة الهبوط (13 قسم)", "🎬 سكريبتات الفيديو", "🖼️ استوديو الصور", "💰 التحليل المالي"])
     
     with tabs[0]:
         st.subheader("دراسة السوق وبناء الحجة (Agora)")
@@ -158,22 +162,21 @@ else:
             st.text_area("نتائج الاستراتيجية (قابلة للنسخ والتمرير):", value=st.session_state.marketing_strategy, height=400)
 
     with tabs[1]:
-        st.subheader("بناء صفحة هبوط بصرية بـ 12 قسم متوافق مع الهوية")
+        st.subheader("بناء صفحة هبوط بصرية بـ 13 قسم متوافق مع الهوية والاستراتيجية")
         if st.button("🚀 توليد الصفحة المتكاملة"):
             if product_name:
-                # إذا لم يكتب المستخدم لوناً، نعطي تعليمة افتراضية للذكاء ليختار هو الأنسب
                 color_theme = product_color if product_color else "ألوان عصرية احترافية وجذابة تناسب المنتج"
                 
                 if not st.session_state.marketing_strategy:
                     with st.spinner("جاري بناء الاستراتيجية كأساس لتصميم الصفحة..."):
                         st.session_state.marketing_strategy = generate_strategy(api_key, product_name)
                 
-                with st.spinner("جاري برمجة الصفحة، تنسيق الألوان، وإضافة شريط الثقة..."):
+                with st.spinner("جاري دمج الاستراتيجية وبرمجة الأقسام الـ 13..."):
                     st.session_state.html_code = generate_html_page(api_key, product_name, st.session_state.marketing_strategy, color_theme)
             else: st.error("أدخل اسم المنتج!")
         
         if st.session_state.html_code:
-            st.success("✅ الصفحة جاهزة! لاحظ شريط الثقة العلوي، وتناسق الألوان مع منتجك.")
+            st.success("✅ الصفحة جاهزة! تم دمج الاستراتيجية التسويقية بنجاح مع الأقسام الـ 13.")
             components.html(st.session_state.html_code, height=750, scrolling=True)
             with st.expander("💻 عرض كود الـ HTML للنسخ"):
                 st.code(st.session_state.html_code, language='html')
@@ -224,4 +227,3 @@ else:
                 if results: st.table(pd.DataFrame(results))
             except Exception as e: st.error(f"خطأ: {str(e)}")
         else: st.info("ارفع ملف البيانات المالي لعرض التحليل.")
-
