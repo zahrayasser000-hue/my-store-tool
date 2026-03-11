@@ -10,7 +10,7 @@ st.set_page_config(page_title="ALI Growth Engine V19", layout="wide", page_icon=
 # --- 2. التصميم (CSS) ---
 st.markdown("""
 <style>
-@import url('[https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap](https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap)');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
 html, body, [data-testid="stAppViewContainer"], .main {
     font-family: 'Cairo', sans-serif !important;
     direction: rtl !important;
@@ -33,29 +33,14 @@ if 'video_scripts' not in st.session_state:
     st.session_state.video_scripts = ""
 if 'marketing_strategy' not in st.session_state:
     st.session_state.marketing_strategy = ""
-if 'active_model' not in st.session_state:
-    st.session_state.active_model = None
 
-# --- 4. دوال الذكاء الاصطناعي ---
-def get_working_model(api_key):
-    if st.session_state.active_model:
-        return st.session_state.active_model
-    try:
-        genai.configure(api_key=api_key)
-        for m in genai.list_models():
-            if 'generateContent' in m.supported_generation_methods and 'flash' in m.name.lower():
-                st.session_state.active_model = m.name
-                return m.name
-        st.session_state.active_model = "gemini-pro"
-        return "gemini-pro"
-    except:
-        return "gemini-pro"
+# --- 4. دوال الذكاء الاصطناعي (النسخة الصاروخية) ---
 
 def generate_strategy(api_key, product_name):
     try:
-        model_name = get_working_model(api_key)
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel(model_name)
+        # استخدام الموديل الأسرع مباشرة لتوفير وقت البحث
+        model = genai.GenerativeModel("gemini-1.5-flash")
         prompt = f"""أنت خبير أبحاث تسويقية من مدرسة Agora العملاقة.
         المطلوب: دراسة سوق لمنتج: {product_name}.
         ⚠️ ركز على: 1. الآلية الفريدة، 2. الحجة التي لا تقهر، 3. المعتقدات الأساسية، 4. فجوات السوق.
@@ -66,9 +51,8 @@ def generate_strategy(api_key, product_name):
 
 def generate_html_page(api_key, product_name, strategy_text, product_color):
     try:
-        model_name = get_working_model(api_key)
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel(model_name)
+        model = genai.GenerativeModel("gemini-1.5-flash")
         
         prompt = f"""أنت أعظم مبرمج ومصمم لصفحات الهبوط البصرية (Visual-First) وخبير Copywriting بمستوى دان كينيدي.
         المطلوب: برمجة كود HTML و CSS متكامل لصفحة هبوط لمنتج: {product_name}.
@@ -119,9 +103,8 @@ def generate_html_page(api_key, product_name, strategy_text, product_color):
 
 def generate_video_scripts(api_key, product_name, strategy_text):
     try:
-        model_name = get_working_model(api_key)
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel(model_name)
+        model = genai.GenerativeModel("gemini-1.5-flash")
         prompt = f"""أنت خبير محتوى تسويقي و Copywriter محترف. 
         اكتب 5 سكريبتات مفصلة لفيديوهات (UGC) قصيرة لمنتج: {product_name}.
         المنصات: تيك توك، انستجرام ريلز، يوتيوب شورتس، سناب شات، فيسبوك.
@@ -133,9 +116,8 @@ def generate_video_scripts(api_key, product_name, strategy_text):
 
 def generate_image_prompts(api_key, product_name):
     try:
-        model_name = get_working_model(api_key)
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel(model_name)
+        model = genai.GenerativeModel("gemini-1.5-flash")
         prompt = f"""اكتب 3 برومتات احترافية باللغة الإنجليزية لتوليد صور لمنتج: "{product_name}".
         1. Hero Shot
         2. Lifestyle Shot
@@ -187,7 +169,7 @@ else:
                 color_theme = product_color if product_color else "ألوان عصرية احترافية وجذابة تناسب المنتج"
                 
                 if not st.session_state.marketing_strategy:
-                    with st.spinner("جاري بناء الاستراتيجية كأساس لتصميم الصفحة..."):
+                    with st.spinner("جاري بناء الاستراتيجية كأساس لتصميم الصفحة... (قد يستغرق 5 ثوانٍ إضافية)"):
                         st.session_state.marketing_strategy = generate_strategy(api_key, product_name)
                 
                 with st.spinner("جاري دمج الاستراتيجية وبرمجة الأقسام الـ 13..."):
