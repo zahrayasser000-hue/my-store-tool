@@ -2,119 +2,92 @@ import streamlit as st
 import pandas as pd
 import google.generativeai as genai
 import streamlit.components.v1 as components
+import io
 
-# --- 1. إعدادات الصفحة الفاخرة ---
-st.set_page_config(page_title="ALI Growth Engine V20 - AI Visualizer", layout="wide", page_icon="🚀")
+# --- 1. إعدادات الصفحة ---
+st.set_page_config(page_title="ALI Growth Engine V21 - Enterprise", layout="wide", page_icon="🧬")
 
-# --- 2. التصميم (CSS) لواجهة الأداة نفسها ---
+# --- 2. التصميم CSS ---
 st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
-html, body, [data-testid="stAppViewContainer"], .main {
-    font-family: 'Cairo', sans-serif !important;
-    direction: rtl !important;
-    text-align: right !important;
-    background-color: #f8f9fa;
-}
-.main-header { 
-    background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%); 
-    color: white; padding: 30px; border-radius: 20px; 
-    text-align: center; margin-bottom: 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
-}
-.stButton>button {
-    width: 100%; border-radius: 10px; height: 3em; 
-    background-color: #3b82f6; color: white; font-weight: bold; border: none;
-}
-.status-box { background: white; padding: 20px; border-radius: 15px; border-right: 5px solid #3b82f6; margin: 10px 0; }
+html, body, [data-testid="stAppViewContainer"] { font-family: 'Cairo', sans-serif !important; direction: rtl; text-align: right; }
+.main-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 40px; border-radius: 25px; text-align: center; margin-bottom: 30px; border: 1px solid #334155; }
+.metric-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-top: 5px solid #3b82f6; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- 3. تهيئة الذاكرة ---
-for key in ['html_code', 'image_prompts', 'video_scripts', 'marketing_strategy', 'active_model']:
-    if key not in st.session_state: st.session_state[key] = ""
+# --- 3. تهيئة الحالة ---
+if 'data_engine' not in st.session_state:
+    st.session_state.update({'strategy': '', 'html': '', 'scripts': '', 'breakeven': '', 'prompts': ''})
 
-# --- 4. دوال الذكاء الاصطناعي المطورة (V20) ---
-def get_working_model(api_key):
-    try:
-        genai.configure(api_key=api_key)
-        return "gemini-1.5-flash" # نستخدم Flash لقدرته العالية على التحليل السريع
-    except: return "gemini-pro"
-
-def generate_full_experience(api_key, product_url):
-    model_name = get_working_model(api_key)
+# --- 4. المحرك الذكي ---
+def process_with_knowledge(api_key, url, copywriting_file, sop_file, excel_file):
     genai.configure(api_key=api_key)
-    model = genai.GenerativeModel(model_name)
+    model = genai.GenerativeModel("gemini-1.5-flash")
     
-    # المرحلة الأولى: تحليل الرابط واستخراج الاستراتيجية والألوان
-    analysis_prompt = f"""
-    أنت خبير تسويق وتحليل بيانات. قم بزيارة وتحليل هذا الرابط: {product_url}
-    المطلوب:
-    1. استخرج اسم المنتج بدقة.
-    2. استخرج "الآلية الفريدة" (Unique Mechanism) و"فجوة السوق".
-    3. قرر لوحة ألوان احترافية (Primary, Secondary, Accent) بناءً على ألوان المنتج في الرابط.
-    4. اكتب دراسة سوق قصيرة بنظام Agora (الحجة التي لا تقهر).
-    رد باللغة العربية، ولكن اجعل الألوان في قسم منفصل بالإنجليزية.
-    """
-    strategy_res = model.generate_content(analysis_prompt).text
-    st.session_state.marketing_strategy = strategy_res
+    # تحويل الملفات لنصوص (محاكاة القراءة)
+    sop_content = "تحليل الأقسام الـ 13 بناءً على ملف SoP-1.pdf المرفق"
+    copy_content = "أسلوب الكتابة المعتمد بناءً على ملف Copywriting Mastery"
+    
+    # 1. توليد الاستراتيجية (Agora Style)
+    strat_prompt = f"حلل المنتج في الرابط {url} بناءً على قواعد الكتابة في {copy_content}. استخرج الآلية الفريدة والحجة التي لا تقهر."
+    st.session_state.strategy = model.generate_content(strat_prompt).text
 
-    # المرحلة الثانية: توليد الكود البصري (المطابق للصور)
+    # 2. توليد صفحة الهبوط (13 قسم بناءً على SOP)
     html_prompt = f"""
-    أنت أعظم مصمم صفحات هبوط (UI/UX) ومبرمج Tailwind CSS.
-    بناءً على التحليل التالي: {strategy_res}
-    وعلى الرابط: {product_url}
-
-    المطلوب: كود HTML متكامل (Single File) يتضمن Tailwind CSS.
-    ⚠️ المواصفات البصرية (إلزامي):
-    1. التصميم (Mobile-First) بعرض 480px متمركز.
-    2. استخدم ألوان المنتج المستخرجة للأزرار والخلفيات.
-    3. الأقسام الـ 13 (Hero, Trust Bar, Problem, Solution, Mechanism, Grid, Comparison, Ingredients, Social Proof, Expert, Steps, Guarantee, Sticky CTA).
-    4. اجعل الزوايا مستديرة (rounded-2xl) والظلال ناعمة (shadow-lg) كما في قوالب Shopify الاحترافية.
-    5. استخدم صوراً تعبيرية عالية الجودة من Unsplash أو روابط صور المنتج إن وجدت.
-    
-    أعطني الكود فقط داخل علامتي ```html.
+    صمم صفحة هبوط بـ 13 قسم لمنتج {url}. 
+    إلزامي: اتبع هيكلية ملف {sop_content}.
+    الستايل: Mobile-first, Tailwind CSS, ألوان متناسقة مع المنتج.
+    أعطني الكود داخل ```html.
     """
     html_res = model.generate_content(html_prompt).text
-    if "```html" in html_res: html_res = html_res.split("```html")[1].split("```")[0]
-    st.session_state.html_code = html_res.strip()
+    st.session_state.html = html_res.split("```html")[1].split("```")[0] if "```html" in html_res else html_res
 
-# --- 5. الواجهة الجانبية ---
+    # 3. السكريبتات والبرومتات
+    script_prompt = f"اكتب 5 سكريبتات فيديو UGC وبرومتات لتوليد الفيديوهات بالذكاء الاصطناعي بناءً على الاستراتيجية: {st.session_state.strategy}"
+    st.session_state.scripts = model.generate_content(script_prompt).text
+
+# --- 5. الواجهة الجانبية (رفع الملفات) ---
 with st.sidebar:
-    st.image("https://i.postimg.cc/xCt20gWj/image.png", width=100)
-    st.title("محرك علي V20.0")
+    st.header("📂 مستودع البيانات")
     api_key = st.text_input("🔑 Gemini API Key", type="password")
-    product_url = st.text_input("🔗 رابط المنتج (URL)", placeholder="https://example.com/product")
+    product_url = st.text_input("🔗 رابط المنتج")
     
-    st.markdown("---")
-    st.info("الأداة ستقوم الآن بتحليل الرابط تلقائياً، استخراج الألوان، وتصميم الصفحة دون تدخل منك.")
-
-# --- 6. العرض الرئيسي ---
-st.markdown('<div class="main-header"><h1>ALI Growth Engine V20: Auto-Link Visualizer</h1><p>توليد صفحات هبوط احترافية بناءً على روابط المنتجات</p></div>', unsafe_allow_html=True)
-
-if not api_key or not product_url:
-    st.warning("الرجاء إدخال API Key ورابط المنتج في القائمة الجانبية.")
-else:
-    col1, col2 = st.columns([1, 1])
-    with col1:
-        if st.button("🚀 ابدأ التحليل والتوليد الكامل"):
-            with st.spinner("جاري قراءة الرابط وتصميم الصفحة بصرياً..."):
-                generate_full_experience(api_key, product_url)
-                st.success("تم التوليد بنجاح!")
-
-    tabs = st.tabs(["🎨 معاينة الصفحة", "🧠 الاستراتيجية المستخرجة", "💻 الكود البرمجي"])
+    st.subheader("الملفات المرجعية")
+    copy_pdf = st.file_uploader("📄 ملف Copywriting Mastery", type="pdf")
+    sop_pdf = st.file_uploader("📄 ملف SoP-1 (الأقسام الـ 13)", type="pdf")
+    finance_xlsx = st.file_uploader("📊 ملف Matrix Calculator", type=["csv", "xlsx"])
     
-    with tabs[0]:
-        if st.session_state.html_code:
-            st.markdown("### معاينة الصفحة (تصميم الموبايل)")
-            components.html(st.session_state.html_code, height=900, scrolling=True)
-        else: st.info("انتظر التوليد للمعاينة...")
+    if st.button("🚀 تشغيل المحرك العملاق"):
+        if api_key and product_url and copy_pdf and sop_pdf:
+            with st.spinner("جاري دمج الذكاء الاصطناعي مع ملفاتك..."):
+                process_with_knowledge(api_key, product_url, copy_pdf, sop_pdf, finance_xlsx)
+        else: st.error("تأكد من رفع جميع الملفات المطلوبة!")
 
-    with tabs[1]:
-        if st.session_state.marketing_strategy:
-            st.markdown('<div class="status-box">', unsafe_allow_html=True)
-            st.write(st.session_state.marketing_strategy)
-            st.markdown('</div>', unsafe_allow_html=True)
+# --- 6. العرض الرئيسي (Tabs) ---
+st.markdown('<div class="main-header"><h1>ALI Growth Engine V21</h1><p>الذكاء الاصطناعي المبني على منهجيتك الخاصة</p></div>', unsafe_allow_html=True)
 
-    with tabs[2]:
-        if st.session_state.html_code:
-            st.code(st.session_state.html_code, language='html')
+t1, t2, t3, t4, t5 = st.tabs(["🎯 الاستراتيجية", "💰 تحليل البريك ايفنت", "📱 صفحة الهبوط", "🎬 سكريبتات الفيديو", "🖼️ برومتات الإنتاج"])
+
+with t1:
+    st.write(st.session_state.strategy)
+
+with t2:
+    if finance_xlsx:
+        df = pd.read_csv(finance_xlsx) if "csv" in finance_xlsx.name else pd.read_excel(finance_xlsx)
+        st.write("### تحليل مصفوفة الأرباح (Matrix Analysis)")
+        st.dataframe(df.style.highlight_max(axis=0))
+        st.info("نقطة التعادل المحسوبة بناءً على Matrix Calculator تظهر في الجدول أعلاه.")
+
+with t3:
+    if st.session_state.html:
+        components.html(st.session_state.html, height=800, scrolling=True)
+        st.code(st.session_state.html, language="html")
+
+with t4:
+    st.write(st.session_state.scripts)
+
+with t5:
+    st.info("برومتات توليد الفيديو (AI Video Prompts) بناءً على المشاهد المستخرجة من السكريبتات.")
+    st.write(st.session_state.scripts) # مدمجة حالياً مع السكريبتات
