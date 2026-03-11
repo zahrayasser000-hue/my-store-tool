@@ -64,48 +64,50 @@ TEMPLATES = {
             </div>
 
             <!-- 2. Hero Section -->
-            <section class="relative w-full">
+            <section class="relative w-full bg-gray-900">
                 <!-- صورة ذكية مولدة تلقائياً -->
-                <img src="https://image.pollinations.ai/prompt/{{IMAGE_HERO}}?width=800&height=1000&nologo=true" alt="Hero" class="w-full h-[500px] object-cover">
-                <div class="absolute bottom-0 left-0 w-full h-2/3 bg-gradient-to-t from-[var(--primary)] to-transparent"></div>
+                <img src="https://image.pollinations.ai/prompt/{{IMAGE_HERO}}?width=800&height=1000&nologo=true" alt="Hero" class="w-full h-[500px] object-cover opacity-90">
+                <div class="absolute bottom-0 left-0 w-full h-3/4 bg-gradient-to-t from-[var(--primary)] to-transparent"></div>
                 <div class="absolute bottom-0 left-0 w-full p-6 text-white text-center z-10">
-                    <div class="inline-block bg-accent text-white px-3 py-1 rounded-full text-xs font-black mb-3 shadow-lg animate-pulse">عرض حصري</div>
-                    <h1 class="text-3xl md:text-4xl font-black mb-2 drop-shadow-md leading-tight">{{HERO_HEADLINE}}</h1>
-                    <p class="text-lg font-bold text-gray-100 drop-shadow mb-4">{{HERO_SUB}}</p>
+                    <div class="inline-block bg-accent text-white px-4 py-1 rounded-full text-xs font-black mb-4 shadow-lg animate-pulse border border-white/30">عرض حصري</div>
+                    <h1 class="text-4xl font-black mb-3 drop-shadow-lg leading-tight text-white">{{HERO_HEADLINE}}</h1>
+                    <p class="text-lg font-bold text-gray-100 drop-shadow mb-6 leading-relaxed">{{HERO_SUB}}</p>
                 </div>
             </section>
 
             <!-- 3. Problem Section -->
-            <section class="bg-primary text-white text-center pb-8 pt-4 px-4 rounded-b-3xl shadow-md z-20 relative">
-                <h2 class="text-2xl font-black mb-4 text-accent">⚠️ {{PROBLEM_TITLE}}</h2>
-                <img src="https://image.pollinations.ai/prompt/{{IMAGE_PROBLEM}}?width=600&height=400&nologo=true" class="w-full h-48 object-cover rounded-2xl border-4 border-white shadow-lg mb-4">
-                <p class="text-base font-bold leading-relaxed">{{PROBLEM_DESC}}</p>
+            <section class="bg-primary text-white text-center pb-10 pt-6 px-6 rounded-b-3xl shadow-md z-20 relative">
+                <h2 class="text-2xl font-black mb-5 text-accent">⚠️ {{PROBLEM_TITLE}}</h2>
+                <div class="relative inline-block w-full">
+                    <img src="https://image.pollinations.ai/prompt/{{IMAGE_PROBLEM}}?width=600&height=400&nologo=true" class="w-full h-56 object-cover rounded-2xl border-4 border-white shadow-2xl mb-5">
+                </div>
+                <p class="text-lg font-bold leading-relaxed">{{PROBLEM_DESC}}</p>
             </section>
 
             <!-- 4. Solution & Mechanism -->
             <section class="content-pad bg-white text-center">
-                <h2 class="text-3xl font-black text-primary mb-4">✨ {{SOLUTION_TITLE}}</h2>
-                <p class="text-lg text-gray-700 font-bold mb-6">{{SOLUTION_DESC}}</p>
-                <img src="https://image.pollinations.ai/prompt/{{IMAGE_SOLUTION}}?width=800&height=600&nologo=true" class="w-full h-64 object-cover rounded-2xl shadow-md border border-gray-100 mb-6">
+                <h2 class="text-3xl font-black text-primary mb-4 drop-shadow-sm">✨ {{SOLUTION_TITLE}}</h2>
+                <p class="text-lg text-gray-700 font-bold mb-8 leading-relaxed">{{SOLUTION_DESC}}</p>
+                <img src="https://image.pollinations.ai/prompt/{{IMAGE_SOLUTION}}?width=800&height=600&nologo=true" class="w-full h-64 object-cover rounded-2xl shadow-lg border border-gray-200 mb-8">
                 
-                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200 text-right">
-                    <h3 class="font-black text-gray-900 text-xl mb-2">⚙️ {{MECHANISM_TITLE}}</h3>
-                    <p class="text-sm font-bold text-gray-600 leading-relaxed">{{MECHANISM_DESC}}</p>
+                <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-2xl border border-gray-200 text-right shadow-sm">
+                    <h3 class="font-black text-gray-900 text-xl mb-3 flex items-center gap-2"><span>⚙️</span> {{MECHANISM_TITLE}}</h3>
+                    <p class="text-base font-bold text-gray-600 leading-relaxed">{{MECHANISM_DESC}}</p>
                 </div>
             </section>
 
             <!-- 5. Ingredients Section (المكونات الديناميكية) -->
             <section class="bg-primary text-white content-pad text-center">
-                <h2 class="text-3xl font-black text-accent mb-8">السر في مكوناتنا</h2>
-                <div class="grid grid-cols-1 gap-4">
+                <h2 class="text-3xl font-black text-accent mb-10">السر في مكوناتنا</h2>
+                <div class="grid grid-cols-1 gap-5">
                     {{INGREDIENTS_HTML}}
                 </div>
             </section>
 
             <!-- 6. Benefits Grid (الفوائد المرئية) -->
             <section class="content-pad bg-secondary">
-                <h2 class="text-3xl font-black text-center text-gray-900 mb-8">نتائج سريعة ومضمونة</h2>
-                <div class="grid grid-cols-1 gap-4">
+                <h2 class="text-3xl font-black text-center text-gray-900 mb-8 drop-shadow-sm">نتائج سريعة ومضمونة</h2>
+                <div class="grid grid-cols-1 gap-5">
                     {{BENEFITS_HTML}}
                 </div>
             </section>
@@ -113,7 +115,7 @@ TEMPLATES = {
             <!-- 7. Customer Reviews (آراء العملاء) -->
             <section class="content-pad bg-white border-t border-gray-100">
                 <h2 class="text-3xl font-black text-center text-primary mb-8">ماذا يقول عملاؤنا؟</h2>
-                <div class="space-y-4">
+                <div class="space-y-5">
                     {{REVIEWS_HTML}}
                 </div>
             </section>
@@ -127,20 +129,21 @@ TEMPLATES = {
             </section>
 
             <!-- 9. Expert & Risk Reversal -->
-            <section class="content-pad bg-primary text-center pb-16 text-white">
+            <section class="content-pad bg-primary text-center pb-20 text-white rounded-t-3xl mt-4">
+                <div class="text-6xl mb-4 drop-shadow-md">🛡️</div>
                 <h3 class="text-3xl font-black text-accent mb-4">ضمان ذهبي 100%</h3>
-                <p class="text-lg font-bold text-gray-100 mb-8">{{GUARANTEE}}</p>
+                <p class="text-lg font-bold text-gray-100 mb-8 leading-relaxed">{{GUARANTEE}}</p>
             </section>
 
             <!-- Sticky Urgency CTA (الزر العائم) -->
-            <div id="buy" class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-sm p-3 shadow-[0_-10px_20px_rgba(0,0,0,0.15)] flex justify-center z-50 border-t-4 border-accent">
+            <div id="buy" class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-sm p-4 shadow-[0_-15px_30px_rgba(0,0,0,0.15)] flex justify-center z-50 border-t-4 border-accent">
                 <div class="w-full max-w-lg flex flex-col items-center">
-                    <div class="text-gray-800 text-sm font-black mb-2 flex items-center gap-2">
+                    <div class="text-gray-800 text-sm font-black mb-2 flex items-center gap-2 bg-gray-100 px-4 py-1 rounded-full border border-gray-200">
                         <span class="w-3 h-3 rounded-full bg-red-600 animate-ping"></span>
                         العرض ينتهي قريباً! الدفع عند الاستلام
                     </div>
-                    <a href="#buy" class="bg-accent hover:opacity-90 text-white font-black py-4 px-4 rounded-xl text-2xl w-full text-center shadow-lg transition transform hover:scale-[1.02] flex justify-center items-center gap-2">
-                        🛒 {{CTA_BUTTON}}
+                    <a href="#buy" class="bg-accent hover:opacity-90 text-white font-black py-4 px-6 rounded-xl text-2xl w-full text-center shadow-lg transition transform hover:scale-[1.02] flex justify-center items-center gap-3">
+                        <span>🛒</span> {{CTA_BUTTON}}
                     </a>
                 </div>
             </div>
@@ -152,7 +155,7 @@ TEMPLATES = {
 }
 
 # ==========================================================
-# 🧠 الخطوة 1: المحرك اللفظي المعزز بإنشاء الصور والأقسام الجديدة
+# 🧠 الخطوة 1: المحرك اللفظي المعزز (حماية اللغة العربية)
 # ==========================================================
 def get_fast_working_model(api_key):
     if 'valid_model_name' in st.session_state:
@@ -172,38 +175,41 @@ def generate_landing_page_json(api_key, product):
     model_name = get_fast_working_model(api_key)
     model = genai.GenerativeModel(model_name)
     
+    # ⚠️ تم تحديث البرومت لضمان اللغة العربية 100% في النصوص والإنجليزية 100% في الصور
     prompt = f"""
     أنت أعظم خبير تسويق لصفحات الهبوط (Infographic Sales Pages).
     المنتج: "{product}".
     
-    المطلوب: توليد نصوص قوية ووصف لصور باللغة الإنجليزية لتوليدها بالذكاء الاصطناعي.
+    ⚠️ قانون صارم جداً: جميع النصوص التي سيقرأها العميل يجب أن تكون باللغة "العربية الفصحى" فقط. 
+    الحقول الوحيدة التي يجب كتابتها باللغة "الإنجليزية" هي حقول (image_prompts) لكي يفهمها مولد الصور.
+
     رد حصراً بصيغة JSON صالحة (Valid JSON) بهذا الهيكل الدقيق:
     {{
-        "hero_headline": "عنوان رئيسي قصير وصادم",
-        "hero_subheadline": "عنوان فرعي يبرز الفائدة",
-        "image_hero_prompt": "English prompt for AI image generator showing the product in a beautiful, elegant, professional studio shot. highly detailed",
-        "problem_title": "عنوان المشكلة",
-        "problem_description": "وصف قصير للمشكلة",
-        "image_problem_prompt": "English prompt for AI image showing a person frustrated with the problem, photography, emotional",
-        "solution_title": "عنوان الحل",
-        "solution_description": "كيف يحل المنتج المشكلة",
-        "image_solution_prompt": "English prompt for AI image showing a happy person with perfect results after using the product",
-        "mechanism_title": "كيف يعمل؟",
-        "mechanism_description": "وصف الآلية باختصار",
+        "hero_headline": "عنوان رئيسي قصير وصادم (بالعربية)",
+        "hero_subheadline": "عنوان فرعي يبرز الفائدة (بالعربية)",
+        "image_hero_prompt": "A short English prompt for an AI image generator showing the product. e.g. 'professional studio shot of the product, highly detailed, elegant lighting'",
+        "problem_title": "عنوان المشكلة (بالعربية)",
+        "problem_description": "وصف المشكلة بشكل عاطفي (بالعربية)",
+        "image_problem_prompt": "A short English prompt for an AI image showing a frustrated person dealing with the problem. e.g. 'sad person holding their face, dark lighting'",
+        "solution_title": "عنوان الحل (بالعربية)",
+        "solution_description": "كيف يحل المنتج المشكلة (بالعربية)",
+        "image_solution_prompt": "A short English prompt for an AI image showing a happy person with perfect results. e.g. 'happy smiling person looking flawless, bright lighting'",
+        "mechanism_title": "كيف يعمل؟ (بالعربية)",
+        "mechanism_description": "وصف الآلية باختصار (بالعربية)",
         "ingredients": [
-            {{"name": "اسم المكون 1", "desc": "فائدة هذا المكون"}}
+            {{"name": "اسم المكون (بالعربية)", "desc": "فائدة المكون (بالعربية)", "image_prompt": "English prompt for macro photo of the ingredient. e.g. 'macro shot of aloe vera leaf'"}}
         ],
-        "benefits": ["النتيجة الأولى", "النتيجة الثانية", "توفير الجهد والمال"],
+        "benefits": ["النتيجة الأولى (بالعربية)", "النتيجة الثانية (بالعربية)", "توفير الجهد والمال (بالعربية)"],
         "reviews": [
-            {{"name": "سارة م.", "rating": 5, "comment": "تعليق إيجابي واقعي وقصير"}},
-            {{"name": "أمينة ع.", "rating": 5, "comment": "تعليق يركز على سرعة النتيجة"}}
+            {{"name": "سارة م.", "rating": 5, "comment": "تعليق إيجابي (بالعربية)"}},
+            {{"name": "أمينة ع.", "rating": 5, "comment": "تعليق يركز على سرعة النتيجة (بالعربية)"}}
         ],
         "faq": [
-            {{"q": "سؤال شائع 1؟", "a": "إجابة مقنعة."}},
-            {{"q": "سؤال حول الضمان والتوصيل؟", "a": "إجابة تطمئن العميل."}}
+            {{"q": "سؤال شائع 1؟ (بالعربية)", "a": "إجابة مقنعة (بالعربية)."}},
+            {{"q": "سؤال حول الضمان والتوصيل؟ (بالعربية)", "a": "إجابة تطمئن العميل (بالعربية)."}}
         ],
-        "guarantee": "نص ضمان استرجاع الأموال",
-        "call_to_action": "نص زر الشراء القصير (مثال: اطلب بخصم 50%)"
+        "guarantee": "نص ضمان استرجاع الأموال (بالعربية)",
+        "call_to_action": "نص زر الشراء (بالعربية)"
     }}
     لا تكتب أي حرف خارج الـ JSON.
     """
@@ -224,25 +230,27 @@ def inject_data_into_template(json_data, template_name, colors):
     for benefit in json_data.get('benefits', []):
         benefits_html += f'''
         <div class="bg-white p-5 rounded-2xl flex items-center gap-4 shadow-sm border-r-4 border-accent">
-            <div class="w-10 h-10 flex-shrink-0 bg-green-100 rounded-full flex items-center justify-center">
-                <span class="text-xl text-green-600">✓</span>
+            <div class="w-12 h-12 flex-shrink-0 bg-green-100 rounded-full flex items-center justify-center">
+                <span class="text-2xl text-green-600">✓</span>
             </div>
             <p class="font-bold text-gray-800 text-right text-lg">{benefit}</p>
         </div>'''
 
-    # 2. تجهيز المكونات (الآن أصبحت متقدمة مع اسم ووصف)
+    # 2. تجهيز المكونات (مع صور بالذكاء الاصطناعي مخصصة للمكونات)
     ingredients_html = ""
     for ing in json_data.get('ingredients', [])[:3]:
         name = ing.get('name', '')
         desc = ing.get('desc', '')
-        # توليد صورة للمكون بناء على اسمه
-        ing_prompt = urllib.parse.quote(f"macro photography of {name}, natural, isolated on white background, highly detailed")
+        # تنظيف الوصف الإنجليزي لتجنب كسر الرابط
+        raw_ing_prompt = ing.get('image_prompt', f"macro photography of {name}, highly detailed")
+        ing_prompt = urllib.parse.quote(str(raw_ing_prompt).replace('\n', ' ').strip())
+        
         ingredients_html += f'''
-        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/20 flex items-center gap-4 text-right">
-            <img src="https://image.pollinations.ai/prompt/{ing_prompt}?width=200&height=200&nologo=true" class="w-20 h-20 rounded-full shadow-lg border-2 border-accent object-cover">
+        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/20 flex items-center gap-5 text-right shadow-lg">
+            <img src="https://image.pollinations.ai/prompt/{ing_prompt}?width=200&height=200&nologo=true" class="w-24 h-24 rounded-full shadow-lg border-2 border-accent object-cover flex-shrink-0 bg-white">
             <div>
-                <h4 class="font-black text-accent text-lg mb-1">{name}</h4>
-                <p class="text-sm font-medium text-gray-100">{desc}</p>
+                <h4 class="font-black text-accent text-xl mb-1">{name}</h4>
+                <p class="text-base font-medium text-gray-100 leading-relaxed">{desc}</p>
             </div>
         </div>'''
 
@@ -251,13 +259,13 @@ def inject_data_into_template(json_data, template_name, colors):
     for rev in json_data.get('reviews', [])[:3]:
         stars = '⭐' * int(rev.get('rating', 5))
         reviews_html += f'''
-        <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200">
+        <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 shadow-sm">
             <div class="flex justify-between items-center mb-3">
-                <span class="font-black text-primary">{rev.get('name')}</span>
+                <span class="font-black text-primary text-lg">{rev.get('name')}</span>
                 <span class="text-accent text-sm">{stars}</span>
             </div>
-            <p class="text-gray-600 font-medium italic">"{rev.get('comment')}"</p>
-            <div class="mt-3 text-xs text-green-600 font-bold flex items-center gap-1">
+            <p class="text-gray-700 font-bold italic leading-relaxed">"{rev.get('comment')}"</p>
+            <div class="mt-4 text-sm text-green-600 font-black flex items-center gap-1">
                 <span>✅</span> مشتري موثق
             </div>
         </div>'''
@@ -266,9 +274,9 @@ def inject_data_into_template(json_data, template_name, colors):
     faq_html = ""
     for faq in json_data.get('faq', [])[:3]:
         faq_html += f'''
-        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-primary">
-            <h4 class="font-black text-gray-900 mb-2 text-lg">❓ {faq.get('q')}</h4>
-            <p class="text-gray-700 text-sm font-bold leading-relaxed">{faq.get('a')}</p>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border-r-4 border-primary">
+            <h4 class="font-black text-gray-900 mb-3 text-lg">❓ {faq.get('q')}</h4>
+            <p class="text-gray-600 text-base font-bold leading-relaxed">{faq.get('a')}</p>
         </div>'''
 
     # جلب القالب
@@ -279,10 +287,14 @@ def inject_data_into_template(json_data, template_name, colors):
     final_html = final_html.replace("{{COLOR_SECONDARY}}", colors['secondary'])
     final_html = final_html.replace("{{COLOR_ACCENT}}", colors['accent'])
 
-    # تجهيز روابط الصور بالذكاء الاصطناعي
-    img_hero = urllib.parse.quote(json_data.get("image_hero_prompt", "beautiful product photography"))
-    img_prob = urllib.parse.quote(json_data.get("image_problem_prompt", "sad person having a problem"))
-    img_sol = urllib.parse.quote(json_data.get("image_solution_prompt", "happy successful person"))
+    # تنظيف وتجهيز روابط الصور بالذكاء الاصطناعي بدقة تامة لتجنب كسر الروابط
+    raw_img_hero = str(json_data.get("image_hero_prompt", "beautiful product photography, highly detailed")).replace('\n', ' ').strip()
+    raw_img_prob = str(json_data.get("image_problem_prompt", "sad person facing a problem, emotional")).replace('\n', ' ').strip()
+    raw_img_sol = str(json_data.get("image_solution_prompt", "happy successful person, bright")).replace('\n', ' ').strip()
+
+    img_hero = urllib.parse.quote(raw_img_hero)
+    img_prob = urllib.parse.quote(raw_img_prob)
+    img_sol = urllib.parse.quote(raw_img_sol)
 
     # الحقن النصي والصوري
     final_html = final_html.replace("{{IMAGE_HERO}}", img_hero)
@@ -364,7 +376,7 @@ if 'final_page' in st.session_state:
     tab1, tab2 = st.tabs(["📱 المعاينة البصرية الحية", "💻 كود HTML للنسخ"])
     
     with tab1:
-        st.info("💡 تم توليد الصور تلقائياً بواسطة الذكاء الاصطناعي بناءً على وصف منتجك! (قد تستغرق الصور ثواني للتحميل في أول مرة)")
+        st.info("💡 تم توليد الصور تلقائياً بواسطة الذكاء الاصطناعي بناءً على وصف منتجك! (قد تستغرق الصور بضع ثواني للتحميل في أول مرة)")
         components.html(st.session_state.final_page, height=1200, scrolling=True)
         
     with tab2:
