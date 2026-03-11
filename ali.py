@@ -5,7 +5,7 @@ import streamlit.components.v1 as components
 import re
 
 # --- إعدادات الصفحة ---
-st.set_page_config(page_title="ALI Engine - Visual Ultimate", layout="wide", page_icon="💎")
+st.set_page_config(page_title="ALI Engine - Infographic Ultimate", layout="wide", page_icon="💎")
 
 st.markdown("""
 <style>
@@ -15,18 +15,17 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-header"><h1>💎 ALI Growth Engine (نظام القوالب البصرية 13-SOP)</h1><p style="color:#94a3b8; margin:0;">صفحات هبوط مدججة بالصور والفيديوهات مصممة للتحويل العالي</p></div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header"><h1>💎 ALI Growth Engine (نظام الإنفوجرافيك البصري)</h1><p style="color:#94a3b8; margin:0;">صفحات هبوط مدججة بالصور، متوافقة مع ألوان منتجك 100%</p></div>', unsafe_allow_html=True)
 
 # ==========================================================
-# 🧱 الخطوة 2: نظام القوالب المتعددة
-# تم إضافة قالب الـ 13 قسم البصري المكثف (Visual Ultimate)
+# 🧱 الخطوة 2: نظام القوالب المتعددة (مع محرك الألوان الديناميكي)
 # ==========================================================
 
 TEMPLATES = {
     # ---------------------------------------------------------
-    # 🌟 القالب البصري الشامل (13 قسم - SOP-1) - الجديد والمستوحى من طلبك
+    # 🌟 القالب البصري الشامل (Infographic Style) - مُدجج بالصور
     # ---------------------------------------------------------
-    "💎 الشامل (13 قسم - بصري مكثف جداً)": """
+    "💎 الشامل (إنفوجرافيك - مدجج بالصور)": """
     <!DOCTYPE html>
     <html lang="ar" dir="rtl">
     <head>
@@ -35,136 +34,142 @@ TEMPLATES = {
         <script src="https://cdn.tailwindcss.com"></script>
         <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
         <style>
-            body { font-family: 'Cairo', sans-serif; background-color: #f3f4f6; scroll-behavior: smooth; }
-            /* محاكاة عرض الموبايل لزيادة التحويل كما في الصور */
-            .mobile-wrapper { max-w-xl; mx-auto; bg-white; shadow-2xl; overflow-hidden; position: relative; }
-            .img-placeholder { display: flex; align-items: center; justify-content: center; font-weight: bold; color: #64748b; background-color: #e2e8f0; text-align: center; }
+            :root {
+                --primary: {{COLOR_PRIMARY}};
+                --secondary: {{COLOR_SECONDARY}};
+                --accent: {{COLOR_ACCENT}};
+            }
+            body { font-family: 'Cairo', sans-serif; background-color: #e5e7eb; scroll-behavior: smooth; }
+            .bg-primary { background-color: var(--primary); }
+            .bg-secondary { background-color: var(--secondary); }
+            .bg-accent { background-color: var(--accent); }
+            .text-primary { color: var(--primary); }
+            .text-accent { color: var(--accent); }
+            .border-primary { border-color: var(--primary); }
+            .border-accent { border-color: var(--accent); }
+            
+            /* إزالة الفراغات لتبدو كصورة إنفوجرافيك واحدة متصلة */
+            section { padding: 0; margin: 0; position: relative; }
+            .content-pad { padding: 2rem 1.5rem; }
         </style>
     </head>
-    <body class="text-gray-800 antialiased pb-24 flex justify-center bg-gray-100">
+    <body class="text-gray-800 antialiased pb-24 flex justify-center">
         
         <div class="w-full max-w-lg bg-white shadow-2xl relative overflow-hidden">
             
             <!-- 1. شريط الثقة العلوي -->
-            <div class="bg-green-700 text-white text-center py-2 text-xs font-bold tracking-wide flex justify-center gap-4">
+            <div class="bg-gray-900 text-white text-center py-2 text-xs font-bold tracking-wide flex justify-center gap-4">
                 <span>🚚 شحن سريع مجاني</span>
                 <span>🔒 دفع آمن 100%</span>
             </div>
 
-            <!-- 2. Hero Section (فيديو/صورة البطل) -->
-            <section class="relative bg-gray-900 text-white text-center">
-                <div class="w-full h-80 img-placeholder bg-gray-800 text-gray-400 flex-col border-b-4 border-yellow-400">
-                    <span class="text-4xl mb-2">📸 / 🎥</span>
-                    <span>[ضع صورة أو فيديو مبهر للمنتج هنا]</span>
-                </div>
-                <div class="p-6 -mt-10 relative z-10 bg-gradient-to-t from-gray-900 to-transparent">
-                    <h1 class="text-3xl font-black text-yellow-400 mb-3 leading-tight">{{HERO_HEADLINE}}</h1>
-                    <p class="text-lg text-gray-200 mb-6 font-medium">{{HERO_SUB}}</p>
-                    <a href="#buy" class="bg-green-600 hover:bg-green-500 text-white font-black py-4 px-8 rounded-full text-xl w-full block shadow-[0_0_15px_rgba(22,163,74,0.6)] animate-pulse">{{CTA_BUTTON}}</a>
+            <!-- 2. Hero Section (صورة كاملة + دمج متدرج) -->
+            <section class="relative w-full">
+                <!-- استبدل الرابط بصورة المنتج الرئيسية -->
+                <img src="https://placehold.co/800x1000/292524/ffffff?text=Main+Hero+Image\n(Product+In+Action)" alt="Hero" class="w-full h-auto object-cover">
+                
+                <!-- تدرج لوني يدمج الصورة مع القسم التالي -->
+                <div class="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[var(--primary)] to-transparent"></div>
+                
+                <div class="absolute bottom-0 left-0 w-full p-6 text-white text-center z-10">
+                    <div class="inline-block bg-accent text-white px-3 py-1 rounded-full text-xs font-black mb-3 border-2 border-white shadow-lg animate-pulse">حصرياً اليوم</div>
+                    <h1 class="text-3xl md:text-4xl font-black mb-2 drop-shadow-md leading-tight">{{HERO_HEADLINE}}</h1>
+                    <p class="text-lg font-bold text-gray-100 drop-shadow mb-4">{{HERO_SUB}}</p>
                 </div>
             </section>
 
-            <!-- 3. Problem Section (GIF المشكلة) -->
-            <section class="py-10 px-6 bg-red-50 text-center border-b border-red-100">
-                <h2 class="text-2xl font-black text-red-600 mb-4">⚠️ {{PROBLEM_TITLE}}</h2>
-                <div class="w-full h-48 img-placeholder rounded-xl mb-4 border-2 border-red-200 border-dashed">
-                    <span>[صورة GIF متحركة توضح ألم العميل]</span>
-                </div>
-                <p class="text-base text-gray-700 font-bold leading-relaxed">{{PROBLEM_DESC}}</p>
+            <!-- 3. Problem Section (ألم العميل) -->
+            <section class="bg-primary text-white text-center pb-8 pt-4 px-4 rounded-b-3xl shadow-md z-20 relative">
+                <h2 class="text-2xl font-black mb-4 text-accent">⚠️ {{PROBLEM_TITLE}}</h2>
+                <!-- استبدل بصورة GIF للمشكلة -->
+                <img src="https://placehold.co/600x400/ef4444/ffffff?text=GIF+Problem\n(Agitation)" class="w-full rounded-2xl border-4 border-white shadow-lg mb-4 object-cover">
+                <p class="text-base font-bold">{{PROBLEM_DESC}}</p>
             </section>
 
-            <!-- 4. Solution Section (GIF الحل) -->
-            <section class="py-10 px-6 bg-green-50 text-center border-b border-green-100">
-                <h2 class="text-2xl font-black text-green-700 mb-4">✨ {{SOLUTION_TITLE}}</h2>
-                <div class="w-full h-48 img-placeholder rounded-xl mb-4 border-2 border-green-200 border-dashed">
-                    <span>[صورة GIF متحركة توضح سحر المنتج]</span>
-                </div>
-                <p class="text-base text-gray-700 font-bold leading-relaxed">{{SOLUTION_DESC}}</p>
-            </section>
-
-            <!-- 5. Unique Mechanism (كيف يعمل؟) -->
-            <section class="py-10 px-6 bg-white text-center">
-                <h2 class="text-2xl font-black text-gray-900 mb-4">⚙️ {{MECHANISM_TITLE}}</h2>
-                <div class="w-full h-40 img-placeholder rounded-xl mb-4 bg-blue-50 text-blue-400">
-                    <span>[صورة إنفوجرافيك تشرح التقنية/الآلية]</span>
-                </div>
-                <p class="text-sm text-gray-600 font-medium">{{MECHANISM_DESC}}</p>
-            </section>
-
-            <!-- 6. Comparison (قبل وبعد) -->
-            <section class="py-10 px-6 bg-gray-50 text-center border-t border-b border-gray-200">
-                <h2 class="text-2xl font-black text-gray-900 mb-6">تحول مذهل تلاحظه فوراً!</h2>
-                <div class="flex gap-2 mb-4">
-                    <div class="w-1/2">
-                        <div class="h-40 img-placeholder rounded-lg bg-gray-300 border-b-4 border-red-500">صورة (قبل)</div>
-                        <p class="mt-2 font-bold text-red-600">قبل الاستخدام</p>
+            <!-- 4. Before & After (مقارنة بصرية قوية) -->
+            <section class="content-pad bg-secondary text-center">
+                <h2 class="text-3xl font-black text-gray-900 mb-6 drop-shadow-sm">تحول مذهل تلاحظه فوراً!</h2>
+                <div class="flex gap-2 mb-2 relative">
+                    <div class="w-1/2 relative">
+                        <img src="https://placehold.co/400x500/d1d5db/475569?text=Before" class="w-full h-48 object-cover rounded-r-2xl border-2 border-red-500">
+                        <div class="absolute bottom-2 right-2 bg-red-600 text-white px-2 py-1 text-xs font-bold rounded">قبل</div>
                     </div>
-                    <div class="w-1/2">
-                        <div class="h-40 img-placeholder rounded-lg bg-gray-300 border-b-4 border-green-500">صورة (بعد)</div>
-                        <p class="mt-2 font-bold text-green-600">بعد الاستخدام</p>
+                    <div class="w-1/2 relative">
+                        <img src="https://placehold.co/400x500/d1d5db/475569?text=After" class="w-full h-48 object-cover rounded-l-2xl border-2 border-green-500">
+                        <div class="absolute bottom-2 left-2 bg-green-600 text-white px-2 py-1 text-xs font-bold rounded">بعد</div>
+                    </div>
+                    <!-- سهم التحول بالمنتصف -->
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-accent text-white w-10 h-10 flex items-center justify-center rounded-full border-4 border-white shadow-lg font-black text-xl z-10">
+                        >
                     </div>
                 </div>
             </section>
 
-            <!-- 7. Ingredients / Features (الخصائص 3 دوائر) -->
-            <section class="py-10 px-6 bg-white text-center">
-                <h2 class="text-2xl font-black text-gray-900 mb-8">مكونات/خصائص فائقة</h2>
-                <div class="flex justify-between gap-4">
+            <!-- 5. Solution & Mechanism (الحل والآلية) -->
+            <section class="content-pad bg-white text-center">
+                <h2 class="text-3xl font-black text-primary mb-4">✨ {{SOLUTION_TITLE}}</h2>
+                <p class="text-lg text-gray-700 font-bold mb-6">{{SOLUTION_DESC}}</p>
+                <!-- استبدل بصورة الإنفوجرافيك للآلية -->
+                <img src="https://placehold.co/800x600/f3f4f6/1e293b?text=Infographic/GIF\n(How+it+works)" class="w-full rounded-2xl shadow-md border border-gray-100 mb-4">
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                    <h3 class="font-black text-gray-800">⚙️ {{MECHANISM_TITLE}}</h3>
+                    <p class="text-sm font-medium text-gray-600">{{MECHANISM_DESC}}</p>
+                </div>
+            </section>
+
+            <!-- 6. Ingredients / Features (خصائص دائرية مثل صورك) -->
+            <section class="bg-primary text-white content-pad text-center">
+                <h2 class="text-2xl font-black text-accent mb-8">مكونات/خصائص فائقة</h2>
+                <div class="flex justify-center gap-4 flex-wrap">
                     {{INGREDIENTS_HTML}}
                 </div>
             </section>
 
-            <!-- 8. Benefits Grid (الفوائد) -->
-            <section class="py-10 px-6 bg-gray-900 text-white">
-                <h2 class="text-2xl font-black text-center text-yellow-400 mb-8">لماذا يعتبر الخيار الأول؟</h2>
+            <!-- 7. Benefits Grid (الفوائد المرئية) -->
+            <section class="content-pad bg-secondary">
+                <h2 class="text-3xl font-black text-center text-gray-900 mb-8">نتائج سريعة ومضمونة</h2>
                 <div class="grid grid-cols-1 gap-4">
                     {{BENEFITS_HTML}}
                 </div>
             </section>
 
-            <!-- 9. Social Proof (ريلز وتجارب) -->
-            <section class="py-10 px-6 bg-white text-center">
-                <h2 class="text-2xl font-black text-gray-900 mb-6">آراء عملائنا (تجارب حقيقية)</h2>
-                <div class="flex gap-3 overflow-x-auto pb-4">
-                    <div class="min-w-[140px] h-64 img-placeholder rounded-xl bg-gray-100 flex-shrink-0">📱 ريلز 1</div>
-                    <div class="min-w-[140px] h-64 img-placeholder rounded-xl bg-gray-100 flex-shrink-0">📱 ريلز 2</div>
-                    <div class="min-w-[140px] h-64 img-placeholder rounded-xl bg-gray-100 flex-shrink-0">📱 ريلز 3</div>
+            <!-- 8. Authority & Proof (خبير وتقييمات) -->
+            <section class="content-pad bg-white border-t-8 border-primary relative overflow-hidden">
+                <!-- صورة خلفية خفيفة للشهادة -->
+                <div class="absolute -right-10 top-0 opacity-10 text-9xl">❞</div>
+                <div class="relative z-10 flex flex-col items-center text-center mb-8">
+                    <img src="https://placehold.co/300x300/e2e8f0/64748b?text=Doctor/Expert\nImage" class="w-28 h-28 object-cover rounded-full border-4 border-primary shadow-lg -mt-16 bg-white mb-4">
+                    <h4 class="font-black text-primary text-xl">ينصح به الخبراء</h4>
+                    <p class="text-base font-bold text-gray-700 italic mt-2">"{{EXPERT_QUOTE}}"</p>
                 </div>
+                
+                <!-- تقييمات العملاء الوهمية (Social Proof) -->
+                <img src="https://placehold.co/800x400/f8fafc/334155?text=Customer+Reviews+Collage\n(Images+of+happy+clients)" class="w-full rounded-2xl shadow-sm border border-gray-200">
             </section>
 
-            <!-- 10. Expert Authority (رأي الخبير) -->
-            <section class="py-10 px-6 bg-blue-50 border-t border-blue-100 relative">
-                <div class="flex items-center gap-4 bg-white p-4 rounded-2xl shadow-md border-r-4 border-blue-600">
-                    <div class="w-20 h-20 rounded-full img-placeholder flex-shrink-0 bg-blue-100 text-blue-500 rounded-full">👨‍⚕️ صورة خبير</div>
-                    <div class="text-right">
-                        <h4 class="font-black text-blue-900 text-lg">ينصح به الخبراء</h4>
-                        <p class="text-sm font-medium text-gray-600 italic">"{{EXPERT_QUOTE}}"</p>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 11. How to Use (خطوات الاستخدام) -->
-            <section class="py-10 px-6 bg-white text-center">
-                <h2 class="text-2xl font-black text-gray-900 mb-8">سهل الاستخدام في 3 خطوات</h2>
-                <div class="space-y-4">
+            <!-- 9. Steps (خطوات الاستخدام) -->
+            <section class="content-pad bg-gray-900 text-white text-center">
+                <h2 class="text-2xl font-black text-accent mb-8">طريقة الاستخدام (بسيطة جداً)</h2>
+                <div class="space-y-4 text-right">
                     {{STEPS_HTML}}
                 </div>
             </section>
 
-            <!-- 12. Risk Reversal (ضمان استرجاع الأموال) -->
-            <section class="bg-gray-900 text-white py-12 px-6 text-center border-t-4 border-yellow-400">
-                <div class="w-32 h-32 mx-auto img-placeholder rounded-full bg-yellow-100 text-yellow-600 mb-4 border-4 border-yellow-400">🛡️ ختم الضمان</div>
-                <h3 class="text-2xl font-black text-yellow-400 mb-3">ضمان استرجاع الأموال 100%</h3>
-                <p class="text-base font-medium leading-relaxed text-gray-300">{{GUARANTEE}}</p>
+            <!-- 10. Risk Reversal (الضمان) -->
+            <section class="content-pad bg-secondary text-center pb-12">
+                <img src="https://placehold.co/400x400/fbbf24/854d0e?text=Guarantee\nBadge" class="w-32 h-32 mx-auto object-cover rounded-full shadow-lg border-4 border-white mb-4">
+                <h3 class="text-2xl font-black text-gray-900 mb-3">ضمان استرجاع الأموال 100%</h3>
+                <p class="text-base font-bold text-gray-700">{{GUARANTEE}}</p>
             </section>
 
-            <!-- 13. Sticky Urgency CTA (الزر العائم) -->
-            <div id="buy" class="fixed bottom-0 left-0 w-full bg-white p-3 shadow-[0_-10px_20px_rgba(0,0,0,0.15)] flex justify-center z-50 border-t-2 border-red-500">
+            <!-- Sticky Urgency CTA (الزر العائم) -->
+            <div id="buy" class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-sm p-3 shadow-[0_-10px_20px_rgba(0,0,0,0.15)] flex justify-center z-50 border-t-2 border-accent">
                 <div class="w-full max-w-lg flex flex-col items-center">
-                    <div class="text-red-600 text-xs font-black mb-1 animate-pulse flex items-center gap-1">
-                        ⏳ العرض ينتهي قريباً! سارع بالطلب
+                    <div class="text-gray-800 text-xs font-black mb-1 flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+                        العرض ينتهي قريباً! الدفع عند الاستلام
                     </div>
-                    <a href="#buy" class="bg-red-600 hover:bg-red-700 text-white font-black py-4 px-4 rounded-xl text-xl w-full text-center shadow-lg transition transform hover:scale-[1.02] flex justify-center items-center gap-2">
+                    <a href="#buy" class="bg-accent hover:opacity-90 text-white font-black py-4 px-4 rounded-xl text-2xl w-full text-center shadow-lg transition transform hover:scale-[1.02] flex justify-center items-center gap-2">
                         🛒 {{CTA_BUTTON}}
                     </a>
                 </div>
@@ -173,67 +178,11 @@ TEMPLATES = {
         </div>
     </body>
     </html>
-    """,
-    
-    # ---------------------------------------------------------
-    # 🌸 القالب الأنيق (للمنتجات النسائية والتجميل)
-    # ---------------------------------------------------------
-    "🌸 الأنيق (كلاسيكي - وردي)": """
-    <!DOCTYPE html>
-    <html lang="ar" dir="rtl">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
-        <style>body { font-family: 'Cairo', sans-serif; background-color: #fff1f2; scroll-behavior: smooth; }</style>
-    </head>
-    <body class="text-gray-800 antialiased relative pb-24">
-        <div class="bg-rose-900 text-rose-50 text-center py-2 text-sm font-semibold tracking-wide shadow-sm">
-            ✨ توصيل مجاني وسريع | 💳 الدفع عند الاستلام 
-        </div>
-        <section class="bg-gradient-to-b from-rose-50 to-white py-20 px-4 rounded-b-[3rem] shadow-sm mb-10">
-            <div class="max-w-3xl mx-auto text-center">
-                <h1 class="text-4xl md:text-5xl font-extrabold text-rose-900 mb-6 leading-tight">{{HERO_HEADLINE}}</h1>
-                <p class="text-xl text-rose-700 mb-10 font-medium">{{HERO_SUB}}</p>
-                <a href="#buy" class="bg-rose-500 hover:bg-rose-600 text-white font-bold py-4 px-12 rounded-full text-xl inline-block shadow-lg shadow-rose-200 transition transform hover:-translate-y-1">{{CTA_BUTTON}}</a>
-            </div>
-        </section>
-        <section class="py-16 px-4 text-center">
-            <div class="max-w-3xl mx-auto bg-white p-10 rounded-[2rem] shadow-xl shadow-rose-100/50">
-                <h2 class="text-3xl font-bold text-gray-800 mb-4">⚠️ {{PROBLEM_TITLE}}</h2>
-                <p class="text-lg text-gray-600 font-medium leading-relaxed">{{PROBLEM_DESC}}</p>
-            </div>
-        </section>
-        <section class="py-16 px-4 text-center">
-            <div class="max-w-3xl mx-auto bg-rose-500 text-white p-10 rounded-[2rem] shadow-xl">
-                <h2 class="text-3xl font-bold mb-4 text-rose-100">✨ {{SOLUTION_TITLE}}</h2>
-                <p class="text-lg font-medium leading-relaxed">{{SOLUTION_DESC}}</p>
-            </div>
-        </section>
-        <section class="py-16 px-4">
-            <div class="max-w-5xl mx-auto text-center">
-                <h2 class="text-3xl font-extrabold text-rose-900 mb-12">لماذا تعشقه عميلاتنا؟</h2>
-                <div class="grid grid-cols-1 gap-4 max-w-2xl mx-auto">{{BENEFITS_HTML}}</div>
-            </div>
-        </section>
-        <section class="bg-rose-100 py-16 px-4 text-center mt-8 rounded-t-[3rem]">
-            <div class="max-w-3xl mx-auto">
-                <div class="text-6xl mb-4">👑</div>
-                <h3 class="text-3xl font-bold text-rose-900 mb-4">ضمان الرضا 100%</h3>
-                <p class="text-lg font-medium text-rose-800 leading-relaxed">{{GUARANTEE}}</p>
-            </div>
-        </section>
-        <div id="buy" class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-md p-4 shadow-[0_-10px_20px_rgba(0,0,0,0.05)] text-center flex justify-center z-50">
-            <a href="#buy" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-4 px-10 rounded-full text-xl w-full max-w-md shadow-lg transition animate-pulse">{{CTA_BUTTON}}</a>
-        </div>
-    </body>
-    </html>
     """
 }
 
 # ==========================================================
-# 🧠 الخطوة 1: المحرك اللفظي (JSON Generator المطور للـ 13 قسم)
+# 🧠 الخطوة 1: المحرك اللفظي
 # ==========================================================
 def get_fast_working_model(api_key):
     if 'valid_model_name' in st.session_state:
@@ -253,12 +202,11 @@ def generate_landing_page_json(api_key, product):
     model_name = get_fast_working_model(api_key)
     model = genai.GenerativeModel(model_name)
     
-    # تحديث البرومت ليغطي الأقسام البصرية الجديدة (مكونات، خطوات، خبير، إلخ)
     prompt = f"""
     أنت أعظم Copywriter تسويقي لصفحات الهبوط البصرية (Infographic Sales Pages).
     المنتج: "{product}".
     
-    المطلوب: توليد نصوص قصيرة، قوية، وخاطفة تناسب التصميم البصري.
+    المطلوب: توليد نصوص قصيرة جداً، قوية، ومناسبة لتصميم مليء بالصور.
     رد حصراً بصيغة JSON صالحة (Valid JSON) بهذا الهيكل الدقيق:
     {{
         "hero_headline": "عنوان رئيسي قصير وصادم (مثال: وداعاً للشعر الزائد)",
@@ -287,51 +235,63 @@ def generate_landing_page_json(api_key, product):
     return clean_text
 
 # ==========================================================
-# 💉 الخطوة 3: محرك الحقن الذكي الشامل (Smart Data Binding)
-# يجهز الـ HTML المعقد (دوائر، خطوات، شبكات) بناءً على القالب
+# 💉 الخطوة 3: محرك الحقن المتقدم (ألوان + نصوص + HTML)
 # ==========================================================
-def inject_data_into_template(json_data, template_name):
-    # 1. تجهيز الفوائد (Benefits)
+def inject_data_into_template(json_data, template_name, colors):
+    # 1. تجهيز الفوائد
     benefits_html = ""
     for benefit in json_data.get('benefits', []):
-        if "الشامل" in template_name:
-            benefits_html += f'<div class="bg-gray-800 p-4 rounded-xl flex items-center gap-4 border border-gray-700"><div class="text-3xl">🎯</div><p class="font-bold text-gray-100 text-right">{benefit}</p></div>'
-        else:
-            benefits_html += f'<div class="bg-white p-6 rounded-3xl shadow-lg border border-rose-50 text-center"><div class="text-4xl mb-4">✨</div><p class="font-bold text-rose-900 text-lg">{benefit}</p></div>'
+        benefits_html += f'''
+        <div class="bg-white p-4 rounded-xl flex items-center gap-4 shadow-sm border border-gray-200">
+            <div class="w-12 h-12 flex-shrink-0 bg-secondary rounded-full flex items-center justify-center">
+                <span class="text-2xl text-primary">✓</span>
+            </div>
+            <p class="font-bold text-gray-800 text-right">{benefit}</p>
+        </div>'''
 
-    # 2. تجهيز المكونات/الخصائص (Ingredients - للنموذج الشامل فقط)
+    # 2. تجهيز المكونات/الخصائص الدائرية (مثل صورة الشامبو)
     ingredients_html = ""
-    ingredients_list = json_data.get('ingredients', ["خاصية رائعة", "آمن تماماً", "جودة عالية"])
+    ingredients_list = json_data.get('ingredients', ["خاصية 1", "خاصية 2", "خاصية 3"])
     for ing in ingredients_list[:3]:
-        ingredients_html += f'<div class="flex flex-col items-center w-1/3"><div class="w-20 h-20 rounded-full img-placeholder mb-2 shadow-inner bg-green-100 text-green-500 border-4 border-white shadow-lg text-2xl">🌿</div><p class="text-xs font-bold text-gray-700">{ing}</p></div>'
+        ingredients_html += f'''
+        <div class="flex flex-col items-center w-[30%]">
+            <img src="https://placehold.co/200x200/ffffff/111827?text=Icon" class="w-20 h-20 rounded-full mb-2 shadow-lg border-4 border-accent object-cover">
+            <p class="text-sm font-black text-center leading-tight">{ing}</p>
+        </div>'''
 
-    # 3. تجهيز الخطوات (Steps - للنموذج الشامل فقط)
+    # 3. تجهيز الخطوات
     steps_html = ""
     steps_list = json_data.get('steps', ["خطوة 1", "خطوة 2", "خطوة 3"])
     for i, step in enumerate(steps_list[:3], 1):
-        steps_html += f'<div class="flex items-center gap-4 bg-gray-50 p-3 rounded-lg border border-gray-200"><div class="w-12 h-12 flex items-center justify-center bg-blue-600 text-white font-black rounded-full flex-shrink-0 text-xl">{i}</div><p class="font-bold text-gray-800 text-right text-sm">{step}</p></div>'
+        steps_html += f'''
+        <div class="flex items-center gap-4 bg-gray-800 p-4 rounded-xl border border-gray-700">
+            <div class="w-10 h-10 flex items-center justify-center bg-accent text-white font-black rounded-full flex-shrink-0 text-xl shadow-lg">{i}</div>
+            <p class="font-bold text-gray-100">{step}</p>
+        </div>'''
 
-    # جلب القالب المناسب
+    # جلب القالب
     final_html = TEMPLATES[template_name]
     
-    # الحقن الأساسي
+    # حقن الألوان (المحرك الديناميكي)
+    final_html = final_html.replace("{{COLOR_PRIMARY}}", colors['primary'])
+    final_html = final_html.replace("{{COLOR_SECONDARY}}", colors['secondary'])
+    final_html = final_html.replace("{{COLOR_ACCENT}}", colors['accent'])
+
+    # الحقن النصي
     final_html = final_html.replace("{{HERO_HEADLINE}}", json_data.get("hero_headline", "اكتشف الحل الأمثل"))
-    final_html = final_html.replace("{{HERO_SUB}}", json_data.get("hero_subheadline", "المنتج الذي سيغير حياتك للأفضل."))
+    final_html = final_html.replace("{{HERO_SUB}}", json_data.get("hero_subheadline", "المنتج الذي سيغير حياتك."))
     final_html = final_html.replace("{{PROBLEM_TITLE}}", json_data.get("problem_title", "هل تعاني من هذه المشكلة؟"))
-    final_html = final_html.replace("{{PROBLEM_DESC}}", json_data.get("problem_description", "الكثير يعانون من نفس المشكلة يومياً..."))
-    final_html = final_html.replace("{{SOLUTION_TITLE}}", json_data.get("solution_title", "الحل النهائي أصبح بين يديك"))
-    final_html = final_html.replace("{{SOLUTION_DESC}}", json_data.get("solution_description", "بفضل تقنيتنا الفريدة، ستحصل على نتائج فورية."))
-    final_html = final_html.replace("{{GUARANTEE}}", json_data.get("guarantee", "نضمن لك استرجاع أموالك بالكامل."))
-    final_html = final_html.replace("{{CTA_BUTTON}}", json_data.get("call_to_action", "اطلب الآن واستفد من العرض"))
+    final_html = final_html.replace("{{PROBLEM_DESC}}", json_data.get("problem_description", "وصف المشكلة..."))
+    final_html = final_html.replace("{{SOLUTION_TITLE}}", json_data.get("solution_title", "الحل النهائي"))
+    final_html = final_html.replace("{{SOLUTION_DESC}}", json_data.get("solution_description", "وصف الحل..."))
+    final_html = final_html.replace("{{GUARANTEE}}", json_data.get("guarantee", "ضمان استرجاع الأموال."))
+    final_html = final_html.replace("{{CTA_BUTTON}}", json_data.get("call_to_action", "اطلب الآن"))
     final_html = final_html.replace("{{BENEFITS_HTML}}", benefits_html)
-    
-    # الحقن الخاص بالقالب الشامل (13 قسم)
-    if "الشامل" in template_name:
-        final_html = final_html.replace("{{MECHANISM_TITLE}}", json_data.get("mechanism_title", "كيف يعمل؟"))
-        final_html = final_html.replace("{{MECHANISM_DESC}}", json_data.get("mechanism_description", "تقنية مبتكرة لحل مشكلتك من الجذور."))
-        final_html = final_html.replace("{{EXPERT_QUOTE}}", json_data.get("expert_quote", "هذا المنتج هو الأفضل في فئته، أنصح به بشدة لكل من يبحث عن الجودة."))
-        final_html = final_html.replace("{{INGREDIENTS_HTML}}", ingredients_html)
-        final_html = final_html.replace("{{STEPS_HTML}}", steps_html)
+    final_html = final_html.replace("{{MECHANISM_TITLE}}", json_data.get("mechanism_title", "كيف يعمل؟"))
+    final_html = final_html.replace("{{MECHANISM_DESC}}", json_data.get("mechanism_description", "تقنية مبتكرة لحل مشكلتك."))
+    final_html = final_html.replace("{{EXPERT_QUOTE}}", json_data.get("expert_quote", "أنصح به بشدة لكل من يبحث عن الجودة."))
+    final_html = final_html.replace("{{INGREDIENTS_HTML}}", ingredients_html)
+    final_html = final_html.replace("{{STEPS_HTML}}", steps_html)
     
     return final_html
 
@@ -339,54 +299,68 @@ def inject_data_into_template(json_data, template_name):
 with st.sidebar:
     st.header("⚙️ إعدادات المحرك")
     api_key = st.text_input("🔑 أدخل API Key", type="password")
-    product_name = st.text_input("📦 اسم/وصف المنتج", placeholder="مثال: جهاز Flawless لإزالة الشعر")
+    product_name = st.text_input("📦 اسم/وصف المنتج", placeholder="مثال: شامبو طبيعي لنمو الشعر")
     
     st.markdown("---")
-    st.subheader("🎨 اختر تصميم الصفحة")
-    # تم وضع القالب البصري الشامل كخيار أول افتراضي
-    selected_template = st.selectbox("القوالب المتاحة:", list(TEMPLATES.keys()))
+    st.subheader("🎨 تخصيص ألوان المنتج")
+    st.write("اختر الألوان لكي تتطابق الصفحة مع هوية منتجك:")
     
-    start_btn = st.button("⚡ توليد الصفحة الجديدة", use_container_width=True)
+    col1, col2 = st.columns(2)
+    with col1:
+        # لون رئيسي (للخلفيات البارزة، مثل الأخضر الغامق للشامبو)
+        color_primary = st.color_picker("اللون الأساسي", "#0f766e")
+    with col2:
+        # لون التنبيهات (للأزرار والعروض، مثل الذهبي أو الأحمر)
+        color_accent = st.color_picker("لون الزر/التنبيه", "#eab308")
+    
+    # لون ثانوي (للخلفيات الفاتحة)
+    color_secondary = st.color_picker("اللون الثانوي (خلفيات خفيفة)", "#f1f5f9")
+    
+    colors_dict = {
+        'primary': color_primary,
+        'secondary': color_secondary,
+        'accent': color_accent
+    }
+    
+    st.markdown("---")
+    selected_template = st.selectbox("القوالب المتاحة:", list(TEMPLATES.keys()))
+    start_btn = st.button("⚡ توليد / تحديث الصفحة", use_container_width=True)
     
     if 'json_data' in st.session_state:
         st.markdown("---")
-        change_theme_btn = st.button("🔄 تغيير التصميم فقط (سريع)", use_container_width=True)
+        change_theme_btn = st.button("🔄 تطبيق الألوان فقط (بدون توليد)", use_container_width=True)
         if change_theme_btn:
-            st.session_state.final_page = inject_data_into_template(st.session_state.json_data, selected_template)
+            st.session_state.final_page = inject_data_into_template(st.session_state.json_data, selected_template, colors_dict)
             st.rerun()
 
 if start_btn:
     if not api_key or not product_name:
         st.error("يرجى إدخال المفتاح واسم المنتج أولاً.")
     else:
-        with st.spinner("1️⃣ جاري توليد المحتوى التسويقي (يستغرق 10-15 ثانية)..."):
+        with st.spinner("1️⃣ جاري استخراج العقول التسويقية..."):
             try:
                 raw_json = generate_landing_page_json(api_key, product_name)
                 parsed_data = json.loads(raw_json)
                 
-                with st.spinner(f"2️⃣ جاري حقن البيانات في قالب [{selected_template}]..."):
-                    st.session_state.final_page = inject_data_into_template(parsed_data, selected_template)
+                with st.spinner("2️⃣ جاري تلوين الصفحة ودمج الصور..."):
+                    st.session_state.final_page = inject_data_into_template(parsed_data, selected_template, colors_dict)
                     st.session_state.json_data = parsed_data
-                    st.session_state.current_template = selected_template
+                    st.session_state.current_colors = colors_dict
                     
-                st.success("🎉 اكتمل بناء الصفحة بنجاح! راجع التبويبات بالأسفل.")
+                st.success("🎉 اكتمل بناء الصفحة الإنفوجرافيك! انظر التبويبات.")
             except json.JSONDecodeError:
-                st.error("⚠️ حدث خطأ في قراءة استجابة الذكاء الاصطناعي. الرجاء المحاولة مرة أخرى.")
+                st.error("⚠️ حدث خطأ في قراءة الاستجابة. المحاولة مرة أخرى ستحلها.")
             except Exception as e:
-                st.error(f"🛑 خطأ في الاتصال: {str(e)}")
+                st.error(f"🛑 خطأ: {str(e)}")
 
 # --- العرض (التبويبات) ---
 if 'final_page' in st.session_state:
-    tab1, tab2, tab3 = st.tabs(["📱 المعاينة البصرية الحية", "💻 كود HTML (جاهز للصور)", "📝 المحتوى (JSON)"])
+    tab1, tab2 = st.tabs(["📱 المعاينة البصرية الحية", "💻 كود HTML (جاهز للصور)"])
     
     with tab1:
-        st.info("💡 لاحظ الصناديق الرمادية المكتوب عليها [ضع صورة...]، هذا هو المكان الذي ستستبدله بصور/GIF منتجك الحقيقي في الكود.")
-        components.html(st.session_state.final_page, height=1000, scrolling=True)
+        st.info("💡 الأماكن الرمادية المكتوب عليها [صورة...] هي الأماكن التي ستضع فيها صور منتجك الحقيقية. الكود مهيأ تماماً كإنفوجرافيك!")
+        components.html(st.session_state.final_page, height=1200, scrolling=True)
         
     with tab2:
-        st.write("انسخ هذا الكود لموقعك، ثم قم بتغيير الروابط (src) داخل وسوم الصور والفيديوهات.")
+        st.write("انسخ هذا الكود، ثم ابحث عن `https://placehold.co/` واستبدلها بروابط صور منتجك.")
         st.code(st.session_state.final_page, language="html")
-        
-    with tab3:
-        st.write("النصوص المستخرجة والتي تغذي الأقسام الـ 13:")
-        st.json(st.session_state.json_data)
