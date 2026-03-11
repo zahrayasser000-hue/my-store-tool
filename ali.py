@@ -1,38 +1,57 @@
 import streamlit as st
 import google.generativeai as genai
 import streamlit.components.v1 as components
+import re
 
-st.set_page_config(page_title="ALI Engine V34 - Location Fix", layout="wide")
+# --- 1. إعدادات الصفحة ---
+st.set_page_config(page_title="ALI Engine V35 - Visual Fix", layout="wide")
 
+def clean_html_for_display(raw_text):
+    """وظيفة حاسمة لتحويل النص إلى صفحة ويب حقيقية"""
+    # إزالة أي نصوص توضيحية قد يضيفها Gemini في البداية
+    clean = re.sub(r'^.*?<!DOCTYPE', '<!DOCTYPE', raw_text, flags=re.DOTALL | re.IGNORECASE)
+    # إزالة علامات الماركداون البرمجية
+    clean = clean.replace("```html", "").replace("```", "").strip()
+    return clean
+
+# --- 2. القائمة الجانبية ---
 with st.sidebar:
-    st.title("⚙️ الإعدادات")
-    api_key = st.text_input("🔑 Gemini API Key", type="password")
-    product_url = st.text_input("🔗 رابط المنتج")
+    st.header("⚙️ الإعدادات")
+    api_key = st.text_input("Gemini API Key", type="password")
+    product_url = st.text_input("رابط المنتج")
+    st.info("💡 تأكد من تشغيل الـ VPN كما فعلت الآن لأن الاتصال نجح!")
 
-st.title("🚀 ALI Growth Engine - Tactical")
-
-if st.button("🔥 بدء التوليد"):
+# --- 3. المحرك ---
+if st.button("🚀 توليد العرض البصري النهائي"):
     if api_key and product_url:
         try:
             genai.configure(api_key=api_key)
             model = genai.GenerativeModel("gemini-1.5-flash")
             
-            with st.spinner("⏳ جاري فحص الاتصال وتوليد البيانات..."):
-                # محاولة توليد بسيطة للتأكد من الموقع الجغرافي
-                test_res = model.generate_content("Generate a short landing page headline")
+            with st.spinner("⏳ جاري تحويل البيانات إلى تصميم احترافي..."):
+                # نطلب منه الالتزام بـ SOP-1 و Tailwind
+                prompt = f"""
+                Create a high-converting Landing Page for: {product_url}
+                Framework: 13 sections (SOP-1).
+                Design: Use Tailwind CSS, Cairo Font, High-end visuals.
+                Important: Return ONLY the raw HTML code.
+                """
+                response = model.generate_content(prompt)
                 
-                # إذا نجح الاختبار، نولد الصفحة الكاملة والبريك ايفنت
-                st.session_state.html_v34 = f"<h1>{test_res.text}</h1><p>تم الاتصال بنجاح! جاري بناء الأقسام الـ 13...</p>"
-                st.success("✅ موقعك مدعوم والمفتاح يعمل!")
-                
+                # تخزين وتنظيف الكود
+                st.session_state.v35_html = clean_html_for_display(response.text)
+                st.success("✅ تم بناء التصميم بنجاح!")
         except Exception as e:
-            if "location is not supported" in str(e).lower():
-                st.error("🛑 خطأ جغرافي: موقعك الحالي غير مدعوم من جوجل API. يرجى تفعيل VPN على دولة (أمريكا/أوروبا) ثم حاول مجدداً.")
-            elif "400" in str(e):
-                st.error("❌ المفتاح غير صحيح.")
-            else:
-                st.error(f"⚠️ خطأ: {e}")
+            st.error(f"خطأ: {e}")
 
-# عرض النتائج في حال النجاح
-if 'html_v34' in st.session_state:
-    components.html(st.session_state.html_v34, height=500)
+# --- 4. العرض (هنا يكمن الحل) ---
+if 'v35_html' in st.session_state:
+    tab1, tab2 = st.tabs(["📱 المعاينة البصرية الاحترافية", "💻 الكود المصدري"])
+    
+    with tab1:
+        st.markdown("### المعاينة المباشرة (Mobile View)")
+        # استخدام iframe بعرض مخصص للموبايل لضمان ظهور الـ 13 قسم بشكل صحيح
+        components.html(st.session_state.v35_html, height=1200, scrolling=True)
+        
+    with tab2:
+        st.code(st.session_state.v35_html, language="html")
