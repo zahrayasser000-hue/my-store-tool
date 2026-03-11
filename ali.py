@@ -2,83 +2,92 @@ import streamlit as st
 import pandas as pd
 import google.generativeai as genai
 import streamlit.components.v1 as components
+from PyPDF2 import PdfReader
+import io
 
-# --- 1. إعدادات الصفحة الفاخرة ---
-st.set_page_config(page_title="ALI Growth Engine V22", layout="wide", page_icon="🧬")
+# --- 1. إعدادات الصفحة ---
+st.set_page_config(page_title="ALI Growth Engine V23", layout="wide")
 
-# --- 2. تهيئة الذاكرة ---
-if 'outputs' not in st.session_state:
-    st.session_state.outputs = {'strat': '', 'html': '', 'scripts': '', 'breakeven': ''}
+# --- 2. دالة استخراج النصوص من PDF ---
+def extract_pdf_text(pdf_file):
+    try:
+        reader = PdfReader(pdf_file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text()
+        return text
+    except Exception as e:
+        return f"خطأ في قراءة ملف PDF: {e}"
 
-# --- 3. الدوال الأساسية لمعالجة الملفات والذكاء الاصطناعي ---
-def generate_all_assets(api_key, url, copy_file, sop_file, matrix_file):
+# --- 3. المحرك الرئيسي ---
+def run_ai_engine(api_key, url, copy_text, sop_text, matrix_df):
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-1.5-flash")
     
-    # [مرحلة تحليل الملفات] - نطلب من الذكاء الاصطناعي قراءة سياق الملفات المرفوعة
-    context_prompt = f"""
-    لقد رفعت لك 3 ملفات أساسية:
-    1. ملف Copywriting Mastery: استخدمه لضبط نبرة الكتابة (PAS, AIDA).
-    2. ملف SoP-1: التزم بالأقسام الـ 13 المذكورة فيه لصفحة الهبوط.
-    3. ملف Matrix Calculator: استخدمه لفهم الجدوى المالية.
-    المنتج المراد تحليله: {url}
+    # بناء الـ Prompt العملاق بناءً على ملفاتك الحقيقية
+    full_prompt = f"""
+    بصفتك خبير تسويق ومبرمج واجهات:
+    1. حلل هذا المنتج: {url}
+    2. استخدم قواعد الكتابة من هذا الملف: {copy_text[:2000]} (اكتفِ بالقواعد الأساسية).
+    3. صمم صفحة هبوط بـ 13 قسم بناءً على هذا الـ SOP: {sop_text[:2000]}.
+    
+    المطلوب فوراً:
+    أ- كود HTML/CSS واحد متكامل (Tailwind CSS) لصفحة هبوط احترافية (Mobile-First).
+    ب- 5 سكريبتات فيديو UGC مع وصف المشاهد (Visual Prompts).
+    ج- تحليل لاستراتيجية البيع.
+    
+    أعطني كود الـ HTML داخل ```html والسكريبتات بالأسفل.
     """
-
-    # 1. الاستراتيجية والسكريبتات
-    full_analysis = model.generate_content(context_prompt + " استخرج الاستراتيجية التسويقية و 5 سكريبتات فيديو UGC مع برومتات بصرية لتوليدها.").text
-    st.session_state.outputs['strat'] = full_analysis
-
-    # 2. صفحة الهبوط (الحل لمشكلة المظهر البدائي)
-    # نستخدم Tailwind CSS بشكل مكثف هنا لضمان مظهر الـ Premium
-    html_prompt = f"""
-    صمم كود HTML/CSS واحد متكامل لصفحة هبوط لمنتج {url}.
-    - استخدم Tailwind CSS (CDN).
-    - الهيكل: 13 قسم بناءً على SoP-1.
-    - لغة الكتابة: احترافية بناءً على Copywriting Mastery.
-    - الألوان: استخرجها من المنتج في الرابط.
-    - أضف Sticky CTA Button وتأثيرات Hover.
-    أعطني الكود فقط داخل وسم ```html.
-    """
-    html_res = model.generate_content(html_prompt).text
-    if "```html" in html_res:
-        st.session_state.outputs['html'] = html_res.split("```html")[1].split("```")[0]
+    
+    response = model.generate_content(full_prompt)
+    return response.text
 
 # --- 4. واجهة المستخدم ---
+st.markdown('<h2 style="text-align:center;">🚀 ALI Growth Engine V23 (Fixed & Final)</h2>', unsafe_allow_html=True)
+
 with st.sidebar:
-    st.header("📂 لوحة التحكم بالبيانات")
-    api_key = st.text_input("🔑 Gemini API Key", type="password")
+    api_key = st.text_input("🔑 API Key", type="password")
     product_url = st.text_input("🔗 رابط المنتج")
-    f_copy = st.file_uploader("📄 ملف Copywriting PDF", type="pdf")
-    f_sop = st.file_uploader("📄 ملف SoP PDF", type="pdf")
-    f_matrix = st.file_uploader("📊 ملف Matrix (CSV/XLSX)", type=["csv", "xlsx"])
-    
-    if st.button("🚀 توليد النظام الكامل"):
-        if api_key and product_url and f_copy and f_sop:
-            generate_all_assets(api_key, product_url, f_copy, f_sop, f_matrix)
-        else: st.error("تأكد من إدخال الرابط ورفع الملفات!")
+    f_copy = st.file_uploader("📄 ملف Copywriting Mastery", type="pdf")
+    f_sop = st.file_uploader("📄 ملف SoP-1", type="pdf")
+    f_matrix = st.file_uploader("📊 ملف Matrix Calculator", type=["csv", "xlsx"])
 
-# --- 5. العرض الرئيسي (Tabs) ---
-st.markdown('<h1 style="text-align:center;">ALI Growth Engine V22</h1>', unsafe_allow_html=True)
+if st.button("🔥 تشغيل المحرك الآن"):
+    if not (api_key and product_url and f_copy and f_sop):
+        st.error("أرجوك ارفع جميع الملفات المطلوبة أولاً!")
+    else:
+        with st.spinner("جاري قراءة ملفاتك وتصميم عالمك التسويقي..."):
+            # استخراج النصوص
+            copy_text = extract_pdf_text(f_copy)
+            sop_text = extract_pdf_text(f_sop)
+            
+            # معالجة المصفوفة المالية
+            if f_matrix:
+                df_matrix = pd.read_csv(f_matrix) if f_matrix.name.endswith('.csv') else pd.read_excel(f_matrix)
+                st.session_state.matrix_data = df_matrix
+            
+            # طلب الذكاء الاصطناعي
+            result = run_ai_engine(api_key, product_url, copy_text, sop_text, f_matrix)
+            
+            # توزيع النتائج
+            if "```html" in result:
+                st.session_state.generated_html = result.split("```html")[1].split("```")[0]
+                st.session_state.generated_scripts = result.split("```")[2] if len(result.split("```")) > 2 else result
+            st.success("تم التوليد بنجاح!")
 
-tab1, tab2, tab3, tab4 = st.tabs(["📱 صفحة الهبوط", "🎯 الاستراتيجية والسكريبتات", "💰 التحليل المالي", "🖼️ برومتات الفيديو"])
+# --- 5. عرض النتائج ---
+t1, t2, t3 = st.tabs(["📱 المعاينة البصرية", "🎬 السكريبتات والبرومتات", "💰 تحليل المصفوفة"])
 
-with tab1:
-    if st.session_state.outputs['html']:
-        st.success("تم توليد الصفحة بناءً على SOP الخاص بك")
-        components.html(st.session_state.outputs['html'], height=900, scrolling=True)
-        st.code(st.session_state.outputs['html'], language="html")
+with t1:
+    if 'generated_html' in st.session_state:
+        components.html(st.session_state.generated_html, height=800, scrolling=True)
+        st.code(st.session_state.generated_html, language="html")
 
-with tab2:
-    st.write(st.session_state.outputs['strat'])
+with t2:
+    if 'generated_scripts' in st.session_state:
+        st.write(st.session_state.generated_scripts)
 
-with tab3:
-    if f_matrix:
-        df = pd.read_csv(f_matrix) if "csv" in f_matrix.name else pd.read_excel(f_matrix)
-        st.write("### مصفوفة الجدوى المالية (Matrix)")
-        st.dataframe(df)
-        st.info("نقطة التعادل يتم تحديدها بناءً على تقاطع تكلفة الليد مع نسبة التسليم في الجدول أعلاه.")
-
-with tab4:
-    st.markdown("### 🎬 برومتات توليد الفيديوهات (AI Video Generation Prompts)")
-    st.write("استخدم هذه الأوامر في أدوات مثل Runway Gen-2 أو Luma Dream Machine:")
-    st.write(st.session_state.outputs['strat']) # الجزء المتعلق بالبرومتات
+with t3:
+    if 'matrix_data' in st.session_state:
+        st.dataframe(st.session_state.matrix_data)
+        st.info("نقطة التعادل محددة بناءً على تقاطع البيانات في جدولك المرفوع.")
