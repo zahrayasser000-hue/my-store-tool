@@ -3,9 +3,10 @@ import google.generativeai as genai
 import json
 import streamlit.components.v1 as components
 import re
+import urllib.parse
 
 # --- إعدادات الصفحة ---
-st.set_page_config(page_title="ALI Engine - Infographic Ultimate", layout="wide", page_icon="💎")
+st.set_page_config(page_title="ALI Engine - AI Visual Ultimate", layout="wide", page_icon="💎")
 
 st.markdown("""
 <style>
@@ -15,17 +16,17 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-header"><h1>💎 ALI Growth Engine (نظام الإنفوجرافيك البصري)</h1><p style="color:#94a3b8; margin:0;">صفحات هبوط مدججة بالصور، متوافقة مع ألوان منتجك 100%</p></div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header"><h1>💎 ALI Growth Engine (نظام الإنفوجرافيك + الذكاء الصوري)</h1><p style="color:#94a3b8; margin:0;">صفحات هبوط مدججة بالصور المولدة تلقائياً، مع آراء العملاء والأسئلة الشائعة</p></div>', unsafe_allow_html=True)
 
 # ==========================================================
-# 🧱 الخطوة 2: نظام القوالب المتعددة (مع محرك الألوان الديناميكي)
+# 🧱 الخطوة 2: نظام القوالب المتعددة
 # ==========================================================
 
 TEMPLATES = {
     # ---------------------------------------------------------
-    # 🌟 القالب البصري الشامل (Infographic Style) - مُدجج بالصور
+    # 🌟 القالب البصري الشامل (Infographic Style) - مطور بالكامل
     # ---------------------------------------------------------
-    "💎 الشامل (إنفوجرافيك - مدجج بالصور)": """
+    "💎 الشامل (إنفوجرافيك - صور تلقائية، مراجعات، و FAQ)": """
     <!DOCTYPE html>
     <html lang="ar" dir="rtl">
     <head>
@@ -48,9 +49,8 @@ TEMPLATES = {
             .border-primary { border-color: var(--primary); }
             .border-accent { border-color: var(--accent); }
             
-            /* إزالة الفراغات لتبدو كصورة إنفوجرافيك واحدة متصلة */
             section { padding: 0; margin: 0; position: relative; }
-            .content-pad { padding: 2rem 1.5rem; }
+            .content-pad { padding: 3rem 1.5rem; }
         </style>
     </head>
     <body class="text-gray-800 antialiased pb-24 flex justify-center">
@@ -63,69 +63,46 @@ TEMPLATES = {
                 <span>🔒 دفع آمن 100%</span>
             </div>
 
-            <!-- 2. Hero Section (صورة كاملة + دمج متدرج) -->
+            <!-- 2. Hero Section -->
             <section class="relative w-full">
-                <!-- استبدل الرابط بصورة المنتج الرئيسية -->
-                <img src="https://placehold.co/800x1000/292524/ffffff?text=Main+Hero+Image\n(Product+In+Action)" alt="Hero" class="w-full h-auto object-cover">
-                
-                <!-- تدرج لوني يدمج الصورة مع القسم التالي -->
-                <div class="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-[var(--primary)] to-transparent"></div>
-                
+                <!-- صورة ذكية مولدة تلقائياً -->
+                <img src="https://image.pollinations.ai/prompt/{{IMAGE_HERO}}?width=800&height=1000&nologo=true" alt="Hero" class="w-full h-[500px] object-cover">
+                <div class="absolute bottom-0 left-0 w-full h-2/3 bg-gradient-to-t from-[var(--primary)] to-transparent"></div>
                 <div class="absolute bottom-0 left-0 w-full p-6 text-white text-center z-10">
-                    <div class="inline-block bg-accent text-white px-3 py-1 rounded-full text-xs font-black mb-3 border-2 border-white shadow-lg animate-pulse">حصرياً اليوم</div>
+                    <div class="inline-block bg-accent text-white px-3 py-1 rounded-full text-xs font-black mb-3 shadow-lg animate-pulse">عرض حصري</div>
                     <h1 class="text-3xl md:text-4xl font-black mb-2 drop-shadow-md leading-tight">{{HERO_HEADLINE}}</h1>
                     <p class="text-lg font-bold text-gray-100 drop-shadow mb-4">{{HERO_SUB}}</p>
                 </div>
             </section>
 
-            <!-- 3. Problem Section (ألم العميل) -->
+            <!-- 3. Problem Section -->
             <section class="bg-primary text-white text-center pb-8 pt-4 px-4 rounded-b-3xl shadow-md z-20 relative">
                 <h2 class="text-2xl font-black mb-4 text-accent">⚠️ {{PROBLEM_TITLE}}</h2>
-                <!-- استبدل بصورة GIF للمشكلة -->
-                <img src="https://placehold.co/600x400/ef4444/ffffff?text=GIF+Problem\n(Agitation)" class="w-full rounded-2xl border-4 border-white shadow-lg mb-4 object-cover">
-                <p class="text-base font-bold">{{PROBLEM_DESC}}</p>
+                <img src="https://image.pollinations.ai/prompt/{{IMAGE_PROBLEM}}?width=600&height=400&nologo=true" class="w-full h-48 object-cover rounded-2xl border-4 border-white shadow-lg mb-4">
+                <p class="text-base font-bold leading-relaxed">{{PROBLEM_DESC}}</p>
             </section>
 
-            <!-- 4. Before & After (مقارنة بصرية قوية) -->
-            <section class="content-pad bg-secondary text-center">
-                <h2 class="text-3xl font-black text-gray-900 mb-6 drop-shadow-sm">تحول مذهل تلاحظه فوراً!</h2>
-                <div class="flex gap-2 mb-2 relative">
-                    <div class="w-1/2 relative">
-                        <img src="https://placehold.co/400x500/d1d5db/475569?text=Before" class="w-full h-48 object-cover rounded-r-2xl border-2 border-red-500">
-                        <div class="absolute bottom-2 right-2 bg-red-600 text-white px-2 py-1 text-xs font-bold rounded">قبل</div>
-                    </div>
-                    <div class="w-1/2 relative">
-                        <img src="https://placehold.co/400x500/d1d5db/475569?text=After" class="w-full h-48 object-cover rounded-l-2xl border-2 border-green-500">
-                        <div class="absolute bottom-2 left-2 bg-green-600 text-white px-2 py-1 text-xs font-bold rounded">بعد</div>
-                    </div>
-                    <!-- سهم التحول بالمنتصف -->
-                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-accent text-white w-10 h-10 flex items-center justify-center rounded-full border-4 border-white shadow-lg font-black text-xl z-10">
-                        >
-                    </div>
-                </div>
-            </section>
-
-            <!-- 5. Solution & Mechanism (الحل والآلية) -->
+            <!-- 4. Solution & Mechanism -->
             <section class="content-pad bg-white text-center">
                 <h2 class="text-3xl font-black text-primary mb-4">✨ {{SOLUTION_TITLE}}</h2>
                 <p class="text-lg text-gray-700 font-bold mb-6">{{SOLUTION_DESC}}</p>
-                <!-- استبدل بصورة الإنفوجرافيك للآلية -->
-                <img src="https://placehold.co/800x600/f3f4f6/1e293b?text=Infographic/GIF\n(How+it+works)" class="w-full rounded-2xl shadow-md border border-gray-100 mb-4">
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                    <h3 class="font-black text-gray-800">⚙️ {{MECHANISM_TITLE}}</h3>
-                    <p class="text-sm font-medium text-gray-600">{{MECHANISM_DESC}}</p>
+                <img src="https://image.pollinations.ai/prompt/{{IMAGE_SOLUTION}}?width=800&height=600&nologo=true" class="w-full h-64 object-cover rounded-2xl shadow-md border border-gray-100 mb-6">
+                
+                <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200 text-right">
+                    <h3 class="font-black text-gray-900 text-xl mb-2">⚙️ {{MECHANISM_TITLE}}</h3>
+                    <p class="text-sm font-bold text-gray-600 leading-relaxed">{{MECHANISM_DESC}}</p>
                 </div>
             </section>
 
-            <!-- 6. Ingredients / Features (خصائص دائرية مثل صورك) -->
+            <!-- 5. Ingredients Section (المكونات الديناميكية) -->
             <section class="bg-primary text-white content-pad text-center">
-                <h2 class="text-2xl font-black text-accent mb-8">مكونات/خصائص فائقة</h2>
-                <div class="flex justify-center gap-4 flex-wrap">
+                <h2 class="text-3xl font-black text-accent mb-8">السر في مكوناتنا</h2>
+                <div class="grid grid-cols-1 gap-4">
                     {{INGREDIENTS_HTML}}
                 </div>
             </section>
 
-            <!-- 7. Benefits Grid (الفوائد المرئية) -->
+            <!-- 6. Benefits Grid (الفوائد المرئية) -->
             <section class="content-pad bg-secondary">
                 <h2 class="text-3xl font-black text-center text-gray-900 mb-8">نتائج سريعة ومضمونة</h2>
                 <div class="grid grid-cols-1 gap-4">
@@ -133,40 +110,33 @@ TEMPLATES = {
                 </div>
             </section>
 
-            <!-- 8. Authority & Proof (خبير وتقييمات) -->
-            <section class="content-pad bg-white border-t-8 border-primary relative overflow-hidden">
-                <!-- صورة خلفية خفيفة للشهادة -->
-                <div class="absolute -right-10 top-0 opacity-10 text-9xl">❞</div>
-                <div class="relative z-10 flex flex-col items-center text-center mb-8">
-                    <img src="https://placehold.co/300x300/e2e8f0/64748b?text=Doctor/Expert\nImage" class="w-28 h-28 object-cover rounded-full border-4 border-primary shadow-lg -mt-16 bg-white mb-4">
-                    <h4 class="font-black text-primary text-xl">ينصح به الخبراء</h4>
-                    <p class="text-base font-bold text-gray-700 italic mt-2">"{{EXPERT_QUOTE}}"</p>
+            <!-- 7. Customer Reviews (آراء العملاء) -->
+            <section class="content-pad bg-white border-t border-gray-100">
+                <h2 class="text-3xl font-black text-center text-primary mb-8">ماذا يقول عملاؤنا؟</h2>
+                <div class="space-y-4">
+                    {{REVIEWS_HTML}}
                 </div>
-                
-                <!-- تقييمات العملاء الوهمية (Social Proof) -->
-                <img src="https://placehold.co/800x400/f8fafc/334155?text=Customer+Reviews+Collage\n(Images+of+happy+clients)" class="w-full rounded-2xl shadow-sm border border-gray-200">
             </section>
 
-            <!-- 9. Steps (خطوات الاستخدام) -->
-            <section class="content-pad bg-gray-900 text-white text-center">
-                <h2 class="text-2xl font-black text-accent mb-8">طريقة الاستخدام (بسيطة جداً)</h2>
+            <!-- 8. FAQ Section (الأسئلة الشائعة) -->
+            <section class="content-pad bg-gray-50 border-t border-gray-200">
+                <h2 class="text-3xl font-black text-center text-gray-900 mb-8">❓ الأسئلة الشائعة</h2>
                 <div class="space-y-4 text-right">
-                    {{STEPS_HTML}}
+                    {{FAQ_HTML}}
                 </div>
             </section>
 
-            <!-- 10. Risk Reversal (الضمان) -->
-            <section class="content-pad bg-secondary text-center pb-12">
-                <img src="https://placehold.co/400x400/fbbf24/854d0e?text=Guarantee\nBadge" class="w-32 h-32 mx-auto object-cover rounded-full shadow-lg border-4 border-white mb-4">
-                <h3 class="text-2xl font-black text-gray-900 mb-3">ضمان استرجاع الأموال 100%</h3>
-                <p class="text-base font-bold text-gray-700">{{GUARANTEE}}</p>
+            <!-- 9. Expert & Risk Reversal -->
+            <section class="content-pad bg-primary text-center pb-16 text-white">
+                <h3 class="text-3xl font-black text-accent mb-4">ضمان ذهبي 100%</h3>
+                <p class="text-lg font-bold text-gray-100 mb-8">{{GUARANTEE}}</p>
             </section>
 
             <!-- Sticky Urgency CTA (الزر العائم) -->
-            <div id="buy" class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-sm p-3 shadow-[0_-10px_20px_rgba(0,0,0,0.15)] flex justify-center z-50 border-t-2 border-accent">
+            <div id="buy" class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-sm p-3 shadow-[0_-10px_20px_rgba(0,0,0,0.15)] flex justify-center z-50 border-t-4 border-accent">
                 <div class="w-full max-w-lg flex flex-col items-center">
-                    <div class="text-gray-800 text-xs font-black mb-1 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+                    <div class="text-gray-800 text-sm font-black mb-2 flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full bg-red-600 animate-ping"></span>
                         العرض ينتهي قريباً! الدفع عند الاستلام
                     </div>
                     <a href="#buy" class="bg-accent hover:opacity-90 text-white font-black py-4 px-4 rounded-xl text-2xl w-full text-center shadow-lg transition transform hover:scale-[1.02] flex justify-center items-center gap-2">
@@ -182,7 +152,7 @@ TEMPLATES = {
 }
 
 # ==========================================================
-# 🧠 الخطوة 1: المحرك اللفظي
+# 🧠 الخطوة 1: المحرك اللفظي المعزز بإنشاء الصور والأقسام الجديدة
 # ==========================================================
 def get_fast_working_model(api_key):
     if 'valid_model_name' in st.session_state:
@@ -203,30 +173,41 @@ def generate_landing_page_json(api_key, product):
     model = genai.GenerativeModel(model_name)
     
     prompt = f"""
-    أنت أعظم Copywriter تسويقي لصفحات الهبوط البصرية (Infographic Sales Pages).
+    أنت أعظم خبير تسويق لصفحات الهبوط (Infographic Sales Pages).
     المنتج: "{product}".
     
-    المطلوب: توليد نصوص قصيرة جداً، قوية، ومناسبة لتصميم مليء بالصور.
+    المطلوب: توليد نصوص قوية ووصف لصور باللغة الإنجليزية لتوليدها بالذكاء الاصطناعي.
     رد حصراً بصيغة JSON صالحة (Valid JSON) بهذا الهيكل الدقيق:
     {{
-        "hero_headline": "عنوان رئيسي قصير وصادم (مثال: وداعاً للشعر الزائد)",
-        "hero_subheadline": "عنوان فرعي يبرز النتيجة النهائية",
-        "problem_title": "عنوان المشكلة (مثال: هل تعانين من الجروح؟)",
-        "problem_description": "وصف المشكلة في سطر واحد",
-        "solution_title": "عنوان الحل المبتكر",
-        "solution_description": "كيف يحل المنتج المشكلة فوراً",
-        "mechanism_title": "عنوان الآلية (كيف يعمل؟)",
-        "mechanism_description": "وصف الآلية العلمية أو التقنية للمنتج باختصار",
-        "ingredients": ["المكون/الخاصية 1", "المكون/الخاصية 2", "المكون/الخاصية 3"],
-        "benefits": ["النتيجة المبهرة الأولى", "النتيجة المبهرة الثانية", "توفير الوقت والمال"],
-        "expert_quote": "اقتباس مقنع جداً على لسان خبير أو طبيب",
-        "steps": ["الخطوة الأولى: جهزي..", "الخطوة الثانية: استخدمي..", "الخطوة الثالثة: استمتعي.."],
-        "guarantee": "نص قصير لضمان استرجاع الأموال",
-        "call_to_action": "نص زر الشراء (مثال: اطلب الآن بخصم 50%)"
+        "hero_headline": "عنوان رئيسي قصير وصادم",
+        "hero_subheadline": "عنوان فرعي يبرز الفائدة",
+        "image_hero_prompt": "English prompt for AI image generator showing the product in a beautiful, elegant, professional studio shot. highly detailed",
+        "problem_title": "عنوان المشكلة",
+        "problem_description": "وصف قصير للمشكلة",
+        "image_problem_prompt": "English prompt for AI image showing a person frustrated with the problem, photography, emotional",
+        "solution_title": "عنوان الحل",
+        "solution_description": "كيف يحل المنتج المشكلة",
+        "image_solution_prompt": "English prompt for AI image showing a happy person with perfect results after using the product",
+        "mechanism_title": "كيف يعمل؟",
+        "mechanism_description": "وصف الآلية باختصار",
+        "ingredients": [
+            {{"name": "اسم المكون 1", "desc": "فائدة هذا المكون"}}
+        ],
+        "benefits": ["النتيجة الأولى", "النتيجة الثانية", "توفير الجهد والمال"],
+        "reviews": [
+            {{"name": "سارة م.", "rating": 5, "comment": "تعليق إيجابي واقعي وقصير"}},
+            {{"name": "أمينة ع.", "rating": 5, "comment": "تعليق يركز على سرعة النتيجة"}}
+        ],
+        "faq": [
+            {{"q": "سؤال شائع 1؟", "a": "إجابة مقنعة."}},
+            {{"q": "سؤال حول الضمان والتوصيل؟", "a": "إجابة تطمئن العميل."}}
+        ],
+        "guarantee": "نص ضمان استرجاع الأموال",
+        "call_to_action": "نص زر الشراء القصير (مثال: اطلب بخصم 50%)"
     }}
     لا تكتب أي حرف خارج الـ JSON.
     """
-    response = model.generate_content(prompt, request_options={"timeout": 20.0})
+    response = model.generate_content(prompt, request_options={"timeout": 30.0})
     tb = chr(96) * 3 
     clean_text = re.sub(f'{tb}(?:json|JSON)?', '', response.text, flags=re.IGNORECASE)
     clean_text = clean_text.replace(tb, '').strip()
@@ -235,49 +216,79 @@ def generate_landing_page_json(api_key, product):
     return clean_text
 
 # ==========================================================
-# 💉 الخطوة 3: محرك الحقن المتقدم (ألوان + نصوص + HTML)
+# 💉 الخطوة 3: محرك الحقن المتقدم (ألوان + نصوص + صور + HTML)
 # ==========================================================
 def inject_data_into_template(json_data, template_name, colors):
     # 1. تجهيز الفوائد
     benefits_html = ""
     for benefit in json_data.get('benefits', []):
         benefits_html += f'''
-        <div class="bg-white p-4 rounded-xl flex items-center gap-4 shadow-sm border border-gray-200">
-            <div class="w-12 h-12 flex-shrink-0 bg-secondary rounded-full flex items-center justify-center">
-                <span class="text-2xl text-primary">✓</span>
+        <div class="bg-white p-5 rounded-2xl flex items-center gap-4 shadow-sm border-r-4 border-accent">
+            <div class="w-10 h-10 flex-shrink-0 bg-green-100 rounded-full flex items-center justify-center">
+                <span class="text-xl text-green-600">✓</span>
             </div>
-            <p class="font-bold text-gray-800 text-right">{benefit}</p>
+            <p class="font-bold text-gray-800 text-right text-lg">{benefit}</p>
         </div>'''
 
-    # 2. تجهيز المكونات/الخصائص الدائرية (مثل صورة الشامبو)
+    # 2. تجهيز المكونات (الآن أصبحت متقدمة مع اسم ووصف)
     ingredients_html = ""
-    ingredients_list = json_data.get('ingredients', ["خاصية 1", "خاصية 2", "خاصية 3"])
-    for ing in ingredients_list[:3]:
+    for ing in json_data.get('ingredients', [])[:3]:
+        name = ing.get('name', '')
+        desc = ing.get('desc', '')
+        # توليد صورة للمكون بناء على اسمه
+        ing_prompt = urllib.parse.quote(f"macro photography of {name}, natural, isolated on white background, highly detailed")
         ingredients_html += f'''
-        <div class="flex flex-col items-center w-[30%]">
-            <img src="https://placehold.co/200x200/ffffff/111827?text=Icon" class="w-20 h-20 rounded-full mb-2 shadow-lg border-4 border-accent object-cover">
-            <p class="text-sm font-black text-center leading-tight">{ing}</p>
+        <div class="bg-white/10 backdrop-blur-sm p-4 rounded-2xl border border-white/20 flex items-center gap-4 text-right">
+            <img src="https://image.pollinations.ai/prompt/{ing_prompt}?width=200&height=200&nologo=true" class="w-20 h-20 rounded-full shadow-lg border-2 border-accent object-cover">
+            <div>
+                <h4 class="font-black text-accent text-lg mb-1">{name}</h4>
+                <p class="text-sm font-medium text-gray-100">{desc}</p>
+            </div>
         </div>'''
 
-    # 3. تجهيز الخطوات
-    steps_html = ""
-    steps_list = json_data.get('steps', ["خطوة 1", "خطوة 2", "خطوة 3"])
-    for i, step in enumerate(steps_list[:3], 1):
-        steps_html += f'''
-        <div class="flex items-center gap-4 bg-gray-800 p-4 rounded-xl border border-gray-700">
-            <div class="w-10 h-10 flex items-center justify-center bg-accent text-white font-black rounded-full flex-shrink-0 text-xl shadow-lg">{i}</div>
-            <p class="font-bold text-gray-100">{step}</p>
+    # 3. تجهيز التقييمات (Reviews)
+    reviews_html = ""
+    for rev in json_data.get('reviews', [])[:3]:
+        stars = '⭐' * int(rev.get('rating', 5))
+        reviews_html += f'''
+        <div class="bg-gray-50 p-5 rounded-2xl border border-gray-200">
+            <div class="flex justify-between items-center mb-3">
+                <span class="font-black text-primary">{rev.get('name')}</span>
+                <span class="text-accent text-sm">{stars}</span>
+            </div>
+            <p class="text-gray-600 font-medium italic">"{rev.get('comment')}"</p>
+            <div class="mt-3 text-xs text-green-600 font-bold flex items-center gap-1">
+                <span>✅</span> مشتري موثق
+            </div>
+        </div>'''
+
+    # 4. تجهيز الأسئلة الشائعة (FAQ)
+    faq_html = ""
+    for faq in json_data.get('faq', [])[:3]:
+        faq_html += f'''
+        <div class="bg-white p-5 rounded-2xl shadow-sm border-l-4 border-primary">
+            <h4 class="font-black text-gray-900 mb-2 text-lg">❓ {faq.get('q')}</h4>
+            <p class="text-gray-700 text-sm font-bold leading-relaxed">{faq.get('a')}</p>
         </div>'''
 
     # جلب القالب
     final_html = TEMPLATES[template_name]
     
-    # حقن الألوان (المحرك الديناميكي)
+    # حقن الألوان
     final_html = final_html.replace("{{COLOR_PRIMARY}}", colors['primary'])
     final_html = final_html.replace("{{COLOR_SECONDARY}}", colors['secondary'])
     final_html = final_html.replace("{{COLOR_ACCENT}}", colors['accent'])
 
-    # الحقن النصي
+    # تجهيز روابط الصور بالذكاء الاصطناعي
+    img_hero = urllib.parse.quote(json_data.get("image_hero_prompt", "beautiful product photography"))
+    img_prob = urllib.parse.quote(json_data.get("image_problem_prompt", "sad person having a problem"))
+    img_sol = urllib.parse.quote(json_data.get("image_solution_prompt", "happy successful person"))
+
+    # الحقن النصي والصوري
+    final_html = final_html.replace("{{IMAGE_HERO}}", img_hero)
+    final_html = final_html.replace("{{IMAGE_PROBLEM}}", img_prob)
+    final_html = final_html.replace("{{IMAGE_SOLUTION}}", img_sol)
+    
     final_html = final_html.replace("{{HERO_HEADLINE}}", json_data.get("hero_headline", "اكتشف الحل الأمثل"))
     final_html = final_html.replace("{{HERO_SUB}}", json_data.get("hero_subheadline", "المنتج الذي سيغير حياتك."))
     final_html = final_html.replace("{{PROBLEM_TITLE}}", json_data.get("problem_title", "هل تعاني من هذه المشكلة؟"))
@@ -289,9 +300,10 @@ def inject_data_into_template(json_data, template_name, colors):
     final_html = final_html.replace("{{BENEFITS_HTML}}", benefits_html)
     final_html = final_html.replace("{{MECHANISM_TITLE}}", json_data.get("mechanism_title", "كيف يعمل؟"))
     final_html = final_html.replace("{{MECHANISM_DESC}}", json_data.get("mechanism_description", "تقنية مبتكرة لحل مشكلتك."))
-    final_html = final_html.replace("{{EXPERT_QUOTE}}", json_data.get("expert_quote", "أنصح به بشدة لكل من يبحث عن الجودة."))
+    
     final_html = final_html.replace("{{INGREDIENTS_HTML}}", ingredients_html)
-    final_html = final_html.replace("{{STEPS_HTML}}", steps_html)
+    final_html = final_html.replace("{{REVIEWS_HTML}}", reviews_html)
+    final_html = final_html.replace("{{FAQ_HTML}}", faq_html)
     
     return final_html
 
@@ -303,18 +315,12 @@ with st.sidebar:
     
     st.markdown("---")
     st.subheader("🎨 تخصيص ألوان المنتج")
-    st.write("اختر الألوان لكي تتطابق الصفحة مع هوية منتجك:")
-    
     col1, col2 = st.columns(2)
     with col1:
-        # لون رئيسي (للخلفيات البارزة، مثل الأخضر الغامق للشامبو)
         color_primary = st.color_picker("اللون الأساسي", "#0f766e")
     with col2:
-        # لون التنبيهات (للأزرار والعروض، مثل الذهبي أو الأحمر)
         color_accent = st.color_picker("لون الزر/التنبيه", "#eab308")
-    
-    # لون ثانوي (للخلفيات الفاتحة)
-    color_secondary = st.color_picker("اللون الثانوي (خلفيات خفيفة)", "#f1f5f9")
+    color_secondary = st.color_picker("اللون الثانوي (خلفيات)", "#f8fafc")
     
     colors_dict = {
         'primary': color_primary,
@@ -324,11 +330,11 @@ with st.sidebar:
     
     st.markdown("---")
     selected_template = st.selectbox("القوالب المتاحة:", list(TEMPLATES.keys()))
-    start_btn = st.button("⚡ توليد / تحديث الصفحة", use_container_width=True)
+    start_btn = st.button("⚡ توليد الصفحة الذكية", use_container_width=True)
     
     if 'json_data' in st.session_state:
         st.markdown("---")
-        change_theme_btn = st.button("🔄 تطبيق الألوان فقط (بدون توليد)", use_container_width=True)
+        change_theme_btn = st.button("🔄 تحديث الألوان/التصميم فقط", use_container_width=True)
         if change_theme_btn:
             st.session_state.final_page = inject_data_into_template(st.session_state.json_data, selected_template, colors_dict)
             st.rerun()
@@ -337,17 +343,17 @@ if start_btn:
     if not api_key or not product_name:
         st.error("يرجى إدخال المفتاح واسم المنتج أولاً.")
     else:
-        with st.spinner("1️⃣ جاري استخراج العقول التسويقية..."):
+        with st.spinner("1️⃣ جاري هندسة المحتوى وكتابة أوامر الصور (يستغرق 15 ثانية)..."):
             try:
                 raw_json = generate_landing_page_json(api_key, product_name)
                 parsed_data = json.loads(raw_json)
                 
-                with st.spinner("2️⃣ جاري تلوين الصفحة ودمج الصور..."):
+                with st.spinner("2️⃣ جاري تجميع الصفحة وتوليد الصور تلقائياً..."):
                     st.session_state.final_page = inject_data_into_template(parsed_data, selected_template, colors_dict)
                     st.session_state.json_data = parsed_data
                     st.session_state.current_colors = colors_dict
                     
-                st.success("🎉 اكتمل بناء الصفحة الإنفوجرافيك! انظر التبويبات.")
+                st.success("🎉 اكتمل بناء صفحة الإنفوجرافيك الخارقة! انظر التبويبات.")
             except json.JSONDecodeError:
                 st.error("⚠️ حدث خطأ في قراءة الاستجابة. المحاولة مرة أخرى ستحلها.")
             except Exception as e:
@@ -355,12 +361,12 @@ if start_btn:
 
 # --- العرض (التبويبات) ---
 if 'final_page' in st.session_state:
-    tab1, tab2 = st.tabs(["📱 المعاينة البصرية الحية", "💻 كود HTML (جاهز للصور)"])
+    tab1, tab2 = st.tabs(["📱 المعاينة البصرية الحية", "💻 كود HTML للنسخ"])
     
     with tab1:
-        st.info("💡 الأماكن الرمادية المكتوب عليها [صورة...] هي الأماكن التي ستضع فيها صور منتجك الحقيقية. الكود مهيأ تماماً كإنفوجرافيك!")
+        st.info("💡 تم توليد الصور تلقائياً بواسطة الذكاء الاصطناعي بناءً على وصف منتجك! (قد تستغرق الصور ثواني للتحميل في أول مرة)")
         components.html(st.session_state.final_page, height=1200, scrolling=True)
         
     with tab2:
-        st.write("انسخ هذا الكود، ثم ابحث عن `https://placehold.co/` واستبدلها بروابط صور منتجك.")
+        st.write("انسخ هذا الكود بالكامل، ستجد أن روابط الصور قد تم توليدها برمجياً بالفعل.")
         st.code(st.session_state.final_page, language="html")
