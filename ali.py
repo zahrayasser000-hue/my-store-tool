@@ -2,92 +2,93 @@ import streamlit as st
 import pandas as pd
 import google.generativeai as genai
 import streamlit.components.v1 as components
-from PyPDF2 import PdfReader
-import io
 
-# --- 1. إعدادات الصفحة ---
-st.set_page_config(page_title="ALI Growth Engine V23", layout="wide")
+# --- إعدادات الواجهة ---
+st.set_page_config(page_title="ALI Growth Engine V25", layout="wide")
 
-# --- 2. دالة استخراج النصوص من PDF ---
-def extract_pdf_text(pdf_file):
-    try:
-        reader = PdfReader(pdf_file)
-        text = ""
-        for page in reader.pages:
-            text += page.extract_text()
-        return text
-    except Exception as e:
-        return f"خطأ في قراءة ملف PDF: {e}"
+# --- برومتات صارمة (مستوحاة من ملفاتك) ---
+COPYWRITING_RULES = """
+- استخدم إطار PAS (Problem, Agitation, Solution).
+- ركز على الفوائد (Benefits) وليس الميزات (Features) بناءً على FAB.
+- لغة عربية فصحى بيضاء، عناوين قصيرة وصادمة.
+- كسر الاعتراضات قبل ظهورها.
+"""
 
-# --- 3. المحرك الرئيسي ---
-def run_ai_engine(api_key, url, copy_text, sop_text, matrix_df):
+SOP_13_SECTIONS = """
+1. Hero (Video/Image + Hook + CTA)
+2. Trust Bar (Iconic Trust)
+3. Problem (Pain Agitation)
+4. Solution (The Savior)
+5. Unique Mechanism (Agora Style)
+6. Benefits Grid (4 Items)
+7. Comparison (Us vs Them)
+8. Ingredients/Features
+9. Social Proof (UGC Style)
+10. Expert Authority
+11. How to use (3 Steps)
+12. Risk Reversal (Guarantee)
+13. Sticky Footer CTA
+"""
+
+# --- دالة التوليد ---
+def generate_mega_content(api_key, url, p_price, p_cost, ads_cost):
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-1.5-flash")
     
-    # بناء الـ Prompt العملاق بناءً على ملفاتك الحقيقية
-    full_prompt = f"""
-    بصفتك خبير تسويق ومبرمج واجهات:
-    1. حلل هذا المنتج: {url}
-    2. استخدم قواعد الكتابة من هذا الملف: {copy_text[:2000]} (اكتفِ بالقواعد الأساسية).
-    3. صمم صفحة هبوط بـ 13 قسم بناءً على هذا الـ SOP: {sop_text[:2000]}.
+    prompt = f"""
+    أنت خبير تسويق استراتيجي. المنتج هو: {url}
+    قواعد الكتابة الصارمة: {COPYWRITING_RULES}
+    هيكل الصفحة الإلزامي (13 قسم): {SOP_13_SECTIONS}
     
-    المطلوب فوراً:
-    أ- كود HTML/CSS واحد متكامل (Tailwind CSS) لصفحة هبوط احترافية (Mobile-First).
-    ب- 5 سكريبتات فيديو UGC مع وصف المشاهد (Visual Prompts).
-    ج- تحليل لاستراتيجية البيع.
-    
-    أعطني كود الـ HTML داخل ```html والسكريبتات بالأسفل.
+    المطلوب:
+    1. كود HTML/CSS (Tailwind) احترافي جداً (Mobile-First).
+    2. 5 سكريبتات فيديو UGC وبرومتات بصرية.
+    3. تحليل الاستراتيجية.
+    أعطني الكود داخل ```html.
     """
-    
-    response = model.generate_content(full_prompt)
-    return response.text
+    return model.generate_content(prompt).text
 
-# --- 4. واجهة المستخدم ---
-st.markdown('<h2 style="text-align:center;">🚀 ALI Growth Engine V23 (Fixed & Final)</h2>', unsafe_allow_html=True)
+# --- الواجهة الرئيسية ---
+st.title("🚀 ALI Growth Engine V25: The Hard-Coded Beast")
 
 with st.sidebar:
-    api_key = st.text_input("🔑 API Key", type="password")
-    product_url = st.text_input("🔗 رابط المنتج")
-    f_copy = st.file_uploader("📄 ملف Copywriting Mastery", type="pdf")
-    f_sop = st.file_uploader("📄 ملف SoP-1", type="pdf")
-    f_matrix = st.file_uploader("📊 ملف Matrix Calculator", type=["csv", "xlsx"])
+    api_key = st.text_input("Gemini API Key", type="password")
+    product_url = st.text_input("رابط المنتج")
+    st.divider()
+    st.header("💰 الحسابات المالية")
+    selling_price = st.number_input("ثمن البيع (Price)", value=250.0)
+    product_cost = st.number_input("تكلفة المنتج (COGS)", value=50.0)
+    shipping_cost = st.number_input("تكلفة الشحن (Shipping)", value=30.0)
+    cpl = st.number_input("تكلفة الليد (CPL)", value=15.0)
+    conf_rate = st.slider("نسبة التأكيد المتوقعة (%)", 0, 100, 80) / 100
 
-if st.button("🔥 تشغيل المحرك الآن"):
-    if not (api_key and product_url and f_copy and f_sop):
-        st.error("أرجوك ارفع جميع الملفات المطلوبة أولاً!")
-    else:
-        with st.spinner("جاري قراءة ملفاتك وتصميم عالمك التسويقي..."):
-            # استخراج النصوص
-            copy_text = extract_pdf_text(f_copy)
-            sop_text = extract_pdf_text(f_sop)
+if st.button("🔥 توليد الإمبراطورية التسويقية"):
+    if api_key and product_url:
+        with st.spinner("جاري التوليد..."):
+            # حساب البريك ايفنت
+            total_fixed_cost = product_cost + shipping_cost + (cpl / conf_rate)
+            be_delivery = (total_fixed_cost / selling_price) * 100
+            st.session_state.be_result = round(be_delivery, 2)
             
-            # معالجة المصفوفة المالية
-            if f_matrix:
-                df_matrix = pd.read_csv(f_matrix) if f_matrix.name.endswith('.csv') else pd.read_excel(f_matrix)
-                st.session_state.matrix_data = df_matrix
-            
-            # طلب الذكاء الاصطناعي
-            result = run_ai_engine(api_key, product_url, copy_text, sop_text, f_matrix)
-            
-            # توزيع النتائج
-            if "```html" in result:
-                st.session_state.generated_html = result.split("```html")[1].split("```")[0]
-                st.session_state.generated_scripts = result.split("```")[2] if len(result.split("```")) > 2 else result
-            st.success("تم التوليد بنجاح!")
+            # توليد المحتوى
+            res = generate_mega_content(api_key, product_url, selling_price, product_cost, cpl)
+            if "```html" in res:
+                st.session_state.v25_html = res.split("```html")[1].split("```")[0]
+                st.session_state.v25_strat = res.split("```")[2] if len(res.split("```")) > 2 else res
+            st.success("تم بنجاح!")
 
-# --- 5. عرض النتائج ---
-t1, t2, t3 = st.tabs(["📱 المعاينة البصرية", "🎬 السكريبتات والبرومتات", "💰 تحليل المصفوفة"])
+# --- العرض ---
+t1, t2, t3 = st.tabs(["📱 صفحة الهبوط", "🎬 الاستراتيجية والسكريبتات", "📊 التحليل المالي"])
 
 with t1:
-    if 'generated_html' in st.session_state:
-        components.html(st.session_state.generated_html, height=800, scrolling=True)
-        st.code(st.session_state.generated_html, language="html")
+    if 'v25_html' in st.session_state:
+        components.html(st.session_state.v25_html, height=900, scrolling=True)
 
 with t2:
-    if 'generated_scripts' in st.session_state:
-        st.write(st.session_state.generated_scripts)
+    if 'v25_strat' in st.session_state:
+        st.write(st.session_state.v25_strat)
 
 with t3:
-    if 'matrix_data' in st.session_state:
-        st.dataframe(st.session_state.matrix_data)
-        st.info("نقطة التعادل محددة بناءً على تقاطع البيانات في جدولك المرفوع.")
+    if 'be_result' in st.session_state:
+        st.metric("نقطة التعادل (Delivery Rate Required)", f"{st.session_state.be_result}%")
+        st.write(f"لتحقيق الربح، يجب أن تكون نسبة التسليم لديك أعلى من **{st.session_state.be_result}%**.")
