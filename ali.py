@@ -3,92 +3,92 @@ import pandas as pd
 import google.generativeai as genai
 import streamlit.components.v1 as components
 
-# --- إعدادات الواجهة ---
-st.set_page_config(page_title="ALI Growth Engine V25", layout="wide")
+# --- 1. إعدادات الصفحة ---
+st.set_page_config(page_title="ALI Growth Engine V26", layout="wide")
 
-# --- برومتات صارمة (مستوحاة من ملفاتك) ---
-COPYWRITING_RULES = """
-- استخدم إطار PAS (Problem, Agitation, Solution).
-- ركز على الفوائد (Benefits) وليس الميزات (Features) بناءً على FAB.
-- لغة عربية فصحى بيضاء، عناوين قصيرة وصادمة.
-- كسر الاعتراضات قبل ظهورها.
+# --- 2. الثوابت الصارمة (من ملفاتك) ---
+SOP_STRUCTURE = """
+1. Hero: Title + Subtitle + Product Image + Primary CTA
+2. Trust Bar: 4 Icons (Free Shipping, Original, Safe Pay, Fast Delivery)
+3. Problem: Pain point agitation based on PAS.
+4. Solution: Introducing the product as the hero.
+5. Unique Mechanism: Why this product is different (Agora style).
+6. Benefits Grid: 4 Cards with icons.
+7. Social Proof: Testimonials/Stars.
+8. Risk Reversal: 100% Money back guarantee badge.
+9. Sticky CTA: Button at the bottom for mobile.
 """
 
-SOP_13_SECTIONS = """
-1. Hero (Video/Image + Hook + CTA)
-2. Trust Bar (Iconic Trust)
-3. Problem (Pain Agitation)
-4. Solution (The Savior)
-5. Unique Mechanism (Agora Style)
-6. Benefits Grid (4 Items)
-7. Comparison (Us vs Them)
-8. Ingredients/Features
-9. Social Proof (UGC Style)
-10. Expert Authority
-11. How to use (3 Steps)
-12. Risk Reversal (Guarantee)
-13. Sticky Footer CTA
-"""
+# --- 3. محرك الحسابات المالية (Break-even Engine) ---
+def calculate_break_even(price, cost, shipping, cpl, conf_rate):
+    # المعادلة المستخرجة من ملف Matrix الخاص بك
+    # الربح = (سعر البيع * نسبة التأكيد * نسبة التسليم) - التكاليف
+    # عند البريك ايفنت يكون الربح = 0
+    if price * conf_rate == 0: return 0
+    needed_delivery = ((cost + shipping + (cpl/conf_rate)) / price) * 100
+    return round(needed_delivery, 2)
 
-# --- دالة التوليد ---
-def generate_mega_content(api_key, url, p_price, p_cost, ads_cost):
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel("gemini-1.5-flash")
-    
-    prompt = f"""
-    أنت خبير تسويق استراتيجي. المنتج هو: {url}
-    قواعد الكتابة الصارمة: {COPYWRITING_RULES}
-    هيكل الصفحة الإلزامي (13 قسم): {SOP_13_SECTIONS}
-    
-    المطلوب:
-    1. كود HTML/CSS (Tailwind) احترافي جداً (Mobile-First).
-    2. 5 سكريبتات فيديو UGC وبرومتات بصرية.
-    3. تحليل الاستراتيجية.
-    أعطني الكود داخل ```html.
-    """
-    return model.generate_content(prompt).text
-
-# --- الواجهة الرئيسية ---
-st.title("🚀 ALI Growth Engine V25: The Hard-Coded Beast")
-
+# --- 4. الواجهة الجانبية ---
 with st.sidebar:
+    st.header("🔑 التحكم المركزي")
     api_key = st.text_input("Gemini API Key", type="password")
-    product_url = st.text_input("رابط المنتج")
+    product_url = st.text_input("🔗 رابط المنتج")
+    
     st.divider()
-    st.header("💰 الحسابات المالية")
-    selling_price = st.number_input("ثمن البيع (Price)", value=250.0)
-    product_cost = st.number_input("تكلفة المنتج (COGS)", value=50.0)
-    shipping_cost = st.number_input("تكلفة الشحن (Shipping)", value=30.0)
-    cpl = st.number_input("تكلفة الليد (CPL)", value=15.0)
-    conf_rate = st.slider("نسبة التأكيد المتوقعة (%)", 0, 100, 80) / 100
+    st.header("💰 المعطيات المالية (Matrix)")
+    p_price = st.number_input("سعر البيع (SAR)", value=250.0)
+    p_cost = st.number_input("تكلفة المنتج (SAR)", value=50.0)
+    p_shipping = st.number_input("الشحن والتغليف (SAR)", value=35.0)
+    p_cpl = st.number_input("تكلفة الليد CPL (SAR)", value=15.0)
+    p_conf = st.slider("نسبة التأكيد %", 0, 100, 80) / 100
 
-if st.button("🔥 توليد الإمبراطورية التسويقية"):
-    if api_key and product_url:
-        with st.spinner("جاري التوليد..."):
-            # حساب البريك ايفنت
-            total_fixed_cost = product_cost + shipping_cost + (cpl / conf_rate)
-            be_delivery = (total_fixed_cost / selling_price) * 100
-            st.session_state.be_result = round(be_delivery, 2)
+# --- 5. العرض الرئيسي ---
+st.markdown("<h1 style='text-align:center;'>🚀 ALI Growth Engine V26</h1>", unsafe_allow_html=True)
+
+if st.button("🔥 توليد الإمبراطورية التسويقية الآن"):
+    if not api_key or not product_url:
+        st.error("أدخل المفتاح والرابط أولاً!")
+    else:
+        with st.spinner("جاري تصميم الصفحة والسكريبتات بناءً على SOP-1..."):
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel("gemini-1.5-flash")
             
-            # توليد المحتوى
-            res = generate_mega_content(api_key, product_url, selling_price, product_cost, cpl)
-            if "```html" in res:
-                st.session_state.v25_html = res.split("```html")[1].split("```")[0]
-                st.session_state.v25_strat = res.split("```")[2] if len(res.split("```")) > 2 else res
-            st.success("تم بنجاح!")
+            # برومت صارم جداً لضمان الحصول على كود فقط
+            prompt = f"""
+            Task: Create a High-Converting Landing Page for: {product_url}
+            Framework: Use PAS and FAB from Copywriting Mastery.
+            Structure: Build 13 sections exactly following this SOP: {SOP_STRUCTURE}
+            Technical: Use Tailwind CSS, Mobile-First (480px width max), Cairo Font.
+            Output: You MUST return ONLY the HTML code starting with <!DOCTYPE html> and ending with </html>. No conversational text.
+            """
+            
+            response = model.generate_content(prompt)
+            st.session_state.final_html = response.text
+            
+            # توليد السكريبتات
+            script_prompt = f"اكتب 5 سكريبتات فيديو UGC وبرومتات بصرية لمنتج {product_url} بناءً على استراتيجية Agora."
+            st.session_state.final_scripts = model.generate_content(script_prompt).text
+            
+            # حساب البريك ايفنت
+            st.session_state.be_rate = calculate_break_even(p_price, p_cost, p_shipping, p_cpl, p_conf)
 
-# --- العرض ---
-t1, t2, t3 = st.tabs(["📱 صفحة الهبوط", "🎬 الاستراتيجية والسكريبتات", "📊 التحليل المالي"])
+# --- 6. عرض النتائج الفوري ---
+t1, t2, t3 = st.tabs(["📱 معاينة صفحة الهبوط", "🎬 سكريبتات الفيديو", "📊 تحليل البريك ايفنت"])
 
 with t1:
-    if 'v25_html' in st.session_state:
-        components.html(st.session_state.v25_html, height=900, scrolling=True)
+    if 'final_html' in st.session_state:
+        # تنظيف الكود من أي زوائد قد يضيفها الموديل
+        clean_html = st.session_state.final_html.replace("```html", "").replace("```", "")
+        components.html(clean_html, height=800, scrolling=True)
+        st.code(clean_html, language="html")
 
 with t2:
-    if 'v25_strat' in st.session_state:
-        st.write(st.session_state.v25_strat)
+    if 'final_scripts' in st.session_state:
+        st.markdown(f"```text\n{st.session_state.final_scripts}\n```")
 
 with t3:
-    if 'be_result' in st.session_state:
-        st.metric("نقطة التعادل (Delivery Rate Required)", f"{st.session_state.be_result}%")
-        st.write(f"لتحقيق الربح، يجب أن تكون نسبة التسليم لديك أعلى من **{st.session_state.be_result}%**.")
+    if 'be_rate' in st.session_state:
+        st.header("📊 مصفوفة نقطة التعادل")
+        col1, col2 = st.columns(2)
+        col1.metric("نسبة التسليم المطلوبة (BEP)", f"{st.session_state.be_rate}%")
+        col2.info(f"إذا كانت نسبة تسليم طلبياتك في الدولة المستهدفة أقل من {st.session_state.be_rate}% فأنت تخسر مالاً.")
