@@ -2,92 +2,83 @@ import streamlit as st
 import pandas as pd
 import google.generativeai as genai
 import streamlit.components.v1 as components
-import io
 
-# --- 1. إعدادات الصفحة ---
-st.set_page_config(page_title="ALI Growth Engine V21 - Enterprise", layout="wide", page_icon="🧬")
+# --- 1. إعدادات الصفحة الفاخرة ---
+st.set_page_config(page_title="ALI Growth Engine V22", layout="wide", page_icon="🧬")
 
-# --- 2. التصميم CSS ---
-st.markdown("""
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
-html, body, [data-testid="stAppViewContainer"] { font-family: 'Cairo', sans-serif !important; direction: rtl; text-align: right; }
-.main-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 40px; border-radius: 25px; text-align: center; margin-bottom: 30px; border: 1px solid #334155; }
-.metric-card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border-top: 5px solid #3b82f6; }
-</style>
-""", unsafe_allow_html=True)
+# --- 2. تهيئة الذاكرة ---
+if 'outputs' not in st.session_state:
+    st.session_state.outputs = {'strat': '', 'html': '', 'scripts': '', 'breakeven': ''}
 
-# --- 3. تهيئة الحالة ---
-if 'data_engine' not in st.session_state:
-    st.session_state.update({'strategy': '', 'html': '', 'scripts': '', 'breakeven': '', 'prompts': ''})
-
-# --- 4. المحرك الذكي ---
-def process_with_knowledge(api_key, url, copywriting_file, sop_file, excel_file):
+# --- 3. الدوال الأساسية لمعالجة الملفات والذكاء الاصطناعي ---
+def generate_all_assets(api_key, url, copy_file, sop_file, matrix_file):
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-1.5-flash")
     
-    # تحويل الملفات لنصوص (محاكاة القراءة)
-    sop_content = "تحليل الأقسام الـ 13 بناءً على ملف SoP-1.pdf المرفق"
-    copy_content = "أسلوب الكتابة المعتمد بناءً على ملف Copywriting Mastery"
-    
-    # 1. توليد الاستراتيجية (Agora Style)
-    strat_prompt = f"حلل المنتج في الرابط {url} بناءً على قواعد الكتابة في {copy_content}. استخرج الآلية الفريدة والحجة التي لا تقهر."
-    st.session_state.strategy = model.generate_content(strat_prompt).text
+    # [مرحلة تحليل الملفات] - نطلب من الذكاء الاصطناعي قراءة سياق الملفات المرفوعة
+    context_prompt = f"""
+    لقد رفعت لك 3 ملفات أساسية:
+    1. ملف Copywriting Mastery: استخدمه لضبط نبرة الكتابة (PAS, AIDA).
+    2. ملف SoP-1: التزم بالأقسام الـ 13 المذكورة فيه لصفحة الهبوط.
+    3. ملف Matrix Calculator: استخدمه لفهم الجدوى المالية.
+    المنتج المراد تحليله: {url}
+    """
 
-    # 2. توليد صفحة الهبوط (13 قسم بناءً على SOP)
+    # 1. الاستراتيجية والسكريبتات
+    full_analysis = model.generate_content(context_prompt + " استخرج الاستراتيجية التسويقية و 5 سكريبتات فيديو UGC مع برومتات بصرية لتوليدها.").text
+    st.session_state.outputs['strat'] = full_analysis
+
+    # 2. صفحة الهبوط (الحل لمشكلة المظهر البدائي)
+    # نستخدم Tailwind CSS بشكل مكثف هنا لضمان مظهر الـ Premium
     html_prompt = f"""
-    صمم صفحة هبوط بـ 13 قسم لمنتج {url}. 
-    إلزامي: اتبع هيكلية ملف {sop_content}.
-    الستايل: Mobile-first, Tailwind CSS, ألوان متناسقة مع المنتج.
-    أعطني الكود داخل ```html.
+    صمم كود HTML/CSS واحد متكامل لصفحة هبوط لمنتج {url}.
+    - استخدم Tailwind CSS (CDN).
+    - الهيكل: 13 قسم بناءً على SoP-1.
+    - لغة الكتابة: احترافية بناءً على Copywriting Mastery.
+    - الألوان: استخرجها من المنتج في الرابط.
+    - أضف Sticky CTA Button وتأثيرات Hover.
+    أعطني الكود فقط داخل وسم ```html.
     """
     html_res = model.generate_content(html_prompt).text
-    st.session_state.html = html_res.split("```html")[1].split("```")[0] if "```html" in html_res else html_res
+    if "```html" in html_res:
+        st.session_state.outputs['html'] = html_res.split("```html")[1].split("```")[0]
 
-    # 3. السكريبتات والبرومتات
-    script_prompt = f"اكتب 5 سكريبتات فيديو UGC وبرومتات لتوليد الفيديوهات بالذكاء الاصطناعي بناءً على الاستراتيجية: {st.session_state.strategy}"
-    st.session_state.scripts = model.generate_content(script_prompt).text
-
-# --- 5. الواجهة الجانبية (رفع الملفات) ---
+# --- 4. واجهة المستخدم ---
 with st.sidebar:
-    st.header("📂 مستودع البيانات")
+    st.header("📂 لوحة التحكم بالبيانات")
     api_key = st.text_input("🔑 Gemini API Key", type="password")
     product_url = st.text_input("🔗 رابط المنتج")
+    f_copy = st.file_uploader("📄 ملف Copywriting PDF", type="pdf")
+    f_sop = st.file_uploader("📄 ملف SoP PDF", type="pdf")
+    f_matrix = st.file_uploader("📊 ملف Matrix (CSV/XLSX)", type=["csv", "xlsx"])
     
-    st.subheader("الملفات المرجعية")
-    copy_pdf = st.file_uploader("📄 ملف Copywriting Mastery", type="pdf")
-    sop_pdf = st.file_uploader("📄 ملف SoP-1 (الأقسام الـ 13)", type="pdf")
-    finance_xlsx = st.file_uploader("📊 ملف Matrix Calculator", type=["csv", "xlsx"])
-    
-    if st.button("🚀 تشغيل المحرك العملاق"):
-        if api_key and product_url and copy_pdf and sop_pdf:
-            with st.spinner("جاري دمج الذكاء الاصطناعي مع ملفاتك..."):
-                process_with_knowledge(api_key, product_url, copy_pdf, sop_pdf, finance_xlsx)
-        else: st.error("تأكد من رفع جميع الملفات المطلوبة!")
+    if st.button("🚀 توليد النظام الكامل"):
+        if api_key and product_url and f_copy and f_sop:
+            generate_all_assets(api_key, product_url, f_copy, f_sop, f_matrix)
+        else: st.error("تأكد من إدخال الرابط ورفع الملفات!")
 
-# --- 6. العرض الرئيسي (Tabs) ---
-st.markdown('<div class="main-header"><h1>ALI Growth Engine V21</h1><p>الذكاء الاصطناعي المبني على منهجيتك الخاصة</p></div>', unsafe_allow_html=True)
+# --- 5. العرض الرئيسي (Tabs) ---
+st.markdown('<h1 style="text-align:center;">ALI Growth Engine V22</h1>', unsafe_allow_html=True)
 
-t1, t2, t3, t4, t5 = st.tabs(["🎯 الاستراتيجية", "💰 تحليل البريك ايفنت", "📱 صفحة الهبوط", "🎬 سكريبتات الفيديو", "🖼️ برومتات الإنتاج"])
+tab1, tab2, tab3, tab4 = st.tabs(["📱 صفحة الهبوط", "🎯 الاستراتيجية والسكريبتات", "💰 التحليل المالي", "🖼️ برومتات الفيديو"])
 
-with t1:
-    st.write(st.session_state.strategy)
+with tab1:
+    if st.session_state.outputs['html']:
+        st.success("تم توليد الصفحة بناءً على SOP الخاص بك")
+        components.html(st.session_state.outputs['html'], height=900, scrolling=True)
+        st.code(st.session_state.outputs['html'], language="html")
 
-with t2:
-    if finance_xlsx:
-        df = pd.read_csv(finance_xlsx) if "csv" in finance_xlsx.name else pd.read_excel(finance_xlsx)
-        st.write("### تحليل مصفوفة الأرباح (Matrix Analysis)")
-        st.dataframe(df.style.highlight_max(axis=0))
-        st.info("نقطة التعادل المحسوبة بناءً على Matrix Calculator تظهر في الجدول أعلاه.")
+with tab2:
+    st.write(st.session_state.outputs['strat'])
 
-with t3:
-    if st.session_state.html:
-        components.html(st.session_state.html, height=800, scrolling=True)
-        st.code(st.session_state.html, language="html")
+with tab3:
+    if f_matrix:
+        df = pd.read_csv(f_matrix) if "csv" in f_matrix.name else pd.read_excel(f_matrix)
+        st.write("### مصفوفة الجدوى المالية (Matrix)")
+        st.dataframe(df)
+        st.info("نقطة التعادل يتم تحديدها بناءً على تقاطع تكلفة الليد مع نسبة التسليم في الجدول أعلاه.")
 
-with t4:
-    st.write(st.session_state.scripts)
-
-with t5:
-    st.info("برومتات توليد الفيديو (AI Video Prompts) بناءً على المشاهد المستخرجة من السكريبتات.")
-    st.write(st.session_state.scripts) # مدمجة حالياً مع السكريبتات
+with tab4:
+    st.markdown("### 🎬 برومتات توليد الفيديوهات (AI Video Generation Prompts)")
+    st.write("استخدم هذه الأوامر في أدوات مثل Runway Gen-2 أو Luma Dream Machine:")
+    st.write(st.session_state.outputs['strat']) # الجزء المتعلق بالبرومتات
