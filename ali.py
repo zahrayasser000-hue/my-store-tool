@@ -1,73 +1,55 @@
 import streamlit as st
 import google.generativeai as genai
 import streamlit.components.v1 as components
+import re
 
-# --- 1. إعدادات الصفحة الأساسية ---
-st.set_page_config(page_title="ALI Engine - Original V1", layout="wide")
+st.set_page_config(page_title="ALI Engine - Final Fix", layout="wide")
 
-st.markdown("""
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
-    html, body, [data-testid="stAppViewContainer"] {
-        font-family: 'Cairo', sans-serif;
-        direction: rtl;
-        text-align: right;
-    }
-</style>
-""", unsafe_allow_html=True)
-
-# --- 2. دالة التوليد الأصلية ---
-def generate_original_lp(api_key, product_url):
-    try:
-        genai.configure(api_key=api_key)
-        model = genai.GenerativeModel("gemini-1.5-flash")
-        
-        prompt = f"""
-        أنت خبير تصميم صفحات هبوط ومسوق محترف.
-        المطلوب: برمجة صفحة هبوط كاملة لمنتج من هذا الرابط: {product_url}
-        
-        المواصفات:
-        - استخدم Tailwind CSS.
-        - التصميم Mobile-First.
-        - الألوان: يجب أن تكون متناسقة تماماً مع ألوان المنتج في الرابط.
-        - الأقسام: Hero, Problem, Solution, Features, Testimonials, CTA.
-        - الخط: Cairo.
-        
-        أعطني كود HTML فقط، بدون أي نصوص إضافية.
-        """
-        
-        response = model.generate_content(prompt)
-        return response.text
-    except Exception as e:
-        return f"Error: {str(e)}"
-
-# --- 3. واجهة المستخدم ---
-st.title("🚀 ALI Growth Engine - النسخة الأصلية")
+# دالة تنظيف الكود لضمان عدم وجود فراغ
+def clean_html(text):
+    if not text: return ""
+    # إزالة علامات الماركداون
+    text = re.sub(r'```html', '', text, flags=re.IGNORECASE)
+    text = re.sub(r'```', '', text)
+    return text.strip()
 
 with st.sidebar:
-    st.header("الإعدادات")
+    st.title("🛠️ الإعدادات")
     api_key = st.text_input("Gemini API Key", type="password")
     product_url = st.text_input("رابط المنتج (URL)")
 
-if st.button("توليد الصفحة"):
-    if api_key and product_url:
-        with st.spinner("جاري التوليد..."):
-            raw_result = generate_original_lp(api_key, product_url)
-            
-            # تنظيف الكود من علامات الماركداون لضمان العرض
-            clean_html = raw_result.replace("```html", "").replace("```", "").strip()
-            st.session_state.original_html = clean_html
-            st.success("تم التوليد!")
-    else:
-        st.warning("يرجى إدخال API Key والرابط.")
+st.title("🚀 ALI Growth Engine")
 
-# --- 4. عرض النتائج ---
-if 'original_html' in st.session_state:
-    tab1, tab2 = st.tabs(["📱 المعاينة", "💻 الكود"])
+if st.button("توليد صفحة الهبوط"):
+    if api_key and product_url:
+        try:
+            genai.configure(api_key=api_key)
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            
+            with st.spinner("جاري التواصل مع الذكاء الاصطناعي..."):
+                prompt = f"Create a full landing page HTML with Tailwind CSS for this product: {product_url}. Return ONLY the HTML code starting with <!DOCTYPE html>."
+                response = model.generate_content(prompt)
+                
+                if response.text:
+                    st.session_state.html_content = clean_html(response.text)
+                    st.success("✅ تم التوليد بنجاح!")
+                else:
+                    st.error("❌ الذكاء الاصطناعي لم يرجع أي محتوى.")
+        except Exception as e:
+            st.error(f"❌ حدث خطأ: {str(e)}")
+    else:
+        st.warning("⚠️ أدخل المفتاح والرابط")
+
+# عرض النتائج
+if 'html_content' in st.session_state:
+    tab1, tab2 = st.tabs(["📱 المعاينة الحية", "💻 الكود المصدري"])
     
     with tab1:
-        # عرض الصفحة داخل Iframe
-        components.html(st.session_state.original_html, height=800, scrolling=True)
-        
+        # إذا كان الكود موجود ولكنه لا يظهر، سنعرف السبب هنا
+        if st.session_state.html_content:
+            components.html(st.session_state.html_content, height=1000, scrolling=True)
+        else:
+            st.warning("المحتوى فارغ، حاول التوليد مرة أخرى.")
+            
     with tab2:
-        st.code(st.session_state.original_html, language="html")
+        st.code(st.session_state.html_content, language="html")
