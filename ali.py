@@ -3,6 +3,7 @@ import google.generativeai as genai
 import json
 import streamlit.components.v1 as components
 import re
+import pandas as pd
 
 # --- إعدادات الصفحة ---
 st.set_page_config(page_title="ALI Engine - Ultimate Structure", layout="wide", page_icon="🏗️")
@@ -12,10 +13,11 @@ st.markdown("""
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
     body, [data-testid="stAppViewContainer"] { font-family: 'Cairo', sans-serif; direction: rtl; text-align: right; }
     .main-header { background: linear-gradient(90deg, #1e293b, #0f172a); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
+    .stMetric { background-color: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; text-align: center; }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-header"><h1>🏗️ ALI Growth Engine (بنية التحويل القصوى)</h1><p style="color:#94a3b8; margin:0;">هيكلة احترافية، أقسام تفصيلية، جاهزة لوضع صورك وفيديوهاتك الحقيقية</p></div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header"><h1>🚀 ALI Growth Engine (الإصدار الشامل)</h1><p style="color:#94a3b8; margin:0;">بناء صفحات الهبوط + حاسبة التحليل المالي والمصفوفة</p></div>', unsafe_allow_html=True)
 
 # ==========================================================
 # 🧱 الخطوة 2: القوالب الهيكلية الشاملة (بدون صور AI عشوائية)
@@ -456,44 +458,117 @@ def inject_data_into_template(json_data, category, colors):
     
     return final_html
 
-# --- واجهة المستخدم ---
+# ==========================================================
+# 🎛️ واجهة المستخدم والقائمة الجانبية للتنقل
+# ==========================================================
 with st.sidebar:
-    st.header("⚙️ إعدادات بضغطة زر")
-    api_key = st.text_input("🔑 Gemini API Key", type="password")
-    product_name = st.text_area("📦 تفاصيل المنتج", placeholder="مثال: جهاز تنظيف الوجه الحديث، أو سيروم للشعر.")
-    
-    product_category = st.selectbox("📦 الفئة (تحدد هيكل الصفحة)", ["💄 مستحضرات تجميل وعناية (Cosmetics)", "⚙️ أدوات وأجهزة ذكية (Gadgets)"])
+    st.header("⚙️ القائمة الرئيسية")
+    app_mode = st.radio("اختر الأداة:", ["🏗️ منشئ صفحات الهبوط", "💰 حاسبة التعادل المالي (Matrix)"])
+    st.markdown("---")
 
-    st.subheader("🎨 الألوان")
-    col1, col2 = st.columns(2)
-    with col1: color_primary = st.color_picker("أساسي", "#0f766e" if "Cosmetics" in product_category else "#1f2937")
-    with col2: color_accent = st.color_picker("الزر", "#eab308" if "Cosmetics" in product_category else "#ef4444")
-    color_secondary = st.color_picker("ثانوي", "#f8fafc")
-    
-    colors_dict = {'primary': color_primary, 'secondary': color_secondary, 'accent': color_accent}
-    
-    start_btn = st.button("🚀 توليد بنية الصفحة (محتوى + هيكل)", use_container_width=True)
+if app_mode == "🏗️ منشئ صفحات الهبوط":
+    with st.sidebar:
+        st.subheader("إعدادات صفحة الهبوط")
+        api_key = st.text_input("🔑 Gemini API Key", type="password")
+        product_name = st.text_area("📦 تفاصيل المنتج", placeholder="مثال: جهاز تنظيف الوجه الحديث، أو سيروم للشعر.")
+        product_category = st.selectbox("📦 الفئة (تحدد هيكل الصفحة)", ["💄 مستحضرات تجميل وعناية (Cosmetics)", "⚙️ أدوات وأجهزة ذكية (Gadgets)"])
 
-if start_btn:
-    if not api_key or not product_name:
-        st.error("أدخل المفتاح ووصف المنتج.")
+        st.subheader("🎨 الألوان")
+        col1, col2 = st.columns(2)
+        with col1: color_primary = st.color_picker("أساسي", "#0f766e" if "Cosmetics" in product_category else "#1f2937")
+        with col2: color_accent = st.color_picker("الزر", "#eab308" if "Cosmetics" in product_category else "#ef4444")
+        color_secondary = st.color_picker("ثانوي", "#f8fafc")
+        colors_dict = {'primary': color_primary, 'secondary': color_secondary, 'accent': color_accent}
+        
+        start_btn = st.button("🚀 توليد بنية الصفحة (محتوى + هيكل)", use_container_width=True)
+
+    if start_btn:
+        if not api_key or not product_name:
+            st.error("أدخل المفتاح ووصف المنتج.")
+        else:
+            with st.spinner("🤖 جاري بناء الهيكلة وكتابة المحتوى التسويقي الجبار..."):
+                try:
+                    raw_json = generate_landing_page_json(api_key, product_name, product_category)
+                    parsed_data = json.loads(raw_json)
+                    st.session_state.final_page = inject_data_into_template(parsed_data, product_category, colors_dict)
+                    st.session_state.json_data = parsed_data
+                    st.success("🎉 نجاح! تم بناء الهيكل بالكامل. الصناديق جاهزة لاستقبال صورك.")
+                except Exception as e:
+                    st.error(f"🛑 خطأ: {str(e)}")
+
+    if 'final_page' in st.session_state:
+        tab1, tab2 = st.tabs(["📱 المعاينة البصرية", "💻 كود HTML (ضعه في متجرك)"])
+        with tab1:
+            st.info("💡 الأماكن الرمادية تمثل المساحات المصممة خصيصاً لوضع صورك وفيديوهاتك الحقيقية. تم تصميمها لترفع نسبة التحويل (CR) لأقصى حد.")
+            components.html(st.session_state.final_page, height=1200, scrolling=True)
+        with tab2:
+            st.write("انسخ الكود، ضعه في متجرك (Youcan أو Shopify)، واستبدل فقط الصناديق بصورك وفيديوهات المراجعات.")
+            st.code(st.session_state.final_page, language="html")
+
+# ==========================================================
+# 💰 القسم الجديد: حاسبة التعادل والمصفوفة المالية
+# ==========================================================
+elif app_mode == "💰 حاسبة التعادل المالي (Matrix)":
+    st.subheader("💰 حاسبة نقطة التعادل والمصفوفة المالية (Break-Even Matrix)")
+    st.write("هذه الأداة تغنيك عن ملفات الإكسل المعقدة. أدخل أرقامك لتعرف أقصى تكلفة يمكنك دفعها للإعلان دون التعرض لخسارة.")
+    
+    st.markdown("---")
+    
+    # 1. إدخال البيانات المالية
+    col1, col2, col3 = st.columns(3)
+    P = col1.number_input("سعر بيع المنتج للعميل (P)", value=200.0, step=10.0)
+    C = col2.number_input("تكلفة المنتج + التوصيل (C)", value=80.0, step=5.0)
+    actual_cpl = col3.number_input("تكلفة الليد الحالية في مدير الإعلانات (CPL)", value=20.0, step=1.0)
+
+    # 2. إدخال نسب الأداء
+    st.write("<br>", unsafe_allow_html=True)
+    col4, col5 = st.columns(2)
+    CR_percent = col4.slider("نسبة التأكيد (Confirmation Rate - CR) %", min_value=10, max_value=100, value=60)
+    DR_percent = col5.slider("نسبة التسليم (Delivery Rate - DR) %", min_value=10, max_value=100, value=55)
+    
+    CR = CR_percent / 100.0
+    DR = DR_percent / 100.0
+
+    # 3. الحسابات
+    gross_margin = P - C
+    max_cpl = gross_margin * CR * DR
+    max_cpa = gross_margin * DR
+    profit_per_lead = max_cpl - actual_cpl
+
+    # 4. عرض المؤشرات (KPIs)
+    st.markdown("---")
+    st.markdown("### 📊 المؤشرات الحيوية (KPIs)")
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("هامش الربح الإجمالي", f"{gross_margin:.2f}")
+    m2.metric("أقصى تكلفة لليد (Max CPL)", f"{max_cpl:.2f}")
+    m3.metric("أقصى تكلفة للمبيعة (Max CPA)", f"{max_cpa:.2f}")
+
+    if profit_per_lead >= 0:
+        m4.metric("حالة إعلانك الحالي", "✅ رابح", f"+ {profit_per_lead:.2f} ربح صافي لكل ليد")
     else:
-        with st.spinner("🤖 جاري بناء الهيكلة وكتابة المحتوى التسويقي الجبار..."):
-            try:
-                raw_json = generate_landing_page_json(api_key, product_name, product_category)
-                parsed_data = json.loads(raw_json)
-                st.session_state.final_page = inject_data_into_template(parsed_data, product_category, colors_dict)
-                st.session_state.json_data = parsed_data
-                st.success("🎉 نجاح! تم بناء الهيكل بالكامل. الصناديق جاهزة لاستقبال صورك.")
-            except Exception as e:
-                st.error(f"🛑 خطأ: {str(e)}")
+        m4.metric("حالة إعلانك الحالي", "🚨 خاسر", f"{profit_per_lead:.2f} خسارة في كل ليد")
 
-# --- العرض ---
-if 'final_page' in st.session_state:
-    tab1, tab2 = st.tabs(["📱 المعاينة البصرية", "💻 كود HTML (ضعه في متجرك)"])
-    with tab1:
-        st.info("💡 الأماكن الرمادية تمثل المساحات المصممة خصيصاً لوضع صورك وفيديوهاتك الحقيقية. تم تصميمها لترفع نسبة التحويل (CR) لأقصى حد.")
-        components.html(st.session_state.final_page, height=1200, scrolling=True)
-    with tab2:
-        st.write("انسخ الكود، ضعه في متجرك (Youcan أو Shopify)، واستبدل فقط الصناديق بصورك وفيديوهات المراجعات.")
-        st.code(st.session_state.final_page, language="html")
+    # 5. مصفوفة الحساسية (Max CPL Matrix)
+    st.markdown("---")
+    st.markdown("### 🧮 مصفوفة الحساسية (Max CPL Matrix)")
+    st.info("الجدول أدناه يوضح لك أقصى سعر ليد (Max CPL) يمكنك دفعه بناءً على تغير نسب التأكيد والتسليم. **(الأعمدة: التسليم DR، الصفوف: التأكيد CR)**")
+
+    # بناء المصفوفة
+    dr_list = [x/100.0 for x in range(30, 100, 5)]
+    cr_list = [x/100.0 for x in range(30, 100, 5)]
+
+    matrix_data = []
+    for cr_val in cr_list:
+        row = {'CR \\ DR': f"{int(cr_val*100)}%"}
+        for dr_val in dr_list:
+            row[f"{int(dr_val*100)}%"] = round(gross_margin * cr_val * dr_val, 2)
+        matrix_data.append(row)
+
+    df_matrix = pd.DataFrame(matrix_data)
+    
+    # عرض الجدول ملوناً تلقائياً
+    st.dataframe(
+        df_matrix.style.background_gradient(cmap='RdYlGn', subset=df_matrix.columns[1:]),
+        use_container_width=True,
+        hide_index=True
+    )
