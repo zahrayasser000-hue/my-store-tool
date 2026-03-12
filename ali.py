@@ -6,18 +6,145 @@ import re
 import pandas as pd
 
 # --- إعدادات الصفحة ---
-st.set_page_config(page_title="ALI Engine - Ultimate System", layout="wide", page_icon="🏗️")
+st.set_page_config(page_title="ALI Engine Pro - Ultimate System", layout="wide", page_icon="🚀")
 
+# --- التصميم العبقري (Premium UI/UX CSS) ---
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap');
-    body, [data-testid="stAppViewContainer"] { font-family: 'Cairo', sans-serif; direction: rtl; text-align: right; }
-    .main-header { background: linear-gradient(90deg, #1e293b, #0f172a); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);}
-    .stMetric { background-color: #f8fafc; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; text-align: center; }
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+    
+    /* الأساسيات */
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stSidebar"] { 
+        font-family: 'Cairo', sans-serif !important; 
+        direction: rtl; 
+        text-align: right; 
+        background-color: #f8fafc;
+    }
+    
+    /* شريط التمرير */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* الهيدر الجبار (Premium Header) */
+    .main-header { 
+        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        color: white; 
+        padding: 40px 20px; 
+        border-radius: 20px; 
+        text-align: center; 
+        margin-bottom: 35px; 
+        box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3);
+        border-bottom: 5px solid #3b82f6;
+        position: relative;
+        overflow: hidden;
+    }
+    .main-header::before {
+        content: "";
+        position: absolute;
+        top: -50%; left: -50%; width: 200%; height: 200%;
+        background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 60%);
+        animation: rotate 20s linear infinite;
+    }
+    .main-header h1 {
+        font-weight: 900;
+        font-size: 3rem;
+        margin-bottom: 5px;
+        background: linear-gradient(to right, #93c5fd, #ffffff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        position: relative;
+        z-index: 1;
+    }
+    .main-header p {
+        color: #94a3b8;
+        font-size: 1.2rem;
+        font-weight: 600;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* الأزرار الخارقة (Primary Buttons) */
+    .stButton > button {
+        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%) !important;
+        color: white !important;
+        font-weight: 800 !important;
+        font-size: 1.1rem !important;
+        border: none !important;
+        border-radius: 12px !important;
+        padding: 15px 30px !important;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.06) !important;
+        width: 100%;
+    }
+    .stButton > button:hover {
+        transform: translateY(-3px) scale(1.01) !important;
+        box-shadow: 0 15px 25px -5px rgba(59, 130, 246, 0.4), 0 8px 10px -6px rgba(59, 130, 246, 0.1) !important;
+    }
+
+    /* بطاقات المؤشرات (Metric Cards) */
+    [data-testid="stMetric"] { 
+        background: white; 
+        padding: 25px 20px; 
+        border-radius: 16px; 
+        border: 1px solid #e2e8f0; 
+        text-align: center;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+    [data-testid="stMetric"]:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        border-color: #cbd5e1;
+    }
+    [data-testid="stMetricValue"] {
+        font-weight: 900 !important;
+        color: #0f172a !important;
+    }
+
+    /* حقول الإدخال */
+    .stTextInput input, .stTextArea textarea, .stSelectbox > div > div {
+        border-radius: 10px !important;
+        border: 1px solid #cbd5e1 !important;
+        box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.02) !important;
+        transition: border-color 0.3s !important;
+    }
+    .stTextInput input:focus, .stTextArea textarea:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+    }
+
+    /* تبويبات التصفح (Tabs) */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 15px;
+        background-color: #f1f5f9;
+        padding: 10px;
+        border-radius: 12px;
+    }
+    .stTabs [data-baseweb="tab"] {
+        background-color: transparent;
+        border-radius: 8px;
+        padding: 10px 25px;
+        font-weight: 700;
+        color: #64748b;
+        border: none;
+    }
+    .stTabs [aria-selected="true"] {
+        background-color: white !important;
+        color: #3b82f6 !important;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+    }
+
+    /* رسائل النجاح والخطأ */
+    .stAlert {
+        border-radius: 12px !important;
+        font-weight: 600 !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-header"><h1>🚀 ALI Growth Engine (نظام العمليات المتكامل)</h1><p style="color:#94a3b8; margin:0;">أبحاث سوق معتمدة على SOP-1 + بناء صفحات هبوط + حاسبة مالية</p></div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header"><h1>🚀 ALI Growth Engine Pro</h1><p>منصة العمليات التسويقية المتكاملة | أبحاث، صفحات هبوط، وتحليل مالي</p></div>', unsafe_allow_html=True)
 
 # ==========================================================
 # 🧱 القوالب الهيكلية الشاملة لصفحات الهبوط
@@ -222,7 +349,6 @@ def get_fast_working_model(api_key):
     st.session_state.valid_model_name = "gemini-pro"
     return "gemini-pro"
 
-# 1. دالة بناء صفحات الهبوط
 def generate_landing_page_json(api_key, product, category):
     genai.configure(api_key=api_key, transport="rest")
     model_name = get_fast_working_model(api_key)
@@ -269,7 +395,6 @@ def generate_landing_page_json(api_key, product, category):
     if match: return match.group(0)
     return clean_text
 
-# 2. دالة البحث المعمق (المرتبطة بالمنتج مباشرة وفق SOP-1)
 def generate_deep_research(api_key, product_name, category):
     genai.configure(api_key=api_key, transport="rest")
     model_name = get_fast_working_model(api_key)
@@ -317,7 +442,6 @@ def generate_deep_research(api_key, product_name, category):
     - **الأفضلية (Advantage):** [لماذا هي أفضل من غيرها]
     - **الفائدة (Benefit):** [النتيجة العاطفية المباشرة]
     """
-    
     response = model.generate_content(prompt, request_options={"timeout": 60.0})
     return response.text
 
@@ -379,16 +503,14 @@ def inject_data_into_template(json_data, category, colors):
 # 🎛️ واجهة المستخدم (المركزية والتنقل)
 # ==========================================================
 with st.sidebar:
-    st.header("⚙️ الإعدادات العامة للمنتج")
-    st.info("البيانات هنا ستطبق على جميع الأدوات (صفحة الهبوط وبحث السوق).")
-    
+    st.header("⚙️ الإعدادات العامة")
     global_api_key = st.text_input("🔑 Gemini API Key", type="password")
     global_product_name = st.text_area("📦 تفاصيل واسم المنتج", placeholder="مثال: جهاز تنظيف الوجه الحديث مع فرشتين.")
     global_category = st.selectbox("📦 فئة المنتج", ["💄 مستحضرات تجميل وعناية (Cosmetics)", "⚙️ أدوات وأجهزة ذكية (Gadgets)"])
     
     st.markdown("---")
     st.header("🛠️ اختر الأداة")
-    app_mode = st.radio("القائمة:", ["🏗️ منشئ صفحات الهبوط", "🔍 بحث السوق المعمق (SOP-1)", "💰 حاسبة التعادل المالي (Matrix)"])
+    app_mode = st.radio("قائمة التحكم:", ["🏗️ منشئ صفحات الهبوط", "🔍 بحث السوق المعمق (SOP-1)", "💰 حاسبة التعادل المالي (Matrix)"])
     st.markdown("---")
 
 # ---------------------------------------------------------
@@ -396,70 +518,68 @@ with st.sidebar:
 # ---------------------------------------------------------
 if app_mode == "🏗️ منشئ صفحات الهبوط":
     with st.sidebar:
-        st.subheader("🎨 ألوان صفحة الهبوط")
-        col1, col2 = st.columns(2)
-        with col1: color_primary = st.color_picker("أساسي", "#0f766e" if "Cosmetics" in global_category else "#1f2937")
-        with col2: color_accent = st.color_picker("الزر", "#eab308" if "Cosmetics" in global_category else "#ef4444")
-        color_secondary = st.color_picker("ثانوي", "#f8fafc")
-        colors_dict = {'primary': color_primary, 'secondary': color_secondary, 'accent': color_accent}
-        start_btn = st.button("🚀 توليد بنية الصفحة (محتوى + هيكل)", use_container_width=True)
+        with st.expander("🎨 تخصيص ألوان صفحة الهبوط", expanded=True):
+            col1, col2 = st.columns(2)
+            with col1: color_primary = st.color_picker("أساسي", "#0f766e" if "Cosmetics" in global_category else "#1f2937")
+            with col2: color_accent = st.color_picker("الزر", "#eab308" if "Cosmetics" in global_category else "#ef4444")
+            color_secondary = st.color_picker("ثانوي", "#f8fafc")
+            colors_dict = {'primary': color_primary, 'secondary': color_secondary, 'accent': color_accent}
+        
+        start_btn = st.button("🚀 توليد الصفحة الآن")
 
     if start_btn:
         if not global_api_key or not global_product_name:
-            st.error("الرجاء إدخال المفتاح واسم المنتج في القائمة الجانبية أعلى الصفحة.")
+            st.error("الرجاء إدخال المفتاح واسم المنتج في القائمة الجانبية.")
         else:
-            with st.spinner("🤖 جاري بناء الهيكلة وكتابة المحتوى التسويقي الجبار..."):
+            with st.spinner("🤖 جاري الهندسة وبناء المحتوى التسويقي الجبار..."):
                 try:
                     raw_json = generate_landing_page_json(global_api_key, global_product_name, global_category)
                     parsed_data = json.loads(raw_json)
                     st.session_state.final_page = inject_data_into_template(parsed_data, global_category, colors_dict)
-                    st.success("🎉 نجاح! تم بناء الهيكل بالكامل. الصناديق جاهزة لاستقبال صورك.")
+                    st.success("🎉 اكتمل البناء بنجاح! الصناديق جاهزة لاستقبال صورك.")
                 except Exception as e:
                     st.error(f"🛑 خطأ: {str(e)}")
 
     if 'final_page' in st.session_state:
-        tab1, tab2 = st.tabs(["📱 المعاينة البصرية", "💻 كود HTML (ضعه في متجرك)"])
+        tab1, tab2 = st.tabs(["📱 المعاينة البصرية", "💻 كود HTML (للنسخ)"])
         with tab1:
-            st.info("💡 الأماكن الرمادية تمثل المساحات المصممة خصيصاً لوضع صورك وفيديوهاتك الحقيقية.")
-            components.html(st.session_state.final_page, height=1200, scrolling=True)
+            st.info("💡 الأماكن الرمادية هي مساحات مصممة هندسياً لرفع نسبة التحويل (CR). استبدلها بصورك الحقيقية.")
+            components.html(st.session_state.final_page, height=1000, scrolling=True)
         with tab2:
-            st.write("انسخ الكود، ضعه في متجرك (Youcan أو Shopify)، واستبدل الصناديق بصورك وفيديوهات المراجعات.")
             st.code(st.session_state.final_page, language="html")
 
 # ---------------------------------------------------------
 # أداة 2: بحث السوق المعمق (Deep Research)
 # ---------------------------------------------------------
 elif app_mode == "🔍 بحث السوق المعمق (SOP-1)":
-    st.subheader("🔍 البحث المعمق في السوق والمنافسين (Deep Market Research)")
-    st.write(f"هذه الأداة تقوم بتحليل صارم للمنتج: **{global_product_name if global_product_name else '[أدخل اسم المنتج بالجانب]'}** بناءً على أطر (Direct Response) و (SOP-1).")
+    st.markdown("### 🔍 البحث المعمق في السوق والمنافسين")
+    st.write(f"تحليل صارم لـ: **{global_product_name if global_product_name else '[يرجى إدخال المنتج]'}**")
     
-    st.markdown("---")
-    start_research_btn = st.button("🧠 بدء التحليل واستخراج وثائق البيع للمنتج الحالي", use_container_width=True)
+    start_research_btn = st.button("🧠 استخراج وثائق البيع الاستراتيجية")
 
     if start_research_btn:
         if not global_api_key or not global_product_name:
-            st.error("الرجاء إدخال المفتاح واسم المنتج في القائمة الجانبية أعلى الصفحة لبدء البحث.")
+            st.error("الرجاء إدخال المفتاح واسم المنتج أولاً.")
         else:
-            with st.spinner("🕵️‍♂️ جاري الغوص في أعماق السوق وبناء الوثائق التأسيسية الأربعة... (قد يستغرق دقيقة)"):
+            with st.spinner("🕵️‍♂️ جاري الغوص في أعماق السوق وبناء الوثائق التأسيسية الأربعة..."):
                 try:
                     research_result = generate_deep_research(global_api_key, global_product_name, global_category)
                     st.session_state.research_output = research_result
-                    st.success("✅ اكتمل البحث بنجاح! اقرأ التقرير المفصل أدناه لتصميم أقوى إعلاناتك.")
+                    st.success("✅ اكتمل البحث! إليك التقرير السري لمنتجك.")
                 except Exception as e:
-                    st.error(f"🛑 حدث خطأ أثناء البحث: {str(e)}")
+                    st.error(f"🛑 حدث خطأ: {str(e)}")
 
     if 'research_output' in st.session_state:
-        st.markdown("### 📋 التقرير التسويقي الشامل (Foundational Docs)")
+        st.markdown("---")
         st.markdown(st.session_state.research_output)
-        with st.expander("💾 عرض التقرير الخام (للنسخ)"):
-            st.text_area("انسخ التقرير من هنا:", value=st.session_state.research_output, height=400)
+        with st.expander("💾 عرض التقرير الخام للنسخ"):
+            st.text_area("التقرير:", value=st.session_state.research_output, height=300)
 
 # ---------------------------------------------------------
 # أداة 3: حاسبة التعادل والمصفوفة المالية
 # ---------------------------------------------------------
 elif app_mode == "💰 حاسبة التعادل المالي (Matrix)":
-    st.subheader("💰 حاسبة نقطة التعادل والمصفوفة المالية (Break-Even Matrix)")
-    st.markdown("---")
+    st.markdown("### 💰 حاسبة نقطة التعادل والمصفوفة المالية")
     
     COUNTRIES = {
         "السعودية (KSA)": {"currency": "SAR", "P": 199.0, "C": 85.0, "CPL": 25.0},
@@ -474,18 +594,18 @@ elif app_mode == "💰 حاسبة التعادل المالي (Matrix)":
     }
 
     col_country, col_currency = st.columns(2)
-    with col_country: selected_country = st.selectbox("🌍 اختر الدولة المستهدفة:", list(COUNTRIES.keys()))
+    with col_country: selected_country = st.selectbox("🌍 الدولة:", list(COUNTRIES.keys()))
     with col_currency: currency = st.text_input("💱 العملة:", value=COUNTRIES[selected_country]["currency"])
 
     default_vals = COUNTRIES[selected_country]
 
-    st.markdown("##### 💵 الأرقام الأساسية")
+    st.markdown("##### 💵 البيانات المالية")
     col1, col2, col3 = st.columns(3)
-    P = col1.number_input(f"سعر بيع المنتج (P) [{currency}]", value=default_vals["P"], step=1.0)
+    P = col1.number_input(f"سعر البيع (P) [{currency}]", value=default_vals["P"], step=1.0)
     C = col2.number_input(f"تكلفة المنتج+الشحن (C) [{currency}]", value=default_vals["C"], step=1.0)
-    actual_cpl = col3.number_input(f"تكلفة الليد الحالية (CPL) [{currency}]", value=default_vals["CPL"], step=0.5)
+    actual_cpl = col3.number_input(f"تكلفة الليد (CPL) [{currency}]", value=default_vals["CPL"], step=0.5)
 
-    st.markdown("##### 📈 معدلات الأداء")
+    st.markdown("##### 📈 معدلات الأداء المتوقعة")
     col4, col5 = st.columns(2)
     CR_percent = col4.slider("نسبة التأكيد (CR) %", min_value=10, max_value=100, value=60)
     DR_percent = col5.slider("نسبة التسليم (DR) %", min_value=10, max_value=100, value=55)
@@ -497,16 +617,15 @@ elif app_mode == "💰 حاسبة التعادل المالي (Matrix)":
     profit_per_lead = max_cpl - actual_cpl
 
     st.markdown("---")
-    st.markdown("### 📊 المؤشرات الحيوية (KPIs)")
     m1, m2, m3, m4 = st.columns(4)
-    m1.metric(f"هامش الربح ({currency})", f"{gross_margin:.2f}")
-    m2.metric(f"أقصى CPL", f"{max_cpl:.2f}")
-    m3.metric(f"أقصى CPA", f"{max_cpa:.2f}")
-    if profit_per_lead >= 0: m4.metric("حالة الإعلان", "✅ رابح", f"+ {profit_per_lead:.2f} لكل ليد")
-    else: m4.metric("حالة الإعلان", "🚨 خاسر", f"{profit_per_lead:.2f} لكل ليد")
+    m1.metric(f"هامش الربح", f"{gross_margin:.2f} {currency}")
+    m2.metric(f"أقصى CPL", f"{max_cpl:.2f} {currency}")
+    m3.metric(f"أقصى CPA", f"{max_cpa:.2f} {currency}")
+    if profit_per_lead >= 0: m4.metric("حالة الإعلان", "✅ رابح", f"+ {profit_per_lead:.2f} صافي")
+    else: m4.metric("حالة الإعلان", "🚨 خاسر", f"{profit_per_lead:.2f} خسارة")
 
     st.markdown("---")
-    st.markdown("### 🧮 مصفوفة الحساسية (Max CPL Matrix)")
+    st.markdown("#### 🧮 مصفوفة أقصى تكلفة لليد (Max CPL Matrix)")
     
     dr_list = [x/100.0 for x in range(30, 100, 5)]
     cr_list = [x/100.0 for x in range(30, 100, 5)]
