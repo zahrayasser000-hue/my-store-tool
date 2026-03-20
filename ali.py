@@ -47,7 +47,7 @@ def get_ai_image(keyword, width=800, height=600, style="professional"):
     prompt = prompts.get(style, f"{safe_keyword} high quality realistic photo")
     encoded_prompt = urllib.parse.quote(prompt)
     seed = random.randint(1, 999999)
-    return f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&seed={seed}"
+    return f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&nofeed=true&model=flux&seed={seed}"
 
 AUTO_COLORS = {
     "cosmetics": {"primary": "#0f766e", "secondary": "#f0fdfa", "accent": "#eab308", "gradient1": "#0f766e", "gradient2": "#14b8a6"},
@@ -363,7 +363,24 @@ img {{ max-width:100%; height:auto; display:block; }}
     }})();
     </script></body></html>'''
     html = html.replace('<img ', '<img loading=lazy ')
+
+        # Add sequential image loader script before </body>
+            loader_js = '<script>document.addEventListener("DOMContentLoaded",function(){var imgs=document.querySelectorAll("img[data-src]");var i=0;function loadNext(){if(i>=imgs.length)return;imgs[i].onerror=function(){this.onerror=null;this.style.background="#f0f0f0";this.alt="Image";};imgs[i].src=imgs[i].getAttribute("data-src");imgs[i].onload=function(){i++;setTimeout(loadNext,1500);};imgs[i].onerror=function(){this.style.background="#f0f0f0";this.style.minHeight="200px";i++;setTimeout(loadNext,1500);};i++;if(i<imgs.length)setTimeout(loadNext,1500);}loadNext();});</script>'
+    # Move pollinations URLs from src to data-src for sequential loading
+    html = html.replace(' src="https://image.pollinations.ai/', ' data-src="https://image.pollinations.ai/')
+    html = html.replace('</body>', loader_js + '</body>')
     return html
+
+    def get_youcan_html(html):
+    """Strip script tags for YouCan compatibility"""
+    import re
+    clean = re.sub(r'<script[^>]*>.*?</script>', '', html, flags=re.DOTALL)
+    # Remove data-src and restore src for YouCan
+    clean = clean.replace(' data-src="', ' src="')
+    # Remove countdown IDs that need JS
+    clean = clean.replace('id="cd-hours"', '').replace('id="cd-mins"', '').replace('id="cd-secs"', '')
+    clean = clean.replace('id="cd2-h"', '').replace('id="cd2-m"', '').replace('id="cd2-s"', '')
+    return clean
 
 # UI - Sidebar and Main
 with st.sidebar:
