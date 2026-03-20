@@ -43,6 +43,7 @@ def get_ai_image(keyword, width=800, height=600, style="professional"):
         "solution": f"happy satisfied person after using {safe_keyword}, bright smile, positive mood, natural lighting, high quality, 8k",
         "feature": f"detailed highlight of {safe_keyword}, clean modern aesthetic, studio lighting, detailed close up, commercial photography, 8k",
         "review": f"customer selfie with {safe_keyword}, casual setting, smartphone photo style, realistic, genuine smile, 8k",
+            }
         prompt = prompts.get(style, f"{safe_keyword} high quality realistic photo")
     api_key = st.session_state.get('gemini_api_key', '')
     if api_key:
