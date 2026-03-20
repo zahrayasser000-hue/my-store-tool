@@ -43,33 +43,10 @@ def get_ai_image(keyword, width=800, height=600, style="professional"):
         "solution": f"happy satisfied person after using {safe_keyword}, bright smile, positive mood, natural lighting, high quality, 8k",
         "feature": f"detailed highlight of {safe_keyword}, clean modern aesthetic, studio lighting, detailed close up, commercial photography, 8k",
         "review": f"customer selfie with {safe_keyword}, casual setting, smartphone photo style, realistic, genuine smile, 8k",
-            }
-        prompt = prompts.get(style, f"{safe_keyword} high quality realistic photo")
-    api_key = st.session_state.get('gemini_api_key', '')
-    if api_key:
-        cache_key = f"img_{prompt[:40]}_{width}"
-        if cache_key in st.session_state:
-            return st.session_state[cache_key]
-        try:
-                        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={api_key}"
-            payload = {"contents": [{"parts": [{"text": f"Generate a professional photo: {prompt}"}]}], "generationConfig": {"response_modalities": ["IMAGE", "TEXT"]}}
-            r = requests.post(url, json=payload, timeout=30)
-            if r.status_code == 200:
-                data = r.json()
-                for part in data.get('candidates', [{}])[0].get('content', {}).get('parts', []):
-                    if 'inlineData' in part:
-                        mime = part['inlineData']['mimeType']
-                        b64 = part['inlineData']['data']
-                        data_uri = f"data:{mime};base64,{b64}"
-                        st.session_state[cache_key] = data_uri
-                        time.sleep(7)
-                        return data_uri
-        except Exception:
-            pass
-    colors = ['#3b82f6','#8b5cf6','#06b6d4','#10b981','#f59e0b','#ef4444']
-    c1, c2 = random.choice(colors), random.choice(colors)
-    svg = f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}"><defs><linearGradient id="g" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:{c1}"/><stop offset="100%" style="stop-color:{c2}"/></linearGradient></defs><rect width="100%" height="100%" fill="url(#g)"/><text x="50%" y="50%" font-family="Arial" font-size="16" fill="white" text-anchor="middle" dy=".3em">{safe_keyword[:25]}</text></svg>'
-    return f"data:image/svg+xml;base64,{base64.b64encode(svg.encode()).decode()}"
+    }
+    prompt = prompts.get(style, f"{safe_keyword} high quality realistic photo")
+    encoded_prompt = urllib.parse.quote(prompt)
+    seed = random.randint(1, 999999)
     return f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&seed={seed}"
 
 AUTO_COLORS = {
@@ -396,7 +373,6 @@ with st.sidebar:
     global_category = st.selectbox("\U0001f4e6 \u0641\u0626\u0629 \u0627\u0644\u0645\u0646\u062a\u062c", ["\U0001f484 \u0645\u0633\u062a\u062d\u0636\u0631\u0627\u062a \u062a\u062c\u0645\u064a\u0644 \u0648\u0639\u0646\u0627\u064a\u0629 (Cosmetics)", "\u2699\ufe0f \u0623\u062f\u0648\u0627\u062a \u0648\u0623\u062c\u0647\u0632\u0629 \u0630\u0643\u064a\u0629 (Gadgets)"])
     st.markdown("---")
     st.header("\U0001f6e0\ufe0f \u0627\u062e\u062a\u0631 \u0627\u0644\u0623\u062f\u0627\u0629")
-            st.session_state['gemini_api_key'] = global_api_key
     app_mode = st.radio("\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062a\u062d\u0643\u0645:", ["\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u0627\u062a \u0627\u0644\u0647\u0628\u0648\u0637", "\U0001f50d \u0628\u062d\u062b \u0627\u0644\u0633\u0648\u0642 \u0627\u0644\u0645\u0639\u0645\u0642 (SOP-1)", "\U0001f4b0 \u062d\u0627\u0633\u0628\u0629 \u0627\u0644\u062a\u0639\u0627\u062f\u0644 \u0627\u0644\u0645\u0627\u0644\u064a (Matrix)"])
     st.markdown("---")
 
