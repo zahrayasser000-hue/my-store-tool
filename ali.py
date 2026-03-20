@@ -8,298 +8,76 @@ import requests
 import random
 import urllib.parse
 
-# --- إعدادات الصفحة ---
-st.set_page_config(page_title="ALI Engine Pro - Real Images System", layout="wide", page_icon="🚀")
+st.set_page_config(page_title="ALI Engine Pro - AI Landing Pages", layout="wide", page_icon="\U0001f680")
 
-# --- التصميم العبقري (Premium UI/UX CSS) ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
-    
-    html, body, [data-testid="stAppViewContainer"], [data-testid="stSidebar"] { 
+    html, body, [data-testid="stAppViewContainer"], [data-testid="stSidebar"] {
         font-family: 'Cairo', sans-serif !important; direction: rtl; text-align: right; background-color: #f8fafc;
     }
-    
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #f1f5f9; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-    .main-header { 
-        background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-        color: white; padding: 40px 20px; border-radius: 20px; text-align: center; margin-bottom: 35px; 
-        box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3); border-bottom: 5px solid #3b82f6; position: relative; overflow: hidden;
-    }
-    .main-header::before {
-        content: ""; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-        background: radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 60%); animation: rotate 20s linear infinite;
-    }
-    .main-header h1 {
-        font-weight: 900; font-size: 3rem; margin-bottom: 5px;
-        background: linear-gradient(to right, #93c5fd, #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; position: relative; z-index: 1;
-    }
-    .main-header p { color: #94a3b8; font-size: 1.2rem; font-weight: 600; position: relative; z-index: 1; }
-
-    .stButton > button {
-        background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%) !important; color: white !important; font-weight: 800 !important;
-        font-size: 1.1rem !important; border: none !important; border-radius: 12px !important; padding: 15px 30px !important;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3) !important; width: 100%;
-    }
-    .stButton > button:hover { transform: translateY(-3px) scale(1.01) !important; box-shadow: 0 15px 25px -5px rgba(59, 130, 246, 0.4) !important; }
-
-    [data-testid="stMetric"] { 
-        background: white; padding: 25px 20px; border-radius: 16px; border: 1px solid #e2e8f0; text-align: center;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: all 0.3s ease;
-    }
-    [data-testid="stMetric"]:hover { transform: translateY(-5px); box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); border-color: #cbd5e1; }
-    [data-testid="stMetricValue"] { font-weight: 900 !important; color: #0f172a !important; }
-
-    .stTextInput input, .stTextArea textarea, .stSelectbox > div > div {
-        border-radius: 10px !important; border: 1px solid #cbd5e1 !important; transition: border-color 0.3s !important;
-    }
-    .stTextInput input:focus, .stTextArea textarea:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important; }
+    .main-header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 40px 20px; border-radius: 20px; text-align: center; margin-bottom: 35px; box-shadow: 0 20px 40px -10px rgba(15,23,42,0.3); border-bottom: 5px solid #3b82f6; }
+    .main-header h1 { font-weight: 900; font-size: 3rem; margin-bottom: 5px; background: linear-gradient(to right, #93c5fd, #ffffff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .main-header p { color: #94a3b8; font-size: 1.2rem; font-weight: 600; }
+    .stButton > button { background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%) !important; color: white !important; font-weight: 800 !important; font-size: 1.1rem !important; border: none !important; border-radius: 12px !important; padding: 15px 30px !important; width: 100%; }
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown('<div class="main-header"><h1>🚀 ALI Growth Engine Pro</h1><p>منصة العمليات التسويقية المتكاملة | صور حقيقية 100% (Pexels Integration)</p></div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header"><h1>ALI Growth Engine Pro \U0001f680</h1><p>منصة العمليات التسويقية المتكاملة | صور AI عالية الجودة</p></div>', unsafe_allow_html=True)
+
 
 # ==========================================================
-# 🧠 دوال جلب الصور الحقيقية (Real Image Engine)
+# AI Image Generation Engine (High Quality)
 # ==========================================================
-def get_real_or_ai_image(keyword, pexels_key, width, height, orientation="landscape"):
-    """
-    هذا المحرك يحاول جلب صورة حقيقية من Pexels أولاً.
-    إذا لم ينجح، يستخدم الذكاء الاصطناعي مع أمر صارم (صورة هاتف عفوية) لكي لا تبدو مصطنعة.
-    """
+def get_ai_image(keyword, width=800, height=600, style="professional"):
     safe_keyword = str(keyword).strip()
     if not safe_keyword or safe_keyword.lower() == "none":
         safe_keyword = "product"
-
-    # 1. محاولة جلب صورة حقيقية من Pexels (الخيار الذهبي)
-    if pexels_key:
-        try:
-            url = f"https://api.pexels.com/v1/search?query={urllib.parse.quote(safe_keyword)}&per_page=5&orientation={orientation}"
-            headers = {"Authorization": pexels_key}
-            response = requests.get(url, headers=headers, timeout=5)
-            if response.status_code == 200:
-                data = response.json()
-                if data.get("photos") and len(data["photos"]) > 0:
-                    photo = random.choice(data["photos"])
-                    # إرجاع صورة بدقة عالية
-                    return photo["src"]["large"]
-        except Exception as e:
-            pass # في حال فشل الاتصال، انتقل للخيار البديل
-            
-    # 2. الخيار البديل: الذكاء الاصطناعي بنمط كاميرا الهاتف (لتبدو حقيقية وليست 3D)
-    prompt = f"candid authentic smartphone amateur photo of {safe_keyword}, real life, unedited, realistic, no CGI"
+    if style == "product":
+        prompt = f"professional studio product photography of {safe_keyword}, white background, high resolution, commercial quality, 8k, sharp focus, soft lighting"
+    elif style == "person":
+        prompt = f"professional portrait photo of {safe_keyword}, natural lighting, high quality, realistic, candid, authentic"
+    elif style == "before_after":
+        prompt = f"realistic before and after comparison photo of {safe_keyword}, high quality, clear difference, professional photography"
+    else:
+        prompt = f"professional high quality photo of {safe_keyword}, 8k, sharp, realistic, commercial photography"
     encoded_prompt = urllib.parse.quote(prompt)
-    seed = random.randint(1, 100000)
-    return f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&seed={seed}"
+    seed = random.randint(1, 999999)
+    return f"https://image.pollinations.ai/prompt/{encoded_prompt}?width={width}&height={height}&nologo=true&seed={seed}&model=flux"
+
 
 # ==========================================================
-# 🧱 القوالب الهيكلية (بدمج الصور الحقيقية)
+# Auto Color Engine
 # ==========================================================
-
-TEMPLATES = {
-    "Cosmetics": """
-    <!DOCTYPE html>
-    <html lang="ar" dir="rtl">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-        <style>
-            :root { --primary: {{COLOR_PRIMARY}}; --secondary: {{COLOR_SECONDARY}}; --accent: {{COLOR_ACCENT}}; }
-            body { font-family: 'Cairo', sans-serif; background-color: #f3f4f6; scroll-behavior: smooth; }
-            .bg-primary { background-color: var(--primary); }
-            .text-primary { color: var(--primary); }
-            .bg-accent { background-color: var(--accent); }
-            .text-accent { color: var(--accent); }
-            section { padding: 3rem 1.5rem; }
-            .no-pad { padding: 0 !important; }
-            .img-container { background-color: #e5e7eb; display: flex; align-items: center; justify-content: center; }
-        </style>
-    </head>
-    <body class="text-gray-800 antialiased pb-24 flex justify-center">
-        <div class="w-full max-w-lg bg-white shadow-2xl relative overflow-hidden">
-            <div class="bg-gray-900 text-white text-center py-2 text-xs font-bold flex justify-center gap-4">
-                <span>🚚 شحن سريع مجاني</span><span>🔒 الدفع عند الاستلام</span>
-            </div>
-            
-            <section class="!p-0 relative w-full bg-gray-900 img-container h-[500px]">
-                <img src="{{IMAGE_HERO_URL}}" class="w-full h-full object-cover opacity-90 absolute top-0 left-0" alt="Hero" loading="lazy">
-                <div class="absolute bottom-0 left-0 w-full h-3/4 bg-gradient-to-t from-[var(--primary)] to-transparent"></div>
-                <div class="absolute bottom-0 left-0 w-full p-6 text-white text-center z-10">
-                    <h1 class="text-4xl font-black mb-3 leading-tight drop-shadow-md">{{HERO_HEADLINE}}</h1>
-                    <p class="text-lg font-bold text-gray-100 mb-6 drop-shadow">{{HERO_SUB}}</p>
-                    <a href="#buy" class="bg-accent hover:opacity-90 text-white font-black py-4 px-8 rounded-full text-xl w-full block shadow-lg transition transform hover:scale-105">{{CTA_BUTTON}}</a>
-                </div>
-            </section>
-            
-            <section class="bg-white text-center border-b border-gray-100">
-                <h2 class="text-2xl font-black mb-5 text-red-600">⚠️ {{PROBLEM_TITLE}}</h2>
-                <img src="{{IMAGE_PROBLEM_URL}}" class="w-full h-56 object-cover rounded-2xl mb-5 shadow-md border-2 border-red-100" alt="Problem" loading="lazy">
-                <p class="text-lg font-bold text-gray-700 leading-relaxed">{{PROBLEM_DESC}}</p>
-            </section>
-            
-            <section class="bg-primary text-white text-center relative z-20">
-                <h2 class="text-3xl font-black text-accent mb-4">✨ {{SOLUTION_TITLE}}</h2>
-                <p class="text-lg font-bold mb-6 text-gray-100">{{SOLUTION_DESC}}</p>
-                <img src="{{IMAGE_SOLUTION_URL}}" class="w-full h-64 object-cover rounded-2xl border-4 border-white shadow-xl" alt="Solution" loading="lazy">
-            </section>
-            
-            <section class="bg-gray-50 text-center border-b border-gray-200">
-                <h2 class="text-3xl font-black text-gray-900 mb-6">تحول مذهل تلاحظه فوراً!</h2>
-                <div class="flex gap-2 relative">
-                    <div class="w-1/2 relative h-48 rounded-r-2xl border-2 border-red-300 overflow-hidden bg-white">
-                        <img src="{{IMAGE_BEFORE_URL}}" class="w-full h-full object-cover opacity-90" loading="lazy">
-                        <div class="absolute bottom-2 right-2 bg-red-600 text-white px-2 py-1 text-xs font-bold rounded">قبل</div>
-                    </div>
-                    <div class="w-1/2 relative h-48 rounded-l-2xl border-2 border-green-300 overflow-hidden bg-white">
-                        <img src="{{IMAGE_AFTER_URL}}" class="w-full h-full object-cover" loading="lazy">
-                        <div class="absolute bottom-2 left-2 bg-green-600 text-white px-2 py-1 text-xs font-bold rounded">بعد</div>
-                    </div>
-                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-accent text-white w-10 h-10 flex items-center justify-center rounded-full border-4 border-white shadow-lg font-black text-xl z-10">></div>
-                </div>
-            </section>
-
-            <section class="bg-gray-50 border-b border-gray-200">
-                <h2 class="text-3xl font-black text-center text-primary mb-8">السر في مكوناتنا</h2>
-                <div class="grid grid-cols-1 gap-4">{{DYNAMIC_SECTION_HTML}}</div>
-            </section>
-            
-            <section class="bg-white border-b border-gray-200 text-center">
-                <h2 class="text-3xl font-black text-primary mb-2">شاهد تجارب عملائنا</h2>
-                <p class="text-gray-500 font-bold mb-8">لا تأخذ كلمتنا، شاهد الفيديوهات بنفسك!</p>
-                <div class="flex gap-3 overflow-x-auto pb-4 snap-x">
-                    <div class="min-w-[80%] snap-center"><div class="w-full h-64 bg-gray-200 rounded-xl overflow-hidden relative shadow-md img-container"><span class="text-red-500 text-4xl mb-2">▶️</span><span>ضع فيديو يوتيوب هنا</span></div></div>
-                </div>
-            </section>
-            
-            <section class="bg-white border-b border-gray-200">
-                <h2 class="text-3xl font-black text-center text-gray-900 mb-8">آراء العملاء</h2>
-                <div class="space-y-4">{{REVIEWS_HTML}}</div>
-            </section>
-            
-            <section class="bg-gray-50 border-b border-gray-200">
-                <h2 class="text-3xl font-black text-center text-gray-900 mb-8">❓ الأسئلة الشائعة</h2>
-                <div class="space-y-3 text-right">{{FAQ_HTML}}</div>
-            </section>
-            
-            <section class="bg-primary text-center pb-20 text-white rounded-t-3xl mt-4">
-                <div class="text-6xl mb-4 drop-shadow-lg">🛡️</div>
-                <h3 class="text-3xl font-black text-accent mb-4">{{GUARANTEE_TITLE}}</h3>
-                <p class="text-lg font-bold text-gray-100">{{GUARANTEE_TEXT}}</p>
-            </section>
-            
-            <div id="buy" class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-sm p-4 shadow-[0_-15px_30px_rgba(0,0,0,0.15)] flex justify-center z-50 border-t-4 border-accent">
-                <div class="w-full max-w-lg flex flex-col items-center">
-                    <a href="#buy" class="bg-accent hover:opacity-90 text-white font-black py-4 px-6 rounded-xl text-2xl w-full text-center shadow-lg transition transform hover:scale-[1.02] flex justify-center items-center gap-3"><span>🛒</span> {{CTA_BUTTON}}</a>
-                </div>
-            </div>
-        </div>
-    </body>
-    </html>
-    """,
-    "Gadgets": """
-    <!DOCTYPE html>
-    <html lang="ar" dir="rtl">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="https://cdn.tailwindcss.com"></script>
-        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-        <style>
-            :root { --primary: {{COLOR_PRIMARY}}; --secondary: {{COLOR_SECONDARY}}; --accent: {{COLOR_ACCENT}}; }
-            body { font-family: 'Cairo', sans-serif; background-color: #f3f4f6; scroll-behavior: smooth; }
-            .bg-primary { background-color: var(--primary); }
-            .text-primary { color: var(--primary); }
-            .bg-accent { background-color: var(--accent); }
-            .text-accent { color: var(--accent); }
-            section { padding: 3rem 1.5rem; }
-            .no-pad { padding: 0 !important; }
-            .img-container { background-color: #e5e7eb; display: flex; align-items: center; justify-content: center; }
-        </style>
-    </head>
-    <body class="text-gray-800 antialiased pb-24 flex justify-center">
-        <div class="w-full max-w-lg bg-white shadow-2xl relative overflow-hidden">
-            <div class="bg-gray-900 text-white text-center py-2 text-xs font-bold flex justify-center gap-4">
-                <span>🚚 توصيل سريع </span><span>🔒 جودة مضمونة</span>
-            </div>
-            
-            <section class="no-pad relative w-full bg-gray-900 img-container h-[500px]">
-                <img src="{{IMAGE_HERO_URL}}" class="w-full h-full object-cover opacity-90 absolute top-0 left-0" alt="Hero" loading="lazy">
-                <div class="absolute bottom-0 left-0 w-full h-3/4 bg-gradient-to-t from-[var(--primary)] to-transparent"></div>
-                <div class="absolute bottom-0 left-0 w-full p-6 text-white text-center z-10">
-                    <h1 class="text-4xl font-black mb-3 leading-tight drop-shadow-md">{{HERO_HEADLINE}}</h1>
-                    <p class="text-lg font-bold text-gray-100 mb-6 drop-shadow">{{HERO_SUB}}</p>
-                    <a href="#buy" class="bg-accent hover:opacity-90 text-white font-black py-4 px-8 rounded-full text-xl w-full block shadow-lg transition transform hover:scale-105">{{CTA_BUTTON}}</a>
-                </div>
-            </section>
-            
-            <section class="bg-white text-center border-b border-gray-100">
-                <h2 class="text-2xl font-black mb-5 text-red-600">⚠️ {{PROBLEM_TITLE}}</h2>
-                <img src="{{IMAGE_PROBLEM_URL}}" class="w-full h-56 object-cover rounded-2xl mb-5 shadow-md border-2 border-red-100" alt="Problem" loading="lazy">
-                <p class="text-lg font-bold text-gray-700 leading-relaxed">{{PROBLEM_DESC}}</p>
-            </section>
-            
-            <section class="bg-primary text-white text-center relative z-20">
-                <h2 class="text-3xl font-black text-accent mb-4">✨ {{SOLUTION_TITLE}}</h2>
-                <p class="text-lg font-bold mb-6 text-gray-100">{{SOLUTION_DESC}}</p>
-                <img src="{{IMAGE_SOLUTION_URL}}" class="w-full h-64 object-cover rounded-2xl border-4 border-white shadow-xl" alt="Solution" loading="lazy">
-            </section>
-            
-            <section class="bg-gray-100 border-b border-gray-200">
-                <h2 class="text-3xl font-black text-center text-primary mb-6">⚙️ المقاسات والمواصفات</h2>
-                <div class="flex flex-col gap-4">
-                    <img src="{{IMAGE_DIMENSIONS_URL}}" class="w-full h-48 object-cover rounded-xl shadow-md" alt="Dimensions" loading="lazy">
-                    <ul class="space-y-3 bg-white p-4 rounded-xl shadow-sm border border-gray-200 text-right">{{DIMENSIONS_HTML}}</ul>
-                </div>
-            </section>
-            
-            <section class="bg-white border-b border-gray-200">
-                <h2 class="text-3xl font-black text-center text-primary mb-8">سهولة تامة في الاستخدام</h2>
-                <div class="grid grid-cols-1 gap-4">{{DYNAMIC_SECTION_HTML}}</div>
-            </section>
-            
-            <section class="bg-gray-50 border-b border-gray-200 text-center">
-                <h2 class="text-3xl font-black text-primary mb-2">تجارب عملائنا المباشرة</h2>
-                <p class="text-gray-500 font-bold mb-6">شاهد المنتج وهو يعمل على أرض الواقع</p>
-                <div class="space-y-4">
-                    <div class="w-full h-56 bg-gray-200 rounded-xl overflow-hidden relative shadow-md img-container"><span class="text-red-500 text-4xl mb-2">▶️</span><span>ضع رابط فيديو يوتيوب هنا</span></div>
-                </div>
-            </section>
-            
-            <section class="bg-white border-b border-gray-200">
-                <h2 class="text-3xl font-black text-center text-gray-900 mb-8">التقييمات الكتابية</h2>
-                <div class="space-y-4">{{REVIEWS_HTML}}</div>
-            </section>
-            
-            <section class="bg-gray-50 border-b border-gray-200">
-                <h2 class="text-3xl font-black text-center text-gray-900 mb-8">❓ أسئلة متكررة</h2>
-                <div class="space-y-3 text-right">{{FAQ_HTML}}</div>
-            </section>
-            
-            <section class="bg-gray-900 text-center pb-20 text-white rounded-t-3xl mt-4">
-                <div class="text-6xl mb-4">🛡️</div>
-                <h3 class="text-3xl font-black text-accent mb-4">{{GUARANTEE_TITLE}}</h3>
-                <p class="text-lg font-bold text-gray-300">{{GUARANTEE_TEXT}}</p>
-            </section>
-            
-            <div id="buy" class="fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-sm p-4 shadow-[0_-15px_30px_rgba(0,0,0,0.15)] flex justify-center z-50 border-t-4 border-accent">
-                <div class="w-full max-w-lg flex flex-col items-center">
-                    <a href="#buy" class="bg-accent hover:opacity-90 text-white font-black py-4 px-6 rounded-xl text-2xl w-full text-center shadow-lg transition transform hover:scale-[1.02] flex justify-center items-center gap-3"><span>🛒</span> {{CTA_BUTTON}}</a>
-                </div>
-            </div>
-        </div>
-    </body>
-    </html>
-    """
+AUTO_COLORS = {
+    "cosmetics": {"primary": "#0f766e", "secondary": "#f0fdfa", "accent": "#eab308", "gradient1": "#0f766e", "gradient2": "#14b8a6"},
+    "skincare": {"primary": "#be185d", "secondary": "#fdf2f8", "accent": "#f59e0b", "gradient1": "#be185d", "gradient2": "#ec4899"},
+    "health": {"primary": "#15803d", "secondary": "#f0fdf4", "accent": "#f97316", "gradient1": "#15803d", "gradient2": "#22c55e"},
+    "gadgets": {"primary": "#1e3a5f", "secondary": "#f0f4f8", "accent": "#ef4444", "gradient1": "#1e3a5f", "gradient2": "#3b82f6"},
+    "fashion": {"primary": "#7c2d12", "secondary": "#fef3c7", "accent": "#d97706", "gradient1": "#7c2d12", "gradient2": "#ea580c"},
+    "default": {"primary": "#1e40af", "secondary": "#eff6ff", "accent": "#f59e0b", "gradient1": "#1e40af", "gradient2": "#3b82f6"}
 }
 
+def detect_colors(product_name, category):
+    text = (product_name + " " + category).lower()
+    if any(w in text for w in ["cream", "كريم", "collagen", "كولاجين", "serum", "سيروم", "cosmetic", "تجميل"]):
+        return AUTO_COLORS["skincare"]
+    elif any(w in text for w in ["skin", "بشرة", "face", "وجه", "beauty", "جمال"]):
+        return AUTO_COLORS["cosmetics"]
+    elif any(w in text for w in ["health", "صحة", "vitamin", "فيتامين", "supplement", "مكمل"]):
+        return AUTO_COLORS["health"]
+    elif any(w in text for w in ["gadget", "جهاز", "device", "أداة", "smart", "ذكي"]):
+        return AUTO_COLORS["gadgets"]
+    elif any(w in text for w in ["fashion", "موضة", "clothes", "ملابس"]):
+        return AUTO_COLORS["fashion"]
+    elif "cosmetics" in text.lower() or "Cosmetics" in category:
+        return AUTO_COLORS["cosmetics"]
+    else:
+        return AUTO_COLORS["default"]
+
+
 # ==========================================================
-# 🧠 دوال الذكاء الاصطناعي الأساسية
+# Gemini AI Functions
 # ==========================================================
 def get_fast_working_model(api_key):
     if 'valid_model_name' in st.session_state:
@@ -310,297 +88,425 @@ def get_fast_working_model(api_key):
             if 'generateContent' in m.supported_generation_methods and 'flash' in m.name.lower():
                 st.session_state.valid_model_name = m.name
                 return m.name
-    except: pass
+    except:
+        pass
     st.session_state.valid_model_name = "gemini-pro"
     return "gemini-pro"
+
 
 def generate_landing_page_json(api_key, product, category):
     genai.configure(api_key=api_key, transport="rest")
     model_name = get_fast_working_model(api_key)
     model = genai.GenerativeModel(model_name)
-    
     prompt = f"""
-    أنت خبير Copywriter لصفحات الهبوط.
-    المنتج: "{product}". الفئة: "{category}".
-    النصوص الموجهة للعميل بـ "العربية الفصحى".
-    ⚠️ الحقول المنتهية بـ _search هي كلمات مفتاحية بالإنجليزية فقط للبحث عن صور حقيقية (كلمة إلى 3 كلمات كحد أقصى). مثال: "smiling woman", "acne face", "skincare serum".
-
-    رد بصيغة JSON صالحة بهذا الهيكل:
-    {{
-        "hero_headline": "عنوان رئيسي يخطف الانتباه",
-        "hero_subheadline": "عنوان فرعي يقدم وعداً بالحل",
-        "image_hero_search": "english keyword for product or happy person",
-        "problem_title": "عنوان قسم الألم",
-        "problem_description": "فقرة تصف الإحباط بدقة",
-        "image_problem_search": "english keyword for frustrated person or bad skin/mess",
-        "solution_title": "عنوان قسم الحل",
-        "solution_description": "فقرة تشرح كيف يقدم المنتج الحل",
-        "image_solution_search": "english keyword for happy relieved person or clean result",
-        "image_before_search": "english keyword for before result (bad)",
-        "image_after_search": "english keyword for after result (good)",
-        "dynamic_items": [
-            {{"title": "اسم ميزة 1", "desc": "الفائدة", "image_search": "english keyword for feature 1"}},
-            {{"title": "اسم ميزة 2", "desc": "الفائدة", "image_search": "english keyword for feature 2"}},
-            {{"title": "اسم ميزة 3", "desc": "الفائدة", "image_search": "english keyword for feature 3"}}
-        ],
-        "dimensions": ["الطول: ..", "الوزن: ..", "الخامة: .."],
-        "image_dimensions_search": "english keyword for ruler or measurement",
-        "reviews": [
-            {{"name": "سارة م.", "rating": 5, "comment": "تعليق واقعي"}}
-        ],
-        "faq": [
-            {{"q": "متى سألاحظ النتائج؟", "a": "إجابة مقنعة"}}
-        ],
-        "guarantee_title": "عنوان الضمان",
-        "guarantee_text": "نص تفصيلي للضمان",
-        "call_to_action": "نص زر الشراء"
-    }}
-    """
-    response = model.generate_content(prompt, request_options={"timeout": 45.0})
-    tb = chr(96) * 3 
+أنت خبير Copywriter لصفحات الهبوط. المنتج: "{product}". الفئة: "{category}".
+النصوص بالعربية الفصحى. الحقول المنتهية بـ _search هي كلمات بالإنجليزية لتوليد صور AI.
+رد بصيغة JSON صالحة:
+{{
+  "hero_headline": "عنوان رئيسي يخطف الانتباه",
+  "hero_subheadline": "عنوان فرعي",
+  "image_hero_search": "english keyword for product",
+  "trust_badges": ["شحن مجاني", "الدفع عند الاستلام", "ضمان 30 يوم"],
+  "problem_title": "عنوان قسم الألم",
+  "problem_description": "فقرة تصف الإحباط",
+  "problem_points": ["مشكلة 1", "مشكلة 2", "مشكلة 3"],
+  "image_problem_search": "english keyword for problem",
+  "solution_title": "عنوان الحل",
+  "solution_description": "فقرة الحل",
+  "image_solution_search": "english keyword for solution",
+  "image_before_search": "english keyword before",
+  "image_after_search": "english keyword after",
+  "features": [
+    {{"title": "ميزة 1", "desc": "الفائدة", "icon": "sparkles", "image_search": "keyword1"}},
+    {{"title": "ميزة 2", "desc": "الفائدة", "icon": "shield", "image_search": "keyword2"}},
+    {{"title": "ميزة 3", "desc": "الفائدة", "icon": "heart", "image_search": "keyword3"}},
+    {{"title": "ميزة 4", "desc": "الفائدة", "icon": "check", "image_search": "keyword4"}}
+  ],
+  "ingredients": [
+    {{"name": "مكون 1", "benefit": "فائدته", "image_search": "ingredient keyword"}},
+    {{"name": "مكون 2", "benefit": "فائدته", "image_search": "ingredient keyword"}},
+    {{"name": "مكون 3", "benefit": "فائدته", "image_search": "ingredient keyword"}}
+  ],
+  "how_to_use": ["خطوة 1", "خطوة 2", "خطوة 3"],
+  "stats": [{{"number": "98%", "label": "إحصائية 1"}}, {{"number": "+5000", "label": "إحصائية 2"}}, {{"number": "4.9/5", "label": "إحصائية 3"}}],
+  "reviews": [
+    {{"name": "سارة م.", "rating": 5, "comment": "تعليق واقعي", "image_search": "happy arab woman selfie"}},
+    {{"name": "أحمد ع.", "rating": 5, "comment": "تعليق واقعي", "image_search": "satisfied arab man"}},
+    {{"name": "نورة ك.", "rating": 4, "comment": "تعليق واقعي", "image_search": "happy woman portrait"}}
+  ],
+  "pricing": {{"original": "399", "discounted": "199", "currency": "SAR", "discount_percent": "50%"}},
+  "urgency_text": "العرض ينتهي خلال 24 ساعة!",
+  "faq": [
+    {{"q": "متى سألاحظ النتائج؟", "a": "إجابة"}},
+    {{"q": "هل المنتج آمن؟", "a": "إجابة"}},
+    {{"q": "كيف أطلب؟", "a": "إجابة"}},
+    {{"q": "ما سياسة الإرجاع؟", "a": "إجابة"}}
+  ],
+  "guarantee_title": "ضمان استرجاع المال",
+  "guarantee_text": "نص الضمان",
+  "call_to_action": "اطلب الآن",
+  "footer_text": "جميع الحقوق محفوظة"
+}}
+"""
+    response = model.generate_content(prompt, request_options={"timeout": 60.0})
+    tb = chr(96) * 3
     clean_text = re.sub(f'{tb}(?:json|JSON)?', '', response.text, flags=re.IGNORECASE)
     clean_text = clean_text.replace(tb, '').strip()
     match = re.search(r'\{.*\}', clean_text, re.DOTALL)
-    if match: return match.group(0)
+    if match:
+        return match.group(0)
     return clean_text
+
 
 def generate_deep_research(api_key, product_name, category):
     genai.configure(api_key=api_key, transport="rest")
     model_name = get_fast_working_model(api_key)
     model = genai.GenerativeModel(model_name)
     prompt = f"""
-    أنت أداة "Deep Research" متطورة وخبير استراتيجي في الـ (Direct Response Copywriting).
-    المنتج: "{product_name}". الفئة: "{category}".
-    استند إلى منهجية SOP-1 وبناء الوثائق التأسيسية الأربعة. أخرج تقريراً شاملاً بالعربية الفصحى بتنسيق Markdown.
-    1. وثيقة شخصية العميل (Avatar Sheet) - الآلام، الرغبات، الاعتراضات الخفية.
-    2. وثيقة بحث السوق والمنافسين - فجوة السوق، أخطاء المنافسين.
-    3. وثيقة ملخص العرض (Offer Brief) - الوعد الأساسي، الآلية الفريدة.
-    4. وثيقة المعتقدات الضرورية - 4 إلى 6 معتقدات تبدأ بـ "أنا أؤمن أن...".
-    5. زوايا البيع الجاهزة - تطبيق إطار PAS وإطار FAB.
-    """
+أنت أداة Deep Research. المنتج: "{product_name}". الفئة: "{category}".
+أخرج تقريراً شاملاً بالعربية بتنسيق Markdown:
+1. وثيقة شخصية العميل (Avatar Sheet)
+2. وثيقة بحث السوق والمنافسين
+3. وثيقة ملخص العرض (Offer Brief)
+4. وثيقة المعتقدات الضرورية
+5. زوايا البيع الجاهزة (PAS + FAB)
+"""
     response = model.generate_content(prompt, request_options={"timeout": 60.0})
     return response.text
 
-# ==========================================================
-# 💉 دالة الحقن وبناء الـ HTML بالصور الحقيقية
-# ==========================================================
-def inject_data_into_template(json_data, category, colors, pexels_key):
-    template_key = "Cosmetics" if "Cosmetics" in category else "Gadgets"
-    final_html = TEMPLATES[template_key]
-    
-    # استخراج وتوليد روابط الصور الحقيقية
-    hero_url = get_real_or_ai_image(json_data.get('image_hero_search', 'product'), pexels_key, 800, 1000, "portrait")
-    prob_url = get_real_or_ai_image(json_data.get('image_problem_search', 'sad person'), pexels_key, 600, 400, "landscape")
-    sol_url = get_real_or_ai_image(json_data.get('image_solution_search', 'happy person'), pexels_key, 800, 600, "landscape")
-    before_url = get_real_or_ai_image(json_data.get('image_before_search', 'sad face'), pexels_key, 400, 500, "portrait")
-    after_url = get_real_or_ai_image(json_data.get('image_after_search', 'clean face'), pexels_key, 400, 500, "portrait")
-    dim_url = get_real_or_ai_image(json_data.get('image_dimensions_search', 'ruler measurement'), pexels_key, 600, 400, "landscape")
 
-    dynamic_html = ""
-    for item in json_data.get('dynamic_items', [])[:3]:
-        item_img = get_real_or_ai_image(item.get('image_search', 'feature'), pexels_key, 200, 200, "square")
-        dynamic_html += f'''
-        <div class="bg-white p-4 rounded-2xl border border-gray-100 flex items-center gap-4 text-right shadow-sm">
-            <img src="{item_img}" class="w-16 h-16 rounded-full object-cover shadow-sm border-2 border-accent flex-shrink-0" loading="lazy">
-            <div><h4 class="font-black text-gray-900 text-lg mb-1">{item.get('title')}</h4><p class="text-sm font-bold text-gray-600 leading-relaxed">{item.get('desc')}</p></div>
+# ==========================================================
+# HTML Builder - 15 Sections Landing Page
+# ==========================================================
+def build_landing_page_html(data, colors):
+    p = colors["primary"]
+    s = colors["secondary"]
+    a = colors["accent"]
+    g1 = colors["gradient1"]
+    g2 = colors["gradient2"]
+
+    hero_img = get_ai_image(data.get('image_hero_search', 'product'), 900, 1100, 'product')
+    prob_img = get_ai_image(data.get('image_problem_search', 'worried person'), 700, 500, 'person')
+    sol_img = get_ai_image(data.get('image_solution_search', 'happy person'), 800, 600, 'person')
+    before_img = get_ai_image(data.get('image_before_search', 'before treatment'), 500, 600, 'before_after')
+    after_img = get_ai_image(data.get('image_after_search', 'after treatment'), 500, 600, 'before_after')
+
+    # Build trust badges
+    badges_html = ""
+    for badge in data.get('trust_badges', []):
+        badges_html += f'<span style="background:rgba(255,255,255,0.15);padding:8px 18px;border-radius:50px;font-size:0.85rem;font-weight:600;">{badge}</span> '
+
+    # Build problem points
+    problems_html = ""
+    for pt in data.get('problem_points', []):
+        problems_html += f'<li style="padding:8px 0;font-size:1.05rem;">\u274c {pt}</li>'
+
+    # Build features with images
+    features_html = ""
+    for feat in data.get('features', [])[:4]:
+        feat_img = get_ai_image(feat.get('image_search', 'feature'), 300, 300, 'product')
+        features_html += f'''<div style="background:white;border-radius:16px;padding:25px;text-align:center;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
+            <img src="{feat_img}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:15px;" alt="">
+            <h4 style="color:{p};font-size:1.1rem;margin-bottom:8px;">{feat.get('title','')}</h4>
+            <p style="color:#64748b;font-size:0.9rem;">{feat.get('desc','')}</p>
         </div>'''
 
-    dimensions_html = ""
-    for dim in json_data.get('dimensions', [])[:4]:
-        dimensions_html += f'<li class="flex items-center gap-3 font-bold text-gray-700"><span class="text-accent text-xl">📏</span> {dim}</li>'
+    # Build ingredients
+    ingredients_html = ""
+    for ing in data.get('ingredients', [])[:3]:
+        ing_img = get_ai_image(ing.get('image_search', 'natural ingredient'), 250, 250, 'product')
+        ingredients_html += f'''<div style="text-align:center;padding:20px;">
+            <img src="{ing_img}" style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid {a};" alt="">
+            <h4 style="color:{p};margin-top:12px;">{ing.get('name','')}</h4>
+            <p style="color:#64748b;font-size:0.9rem;">{ing.get('benefit','')}</p>
+        </div>'''
 
+    # Build how to use
+    steps_html = ""
+    for i, step in enumerate(data.get('how_to_use', [])[:3], 1):
+        steps_html += f'''<div style="text-align:center;padding:20px;">
+            <div style="background:linear-gradient(135deg,{g1},{g2});color:white;width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.3rem;margin:0 auto 12px;">{i}</div>
+            <p style="font-weight:600;color:#1e293b;">{step}</p>
+        </div>'''
+
+    # Build stats
+    stats_html = ""
+    for stat in data.get('stats', [])[:3]:
+        stats_html += f'''<div style="text-align:center;padding:20px;">
+            <div style="font-size:2.5rem;font-weight:900;color:{a};">{stat.get('number','')}</div>
+            <p style="color:white;font-weight:600;margin-top:5px;">{stat.get('label','')}</p>
+        </div>'''
+
+    # Build reviews
     reviews_html = ""
-    for rev in json_data.get('reviews', [])[:3]:
-        stars = '⭐' * int(rev.get('rating', 5))
-        reviews_html += f'''
-        <div class="bg-gray-50 p-5 rounded-2xl border border-gray-100 shadow-sm text-right">
-            <div class="flex justify-between items-center mb-2"><span class="font-black text-primary">{rev.get('name')}</span><span class="text-accent text-sm tracking-tighter">{stars}</span></div>
-            <p class="text-gray-700 font-bold italic leading-relaxed text-sm">"{rev.get('comment')}"</p>
-            <div class="mt-3 text-xs text-green-600 font-black flex items-center gap-1"><span>✅</span> مشتري موثق</div>
+    for rev in data.get('reviews', [])[:3]:
+        stars = '\u2b50' * int(rev.get('rating', 5))
+        rev_img = get_ai_image(rev.get('image_search', 'person portrait'), 150, 150, 'person')
+        reviews_html += f'''<div style="background:white;border-radius:16px;padding:25px;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+                <img src="{rev_img}" style="width:50px;height:50px;border-radius:50%;object-fit:cover;" alt="">
+                <div><strong>{rev.get('name','')}</strong><br><span style="color:{a};">{stars}</span></div>
+            </div>
+            <p style="color:#475569;font-style:italic;">"{rev.get('comment','')}"</p>
+            <p style="color:#22c55e;font-size:0.8rem;margin-top:8px;">\u2705 مشتري موثق</p>
         </div>'''
 
+    # Build FAQ
     faq_html = ""
-    for faq in json_data.get('faq', [])[:4]:
-        faq_html += f'''
-        <details class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 group cursor-pointer mb-2">
-            <summary class="font-black text-gray-900 text-base flex justify-between items-center outline-none">{faq.get('q')}<span class="text-accent group-open:rotate-180 transition-transform">▼</span></summary>
-            <p class="text-gray-600 text-sm font-bold mt-3 border-t pt-3 border-gray-100">{faq.get('a')}</p>
+    for faq in data.get('faq', [])[:4]:
+        faq_html += f'''<details style="background:white;border-radius:12px;padding:18px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);cursor:pointer;">
+            <summary style="font-weight:700;color:{p};font-size:1.05rem;">{faq.get('q','')}</summary>
+            <p style="color:#64748b;margin-top:10px;padding-top:10px;border-top:1px solid #e2e8f0;">{faq.get('a','')}</p>
         </details>'''
 
-    # حقن الروابط والنصوص
-    final_html = final_html.replace("{{IMAGE_HERO_URL}}", hero_url)
-    final_html = final_html.replace("{{IMAGE_PROBLEM_URL}}", prob_url)
-    final_html = final_html.replace("{{IMAGE_SOLUTION_URL}}", sol_url)
-    final_html = final_html.replace("{{IMAGE_BEFORE_URL}}", before_url)
-    final_html = final_html.replace("{{IMAGE_AFTER_URL}}", after_url)
-    final_html = final_html.replace("{{IMAGE_DIMENSIONS_URL}}", dim_url)
-    
-    final_html = final_html.replace("{{DYNAMIC_SECTION_HTML}}", dynamic_html)
-    final_html = final_html.replace("{{DIMENSIONS_HTML}}", dimensions_html)
-    final_html = final_html.replace("{{REVIEWS_HTML}}", reviews_html)
-    final_html = final_html.replace("{{FAQ_HTML}}", faq_html)
-    
-    final_html = final_html.replace("{{COLOR_PRIMARY}}", colors['primary'])
-    final_html = final_html.replace("{{COLOR_SECONDARY}}", colors['secondary'])
-    final_html = final_html.replace("{{COLOR_ACCENT}}", colors['accent'])
+    pricing = data.get('pricing', {})
+    cta = data.get('call_to_action', 'اطلب الآن')
 
-    final_html = final_html.replace("{{HERO_HEADLINE}}", json_data.get("hero_headline", ""))
-    final_html = final_html.replace("{{HERO_SUB}}", json_data.get("hero_subheadline", ""))
-    final_html = final_html.replace("{{PROBLEM_TITLE}}", json_data.get("problem_title", ""))
-    final_html = final_html.replace("{{PROBLEM_DESC}}", json_data.get("problem_description", ""))
-    final_html = final_html.replace("{{SOLUTION_TITLE}}", json_data.get("solution_title", ""))
-    final_html = final_html.replace("{{SOLUTION_DESC}}", json_data.get("solution_description", ""))
-    final_html = final_html.replace("{{GUARANTEE_TITLE}}", json_data.get("guarantee_title", "ضمان الجودة"))
-    final_html = final_html.replace("{{GUARANTEE_TEXT}}", json_data.get("guarantee_text", ""))
-    final_html = final_html.replace("{{CTA_BUTTON}}", json_data.get("call_to_action", "اطلب الآن"))
-    
-    return final_html
+    html = f'''<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {{ margin:0; padding:0; box-sizing:border-box; }}
+        body {{ font-family:'Cairo',sans-serif; background:{s}; color:#1e293b; direction:rtl; scroll-behavior:smooth; }}
+        img {{ max-width:100%; height:auto; }}
+        .container {{ max-width:800px; margin:0 auto; padding:0 20px; }}
+        .btn {{ display:inline-block; background:linear-gradient(135deg,{a},{a}dd); color:white; padding:18px 45px; border-radius:12px; font-weight:800; font-size:1.2rem; text-decoration:none; text-align:center; box-shadow:0 8px 25px {a}44; transition:all 0.3s; border:none; cursor:pointer; width:100%; max-width:400px; }}
+        .btn:hover {{ transform:translateY(-3px); box-shadow:0 12px 35px {a}66; }}
+        .section {{ padding:50px 20px; }}
+        .section-title {{ font-size:1.8rem; font-weight:900; color:{p}; text-align:center; margin-bottom:25px; }}
+    </style>
+</head>
+<body>
+
+<!-- 1. Top Bar -->
+<div style="background:{p};color:white;text-align:center;padding:12px;font-size:0.9rem;">
+    <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;">{badges_html}</div>
+</div>
+
+<!-- 2. Hero Section -->
+<section style="background:linear-gradient(135deg,{g1},{g2});color:white;padding:60px 20px;text-align:center;">
+    <div class="container">
+        <h1 style="font-size:2.5rem;font-weight:900;margin-bottom:15px;line-height:1.4;">{data.get('hero_headline','')}</h1>
+        <p style="font-size:1.2rem;opacity:0.9;margin-bottom:25px;">{data.get('hero_subheadline','')}</p>
+        <img src="{hero_img}" style="max-width:350px;border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,0.3);margin:20px auto;display:block;" alt="">
+        <a href="#order" class="btn" style="margin-top:25px;">{cta}</a>
+    </div>
+</section>
+
+<!-- 3. Problem Section -->
+<section class="section" style="background:white;">
+    <div class="container">
+        <h2 class="section-title">\u26a0\ufe0f {data.get('problem_title','')}</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center;">
+            <div>
+                <p style="font-size:1.1rem;color:#475569;line-height:1.8;margin-bottom:15px;">{data.get('problem_description','')}</p>
+                <ul style="list-style:none;padding:0;">{problems_html}</ul>
+            </div>
+            <img src="{prob_img}" style="border-radius:16px;width:100%;" alt="">
+        </div>
+    </div>
+</section>
+
+<!-- 4. Solution Section -->
+<section class="section" style="background:linear-gradient(135deg,{g1},{g2});color:white;">
+    <div class="container">
+        <h2 style="font-size:1.8rem;font-weight:900;text-align:center;margin-bottom:25px;">\u2728 {data.get('solution_title','')}</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center;">
+            <div><p style="font-size:1.1rem;line-height:1.8;">{data.get('solution_description','')}</p></div>
+            <img src="{sol_img}" style="border-radius:16px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,0.2);" alt="">
+        </div>
+    </div>
+</section>
+
+<!-- 5. Before/After -->
+<section class="section" style="background:{s};">
+    <div class="container">
+        <h2 class="section-title">تحول مذهل تلاحظه فوراً!</h2>
+        <div style="display:grid;grid-template-columns:1fr 60px 1fr;gap:15px;align-items:center;text-align:center;">
+            <div><img src="{before_img}" style="border-radius:16px;width:100%;border:3px solid #ef4444;" alt=""><p style="margin-top:10px;font-weight:700;color:#ef4444;">قبل</p></div>
+            <div style="font-size:2rem;font-weight:900;color:{a};">\u27a1</div>
+            <div><img src="{after_img}" style="border-radius:16px;width:100%;border:3px solid #22c55e;" alt=""><p style="margin-top:10px;font-weight:700;color:#22c55e;">بعد</p></div>
+        </div>
+    </div>
+</section>
+
+<!-- 6. Features Section -->
+<section class="section" style="background:white;">
+    <div class="container">
+        <h2 class="section-title">لماذا هذا المنتج مختلف؟</h2>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">{features_html}</div>
+    </div>
+</section>
+
+<!-- 7. Ingredients/Components -->
+<section class="section" style="background:{s};">
+    <div class="container">
+        <h2 class="section-title">السر في مكوناتنا</h2>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">{ingredients_html}</div>
+    </div>
+</section>
+
+<!-- 8. How To Use -->
+<section class="section" style="background:white;">
+    <div class="container">
+        <h2 class="section-title">كيف تستخدمه؟</h2>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">{steps_html}</div>
+    </div>
+</section>
+
+<!-- 9. Stats Section -->
+<section style="background:linear-gradient(135deg,{g1},{g2});padding:40px 20px;">
+    <div class="container">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">{stats_html}</div>
+    </div>
+</section>
+
+<!-- 10. Video Section -->
+<section class="section" style="background:{s};">
+    <div class="container" style="text-align:center;">
+        <h2 class="section-title">شاهد تجارب عملائنا</h2>
+        <div style="background:#1e293b;border-radius:16px;padding:60px;color:white;">
+            <p style="font-size:3rem;">\u25b6\ufe0f</p>
+            <p style="margin-top:10px;opacity:0.7;">ضع رابط فيديو يوتيوب هنا</p>
+        </div>
+    </div>
+</section>
+
+<!-- 11. Reviews -->
+<section class="section" style="background:white;">
+    <div class="container">
+        <h2 class="section-title">آراء العملاء</h2>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;">{reviews_html}</div>
+    </div>
+</section>
+
+<!-- 12. Pricing -->
+<section id="order" class="section" style="background:linear-gradient(135deg,{g1},{g2});color:white;text-align:center;">
+    <div class="container">
+        <h2 style="font-size:1.8rem;font-weight:900;margin-bottom:20px;">احصل عليه الآن!</h2>
+        <div style="background:white;border-radius:20px;padding:30px;display:inline-block;">
+            <p style="color:#94a3b8;text-decoration:line-through;font-size:1.3rem;">{pricing.get('original','')} {pricing.get('currency','')}</p>
+            <p style="color:{p};font-size:2.5rem;font-weight:900;">{pricing.get('discounted','')} {pricing.get('currency','')}</p>
+            <p style="background:{a};color:white;display:inline-block;padding:5px 15px;border-radius:50px;font-weight:700;margin-top:10px;">خصم {pricing.get('discount_percent','')}</p>
+        </div>
+        <p style="margin-top:15px;font-size:1.1rem;font-weight:600;color:#fbbf24;">{data.get('urgency_text','')}</p>
+        <a href="#" class="btn" style="margin-top:20px;display:inline-block;">{cta}</a>
+    </div>
+</section>
+
+<!-- 13. FAQ -->
+<section class="section" style="background:{s};">
+    <div class="container">
+        <h2 class="section-title">\u2753 الأسئلة الشائعة</h2>
+        {faq_html}
+    </div>
+</section>
+
+<!-- 14. Guarantee -->
+<section class="section" style="background:white;text-align:center;">
+    <div class="container">
+        <div style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:2px solid #22c55e;border-radius:20px;padding:40px;">
+            <p style="font-size:3rem;">\U0001f6e1</p>
+            <h3 style="color:#15803d;font-size:1.5rem;margin:15px 0;">{data.get('guarantee_title','')}</h3>
+            <p style="color:#475569;font-size:1.05rem;">{data.get('guarantee_text','')}</p>
+        </div>
+    </div>
+</section>
+
+<!-- 15. Footer CTA -->
+<section style="background:{p};color:white;padding:40px 20px;text-align:center;">
+    <div class="container">
+        <h2 style="font-size:1.5rem;font-weight:900;margin-bottom:15px;">لا تفوت هذا العرض!</h2>
+        <a href="#order" class="btn" style="display:inline-block;">{cta}</a>
+        <p style="margin-top:20px;opacity:0.6;font-size:0.85rem;">{data.get('footer_text','')}</p>
+    </div>
+</section>
+
+</body>
+</html>'''
+    return html
+
 
 # ==========================================================
-# 🎛️ واجهة المستخدم والقائمة الجانبية
+# UI - Sidebar and Main
 # ==========================================================
 with st.sidebar:
     st.header("⚙️ الإعدادات العامة")
     global_api_key = st.text_input("🔑 Gemini API Key", type="password")
-    global_product_name = st.text_area("📦 تفاصيل واسم المنتج", placeholder="مثال: جهاز تنظيف الوجه الحديث مع فرشتين.")
+    global_product_name = st.text_area("📦 تفاصيل واسم المنتج", placeholder="مثال: كريم كولاجين كوري للبشرة")
     global_category = st.selectbox("📦 فئة المنتج", ["💄 مستحضرات تجميل وعناية (Cosmetics)", "⚙️ أدوات وأجهزة ذكية (Gadgets)"])
-    
-    st.markdown("---")
-    st.subheader("📸 الصور الحقيقية (Real Images)")
-    pexels_key = st.text_input("🔑 Pexels API Key (اختياري)", type="password", help="احصل عليه مجاناً من Pexels.com لتعطيك الأداة صوراً فوتوغرافية حقيقية 100% لأشخاص ومنتجات بدلاً من الذكاء الاصطناعي.")
-    
     st.markdown("---")
     st.header("🛠️ اختر الأداة")
     app_mode = st.radio("قائمة التحكم:", ["🏗️ منشئ صفحات الهبوط", "🔍 بحث السوق المعمق (SOP-1)", "💰 حاسبة التعادل المالي (Matrix)"])
     st.markdown("---")
 
-# ---------------------------------------------------------
-# أداة 1: منشئ صفحات الهبوط
-# ---------------------------------------------------------
 if app_mode == "🏗️ منشئ صفحات الهبوط":
-    with st.sidebar:
-        with st.expander("🎨 تخصيص ألوان صفحة الهبوط", expanded=True):
-            col1, col2 = st.columns(2)
-            with col1: color_primary = st.color_picker("أساسي", "#0f766e" if "Cosmetics" in global_category else "#1f2937")
-            with col2: color_accent = st.color_picker("الزر", "#eab308" if "Cosmetics" in global_category else "#ef4444")
-            color_secondary = st.color_picker("ثانوي", "#f8fafc")
-            colors_dict = {'primary': color_primary, 'secondary': color_secondary, 'accent': color_accent}
-        
-        start_btn = st.button("🚀 توليد الصفحة (سحر حقيقي!)")
-
+    start_btn = st.button("🚀 توليد صفحة الهبوط (15 قسم + صور AI)")
     if start_btn:
         if not global_api_key or not global_product_name:
-            st.error("الرجاء إدخال المفتاح واسم المنتج في القائمة الجانبية.")
+            st.error("الرجاء إدخال المفتاح واسم المنتج.")
         else:
-            with st.spinner("🤖 جاري الهندسة، كتابة المحتوى، وجلب الصور الفوتوغرافية الحقيقية..."):
+            with st.spinner("🤖 جاري بناء صفحة الهبوط بـ 15 قسم + صور AI عالية الجودة..."):
                 try:
                     raw_json = generate_landing_page_json(global_api_key, global_product_name, global_category)
                     parsed_data = json.loads(raw_json)
-                    st.session_state.final_page = inject_data_into_template(parsed_data, global_category, colors_dict, pexels_key)
-                    st.success("🎉 اكتمل البناء بنجاح! لاحظ احترافية الصور وواقعيتها.")
+                    auto_colors = detect_colors(global_product_name, global_category)
+                    st.session_state.final_page = build_landing_page_html(parsed_data, auto_colors)
+                    st.success("🎉 اكتمل البناء! 15 قسم + صور AI + ألوان تلقائية")
                 except Exception as e:
                     st.error(f"🛑 خطأ: {str(e)}")
-
     if 'final_page' in st.session_state:
-        tab1, tab2 = st.tabs(["📱 المعاينة البصرية", "💻 كود HTML (للنسخ)"])
+        tab1, tab2 = st.tabs(["📱 المعاينة البصرية", "💻 كود HTML"])
         with tab1:
-            if pexels_key:
-                st.success("📸 تم تفعيل محرك Pexels! الصور المعروضة أدناه هي صور فوتوغرافية حقيقية 100% تم جلبها من أرشيف Pexels.")
-            else:
-                st.info("💡 تم تفعيل محرك الذكاء الاصطناعي بنمط (كاميرا الهاتف) لتبدو الصور عفوية وحقيقية قدر الإمكان. لصور حقيقية 100%، أضف مفتاح Pexels في الجانب.")
-            components.html(st.session_state.final_page, height=1000, scrolling=True)
+            components.html(st.session_state.final_page, height=2500, scrolling=True)
         with tab2:
             st.code(st.session_state.final_page, language="html")
 
-# ---------------------------------------------------------
-# أداة 2: بحث السوق المعمق (Deep Research)
-# ---------------------------------------------------------
 elif app_mode == "🔍 بحث السوق المعمق (SOP-1)":
-    st.markdown("### 🔍 البحث المعمق في السوق والمنافسين")
-    st.write(f"تحليل صارم لـ: **{global_product_name if global_product_name else '[يرجى إدخال المنتج]'}**")
-    
-    start_research_btn = st.button("🧠 استخراج وثائق البيع الاستراتيجية")
-
-    if start_research_btn:
+    st.markdown("### 🔍 البحث المعمق في السوق")
+    if st.button("🧠 استخراج وثائق البيع"):
         if not global_api_key or not global_product_name:
-            st.error("الرجاء إدخال المفتاح واسم المنتج أولاً.")
+            st.error("الرجاء إدخال المفتاح واسم المنتج.")
         else:
-            with st.spinner("🕵️‍♂️ جاري الغوص في أعماق السوق وبناء الوثائق التأسيسية الأربعة..."):
+            with st.spinner("🕵️‍♂️ جاري البحث..."):
                 try:
-                    research_result = generate_deep_research(global_api_key, global_product_name, global_category)
-                    st.session_state.research_output = research_result
-                    st.success("✅ اكتمل البحث! إليك التقرير السري لمنتجك.")
+                    result = generate_deep_research(global_api_key, global_product_name, global_category)
+                    st.session_state.research_output = result
+                    st.success("✅ اكتمل البحث!")
                 except Exception as e:
-                    st.error(f"🛑 حدث خطأ: {str(e)}")
-
+                    st.error(f"🛑 {str(e)}")
     if 'research_output' in st.session_state:
-        st.markdown("---")
         st.markdown(st.session_state.research_output)
-        with st.expander("💾 عرض التقرير الخام للنسخ"):
-            st.text_area("التقرير:", value=st.session_state.research_output, height=300)
 
-# ---------------------------------------------------------
-# أداة 3: حاسبة التعادل والمصفوفة المالية
-# ---------------------------------------------------------
 elif app_mode == "💰 حاسبة التعادل المالي (Matrix)":
-    st.markdown("### 💰 حاسبة نقطة التعادل والمصفوفة المالية")
-    
+    st.markdown("### 💰 حاسبة نقطة التعادل")
     COUNTRIES = {
-        "السعودية (KSA)": {"currency": "SAR", "P": 199.0, "C": 85.0, "CPL": 25.0},
-        "الإمارات (UAE)": {"currency": "AED", "P": 149.0, "C": 60.0, "CPL": 30.0},
-        "الكويت (KWT)": {"currency": "KWD", "P": 19.0, "C": 8.0, "CPL": 2.5},
-        "سلطنة عمان (OMN)": {"currency": "OMR", "P": 19.0, "C": 8.0, "CPL": 3.0},
-        "قطر (QAT)": {"currency": "QAR", "P": 199.0, "C": 80.0, "CPL": 35.0},
-        "البحرين (BHD)": {"currency": "BHD", "P": 19.0, "C": 8.0, "CPL": 3.0},
-        "المغرب (MAD)": {"currency": "MAD", "P": 299.0, "C": 120.0, "CPL": 40.0},
-        "مصر (EGP)": {"currency": "EGP", "P": 500.0, "C": 200.0, "CPL": 50.0},
-        "أخرى (Custom)": {"currency": "USD", "P": 50.0, "C": 20.0, "CPL": 5.0},
+        "السعودية": {"currency": "SAR", "P": 199.0, "C": 85.0, "CPL": 25.0},
+        "الإمارات": {"currency": "AED", "P": 149.0, "C": 60.0, "CPL": 30.0},
+        "الكويت": {"currency": "KWD", "P": 19.0, "C": 8.0, "CPL": 2.5},
+        "المغرب": {"currency": "MAD", "P": 299.0, "C": 120.0, "CPL": 40.0},
+        "مصر": {"currency": "EGP", "P": 500.0, "C": 200.0, "CPL": 50.0},
+        "أخرى": {"currency": "USD", "P": 50.0, "C": 20.0, "CPL": 5.0},
     }
-
-    col_country, col_currency = st.columns(2)
-    with col_country: selected_country = st.selectbox("🌍 الدولة:", list(COUNTRIES.keys()))
-    with col_currency: currency = st.text_input("💱 العملة:", value=COUNTRIES[selected_country]["currency"])
-
-    default_vals = COUNTRIES[selected_country]
-
-    st.markdown("##### 💵 البيانات المالية")
-    col1, col2, col3 = st.columns(3)
-    P = col1.number_input(f"سعر البيع (P) [{currency}]", value=default_vals["P"], step=1.0)
-    C = col2.number_input(f"تكلفة المنتج+الشحن (C) [{currency}]", value=default_vals["C"], step=1.0)
-    actual_cpl = col3.number_input(f"تكلفة الليد (CPL) [{currency}]", value=default_vals["CPL"], step=0.5)
-
-    st.markdown("##### 📈 معدلات الأداء المتوقعة")
-    col4, col5 = st.columns(2)
-    CR_percent = col4.slider("نسبة التأكيد (CR) %", min_value=10, max_value=100, value=60)
-    DR_percent = col5.slider("نسبة التسليم (DR) %", min_value=10, max_value=100, value=55)
-    
-    CR, DR = CR_percent / 100.0, DR_percent / 100.0
-    gross_margin = P - C
-    max_cpl = gross_margin * CR * DR
-    max_cpa = gross_margin * DR
-    profit_per_lead = max_cpl - actual_cpl
-
-    st.markdown("---")
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric(f"هامش الربح", f"{gross_margin:.2f} {currency}")
-    m2.metric(f"أقصى CPL", f"{max_cpl:.2f} {currency}")
-    m3.metric(f"أقصى CPA", f"{max_cpa:.2f} {currency}")
-    if profit_per_lead >= 0: m4.metric("حالة الإعلان", "✅ رابح", f"+ {profit_per_lead:.2f} صافي")
-    else: m4.metric("حالة الإعلان", "🚨 خاسر", f"{profit_per_lead:.2f} خسارة")
-
-    st.markdown("---")
-    st.markdown("#### 🧮 مصفوفة أقصى تكلفة لليد (Max CPL Matrix)")
-    
-    dr_list = [x/100.0 for x in range(30, 100, 5)]
-    cr_list = [x/100.0 for x in range(30, 100, 5)]
-    matrix_data = []
-    for cr_val in cr_list:
-        row = {'CR \\ DR': f"{int(cr_val*100)}%"}
-        for dr_val in dr_list: row[f"{int(dr_val*100)}%"] = round(gross_margin * cr_val * dr_val, 2)
-        matrix_data.append(row)
-
-    df_matrix = pd.DataFrame(matrix_data)
-    try:
-        st.dataframe(df_matrix.style.background_gradient(cmap='RdYlGn', subset=df_matrix.columns[1:]), use_container_width=True)
-    except Exception:
-        st.dataframe(df_matrix, use_container_width=True)
+    sel = st.selectbox("🌍 الدولة:", list(COUNTRIES.keys()))
+    d = COUNTRIES[sel]
+    c1, c2, c3 = st.columns(3)
+    P = c1.number_input(f"سعر البيع [{d['currency']}]", value=d["P"])
+    C = c2.number_input(f"التكلفة [{d['currency']}]", value=d["C"])
+    CPL = c3.number_input(f"CPL [{d['currency']}]", value=d["CPL"])
+    c4, c5 = st.columns(2)
+    CR = c4.slider("CR %", 10, 100, 60) / 100
+    DR = c5.slider("DR %", 10, 100, 55) / 100
+    margin = P - C
+    max_cpl = margin * CR * DR
+    profit = max_cpl - CPL
+    m1, m2, m3 = st.columns(3)
+    m1.metric("هامش الربح", f"{margin:.2f} {d['currency']}")
+    m2.metric("أقصى CPL", f"{max_cpl:.2f} {d['currency']}")
+    if profit >= 0:
+        m3.metric("الحالة", "✅ رابح", f"+{profit:.2f}")
+    else:
+        m3.metric("الحالة", "🚨 خاسر", f"{profit:.2f}")
