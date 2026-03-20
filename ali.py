@@ -361,7 +361,7 @@ img {{ max-width:100%; height:auto; display:block; }}
     }})();
     </script></body></html>'''
     html = html.replace('<img ', '<img loading=lazy ')
-        return html
+    return html
 
 # UI - Sidebar and Main
 with st.sidebar:
