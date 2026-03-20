@@ -360,7 +360,8 @@ img {{ max-width:100%; height:auto; display:block; }}
         tick();
     }})();
     </script></body></html>'''
-    return html
+    html = html.replace('<img ', '<img loading=lazy ')
+        return html
 
 # UI - Sidebar and Main
 with st.sidebar:
