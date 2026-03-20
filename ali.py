@@ -364,11 +364,6 @@ img {{ max-width:100%; height:auto; display:block; }}
     </script></body></html>'''
     html = html.replace('<img ', '<img loading=lazy ')
 
-        # Add sequential image loader script before </body>
-            loader_js = '<script>document.addEventListener("DOMContentLoaded",function(){var imgs=document.querySelectorAll("img[data-src]");var i=0;function loadNext(){if(i>=imgs.length)return;imgs[i].onerror=function(){this.onerror=null;this.style.background="#f0f0f0";this.alt="Image";};imgs[i].src=imgs[i].getAttribute("data-src");imgs[i].onload=function(){i++;setTimeout(loadNext,1500);};imgs[i].onerror=function(){this.style.background="#f0f0f0";this.style.minHeight="200px";i++;setTimeout(loadNext,1500);};i++;if(i<imgs.length)setTimeout(loadNext,1500);}loadNext();});</script>'
-    # Move pollinations URLs from src to data-src for sequential loading
-    html = html.replace(' src="https://image.pollinations.ai/', ' data-src="https://image.pollinations.ai/')
-    html = html.replace('</body>', loader_js + '</body>')
     return html
 
     def get_youcan_html(html):
@@ -416,7 +411,7 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                 except Exception as e:
                     st.error(f"\U0001f6d1 \u062e\u0637\u0623: {str(e)}")
     if 'final_page' in st.session_state:
-        tab1, tab2, tab3 = st.tabs(["\U0001f4f1 \u0627\u0644\u0645\u0639\u0627\u064a\u0646\u0629 \u0627\u0644\u0628\u0635\u0631\u064a\u0629", "\U0001f4bb \u0643\u0648\u062f HTML", "\U0001f4e5 \u062a\u062d\u0645\u064a\u0644 JSON"])
+        tab1, tab2, tab3, tab4 = st.tabs(["\U0001f4f1 \u0627\u0644\u0645\u0639\u0627\u064a\u0646\u0629 \u0627\u0644\u0628\u0635\u0631\u064a\u0629", "\U0001f4bb \u0643\u0648\u062f HTML", "\U0001f4e5 \u062a\u062d\u0645\u064a\u0644 JSON", "\U0001f4e4 YouCan HTML"])
         with tab1:
             components.html(st.session_state.final_page, height=4000, scrolling=True)
         with tab2:
@@ -431,6 +426,12 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                     mime="application/json"
                 )
                 st.json(st.session_state.parsed_json)
+                        with tab4:
+                                        if 'final_page' in st.session_state:
+                                                            youcan_html = get_youcan_html(st.session_state.final_page)
+                                                                            st.info("\u0627\u0646\u0633\u062e \u0647\u0630\u0627 \u0627\u0644\u0643\u0648\u062f \u0648\u0627\u0644\u0635\u0642\u0647 \u0641\u064a YouCan > \u0627\u0644\u062a\u0635\u0645\u064a\u0645 > HTML")
+                                                                                            st.code(youcan_html, language="html")
+                                                                                                            st.download_button(label="\U0001f4e5 \u062a\u062d\u0645\u064a\u0644 YouCan HTML", data=youcan_html, file_name="youcan_landing.html", mime="text/html")
 
 elif app_mode == "\U0001f50d \u0628\u062d\u062b \u0627\u0644\u0633\u0648\u0642 \u0627\u0644\u0645\u0639\u0645\u0642 (SOP-1)":
     st.markdown("### \U0001f50d \u0627\u0644\u0628\u062d\u062b \u0627\u0644\u0645\u0639\u0645\u0642 \u0641\u064a \u0627\u0644\u0633\u0648\u0642")
