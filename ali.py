@@ -215,7 +215,7 @@ def build_landing_page_html(data, colors):
     for faq in data.get('faq', [])[:4]:
         faq_html += f'<details style="background:white;border-radius:10px;padding:15px;margin-bottom:10px;cursor:pointer"><summary style="font-weight:700;color:{p}">{faq.get("q","")}</summary><p style="color:#475569;margin-top:10px">{faq.get("a","")}</p></details>'
 
-    pricing = data.get('pricing', {{}})
+    pricing = data.get('pricing', {})
     cta = data.get('call_to_action', 'اطلب الآن')
 
     html = f'''<!DOCTYPE html>
