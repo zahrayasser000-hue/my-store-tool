@@ -683,7 +683,7 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                 csv = prompt_df.to_csv(index=False)
                 st.download_button('Download Prompts CSV', csv, 'image_prompts.csv', 'text/csv')
                 else:
-                    st.warning("قم بتوليد صفحة هبوط أولاً")                
+                    st.warning("قم بتوليد صفحة هبوط أولاً")
     st.markdown("### \U0001f50d \u0627\u0644\u0628\u062d\u062b \u0627\u0644\u0645\u0639\u0645\u0642 \u0641\u064a \u0627\u0644\u0633\u0648\u0642")
     if st.button("\U0001f9e0 \u0627\u0633\u062a\u062e\u0631\u0627\u062c \u0648\u062b\u0627\u0626\u0642 \u0627\u0644\u0628\u064a\u0639"):
         if not global_api_key or not global_product_name:
