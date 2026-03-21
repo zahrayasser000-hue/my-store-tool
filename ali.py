@@ -645,16 +645,16 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                             st.session_state.generated_images = generated
                             st.success(f"\u2705 تم توليد {len(generated)} صورة بنجاح!")
                 if 'generated_images' in st.session_state:
-                                    prompts = extract_image_prompts(st.session_state.parsed_json) if 'parsed_json' in st.session_state else []
+                prompts = extract_image_prompts(st.session_state.parsed_json) if 'parsed_json' in st.session_state else []
                     st.markdown("#### الصور المولدة:")
                     cols = st.columns(3)
                     for i, (pid, img_b64) in enumerate(st.session_state.generated_images.items()):
                         with cols[i % 3]:
                                                         st.image(img_b64, caption=pid, use_column_width=True)
-                    html_with_imgs = st.session_state.final_page
-                                        for p in prompts:
-                        if p['id'] in st.session_state.generated_images:
-                            html_with_imgs = html_with_imgs.replace(p['poll_url'], st.session_state.generated_images[p['id']], 1)
+                html_with_imgs = st.session_state.final_page
+                for p in prompts:
+                    if p['id'] in st.session_state.generated_images:
+                        html_with_imgs = html_with_imgs.replace(p['poll_url'], st.session_state.generated_images[p['id']], 1)
                     st.session_state.final_page_ai = html_with_imgs
                     st.success("تم إدراج الصور في كود HTML بنجاح!")
                     st.download_button("تحميل HTML مع الصور", html_with_imgs, "landing_page_with_ai_images.html", "text/html")
