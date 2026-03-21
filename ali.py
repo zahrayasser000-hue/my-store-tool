@@ -376,37 +376,38 @@ def get_youcan_html(html):
     clean = clean.replace('id="cd-hours"', '').replace('id="cd-mins"', '').replace('id="cd-secs"', '')
     clean = clean.replace('id="cd2-h"', '').replace('id="cd2-m"', '').replace('id="cd2-s"', '')
     return clean
-
+    
 def extract_image_prompts(data):
-        prompts = []
-            idx = [1]
-                def add(section, keyword, img_type):
-                            pid = f"IMG_{idx[0]:02d}_{section.upper()}"
-                                    prompt = get_ai_image(keyword, 800, 600, img_type)
-                                            decoded = urllib.parse.unquote(prompt.split('prompt/')[1].split('?')[0]) if 'prompt/' in prompt else keyword
-                                                    prompts.append({"id": pid, "section": section, "type": img_type, "keyword": keyword, "prompt": decoded})
-                                                            idx[0] += 1
-                                                                add("hero", data.get('image_hero_search','product'), "product")
-                                                                    add("hero_lifestyle", data.get('image_hero_lifestyle_search','lifestyle'), "lifestyle")
-                                                                        add("hero_closeup", data.get('image_hero_closeup_search','closeup'), "product")
-                                                                            add("problem", data.get('image_problem_search','problem'), "problem")
-                                                                                add("problem2", data.get('image_problem_2_search','problem2'), "problem")
-                                                                                    add("solution", data.get('image_solution_search','solution'), "solution")
-                                                                                        add("solution2", data.get('image_solution_2_search','solution2'), "lifestyle")
-                                                                                            add("before", data.get('image_before_search','before'), "before_after")
-                                                                                                add("after", data.get('image_after_search','after'), "before_after")
-                                                                                                    dims = data.get('dimensions', {})
-                                                                                                        add("dimensions", dims.get('image_search','dimensions'), "dimensions")
-                                                                                                            for i, feat in enumerate(data.get('features', [])[:4], 1):
-                                                                                                                        add(f"feature_{i}", feat.get('image_search','feature'), "feature")
-                                                                                                                            for i, ing in enumerate(data.get('ingredients', [])[:3], 1):
-                                                                                                                                        add(f"ingredient_{i}", ing.get('image_search','ingredient'), "ingredient")
-                                                                                                                                            step_imgs = data.get('how_to_use_images', [])
-                                                                                                                                                for i in range(min(3, len(step_imgs))):
-                                                                                                                                                            add(f"step_{i+1}", step_imgs[i], "gif_step")
-                                                                                                                                                                for i, rev in enumerate(data.get('reviews', [])[:3], 1):
-                                                                                                                                                                            add(f"review_{i}", rev.get('image_search','person'), "review")
-                                                                                                                                                                                return prompts
+    prompts = []
+    idx = [1]
+    def add(section, keyword, img_type):
+        pid = f"IMG_{idx[0]:02d}_{section.upper()}"
+        prompt = get_ai_image(keyword, 800, 600, img_type)
+        decoded = urllib.parse.unquote(prompt.split('prompt/')[1].split('?')[0]) if 'prompt/' in prompt else keyword
+        prompts.append({"id": pid, "section": section, "type": img_type, "keyword": keyword, "prompt": decoded})
+        idx[0] += 1
+    add("hero", data.get('image_hero_search','product'), "product")
+    add("hero_lifestyle", data.get('image_hero_lifestyle_search','lifestyle'), "lifestyle")
+    add("hero_closeup", data.get('image_hero_closeup_search','closeup'), "product")
+    add("problem", data.get('image_problem_search','problem'), "problem")
+    add("problem2", data.get('image_problem_2_search','problem2'), "problem")
+    add("solution", data.get('image_solution_search','solution'), "solution")
+    add("solution2", data.get('image_solution_2_search','solution2'), "lifestyle")
+    add("before", data.get('image_before_search','before'), "before_after")
+    add("after", data.get('image_after_search','after'), "before_after")
+    dims = data.get('dimensions', {})
+    add("dimensions", dims.get('image_search','dimensions'), "dimensions")
+    for i, feat in enumerate(data.get('features', [])[:4], 1):
+        add(f"feature_{i}", feat.get('image_search','feature'), "feature")
+    for i, ing in enumerate(data.get('ingredients', [])[:3], 1):
+        add(f"ingredient_{i}", ing.get('image_search','ingredient'), "ingredient")
+    step_imgs = data.get('how_to_use_images', [])
+    for i in range(min(3, len(step_imgs))):
+        add(f"step_{i+1}", step_imgs[i], "gif_step")
+    for i, rev in enumerate(data.get('reviews', [])[:3], 1):
+        add(f"review_{i}", rev.get('image_search','person'), "review")
+    return prompts
+    
 
 # UI - Sidebar and Main
 with st.sidebar:
@@ -442,7 +443,7 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                 except Exception as e:
                     st.error(f"\U0001f6d1 \u062e\u0637\u0623: {str(e)}")
     if 'final_page' in st.session_state:
-        tab1, tab2, tab3, tab4 = st.tabs(["\U0001f4f1 \u0627\u0644\u0645\u0639\u0627\u064a\u0646\u0629 \u0627\u0644\u0628\u0635\u0631\u064a\u0629", "\U0001f4bb \u0643\u0648\u062f HTML", "\U0001f4e5 \u062a\u062d\u0645\u064a\u0644 JSON", "\U0001f4e4 YouCan HTML", "🎨 مولد البرومبتات"])
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["\U0001f4f1 \u0627\u0644\u0645\u0639\u0627\u064a\u0646\u0629 \u0627\u0644\u0628\u0635\u0631\u064a\u0629", "\U0001f4bb \u0643\u0648\u062f HTML", "\U0001f4e5 \u062a\u062d\u0645\u064a\u0644 JSON", "\U0001f4e4 YouCan HTML", "🎨 مولد البرومبتات"])
         with tab1:
             components.html(st.session_state.final_page, height=4000, scrolling=True)
         with tab2:
@@ -458,22 +459,10 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                 )
                 st.json(st.session_state.parsed_json)
             with tab4:
-                youcan_html = get_youcan_html(st.session_state.final_page)
-                st.info("انسخ هذا الكود والصقه في YouCan")
-                st.code(youcan_html, language="html")
-                st.download_button(label="تحميل YouCan HTML", data=youcan_html, file_name="youcan.html", mime="text/html")
-                        with tab5:
-                                        if 'parsed_json' in st.session_state:
-                                                            prompts = extract_image_prompts(st.session_state.parsed_json)
-                                                                            st.markdown("### 🎨 برومبتات الصور المطلوبة")
-                                                                                            st.info("استخدم هذه البرومبتات لتوليد الصور بأداتك الخاصة")
-                                                                                                            for p in prompts:
-                                                                                                                                    with st.expander(f"{p['id']} - {p['section']}"):
-                                                                                                                                                                st.code(p['prompt'], language='text')
-                                                                                                                                                                                        st.caption(f"Type: {p['type']} | Keyword: {p['keyword']}")
-                                                                                                                                                                                                        prompt_df = pd.DataFrame(prompts)
-                                                                                                                                                                                                                        csv = prompt_df.to_csv(index=False)
-                                                                                                                                                                                                                                        st.download_button('Download Prompts CSV', csv, 'image_prompts.csv', 'text/csv')
+                                                youcan_html = get_youcan_html(st.session_state.final_page)
+                                                            st.info("انسخ هذا الكود والصقه في YouCan")
+                                                                        st.code(youcan_html, language="html")
+                                                                                    st.download_button(label="تحميل YouCan HTML", data=youcan_html, file_name="youcan.html", mime="text/html")
     st.markdown("### \U0001f50d \u0627\u0644\u0628\u062d\u062b \u0627\u0644\u0645\u0639\u0645\u0642 \u0641\u064a \u0627\u0644\u0633\u0648\u0642")
     if st.button("\U0001f9e0 \u0627\u0633\u062a\u062e\u0631\u0627\u062c \u0648\u062b\u0627\u0626\u0642 \u0627\u0644\u0628\u064a\u0639"):
         if not global_api_key or not global_product_name:
