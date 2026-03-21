@@ -455,6 +455,13 @@ def get_youcan_html(html):
     # Remove countdown IDs that need JS
     clean = clean.replace('id="cd-hours"', '').replace('id="cd-mins"', '').replace('id="cd-secs"', '')
     clean = clean.replace('id="cd2-h"', '').replace('id="cd2-m"', '').replace('id="cd2-s"', '')
+    # Replace pollinations AI images with numbered placeholders
+    img_counter = [0]
+    def replace_img(match):
+        img_counter[0] += 1
+        n = img_counter[0]
+        return f'<!-- \u0635\u0648\u0631\u0629 {n}: \u0636\u0639 \u0631\u0627\u0628\u0637 \u0627\u0644\u0635\u0648\u0631\u0629 \u0647\u0646\u0627 --><img src="IMG_{n:02d}_URL_HERE" '
+    clean = re.sub(r'<img\s+src="https://image\.pollinations\.ai/[^"]*"', replace_img, clean)
     return clean
     
 def extract_image_prompts(data):
