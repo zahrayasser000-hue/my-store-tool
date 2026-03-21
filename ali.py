@@ -522,7 +522,57 @@ def extract_image_prompts(data):
         add(f"step_{i+1}", step_imgs[i], "gif_step")
     for i, rev in enumerate(data.get('reviews', [])[:3], 1):
         add(f"review_{i}", rev.get('image_search','person'), "review")
-    return prompts
+    return promptsdef generate_nb_image(api_key, prompt, aspect_ratio="1:1"):
+    """Generate image using Gemini Nano Banana (image generation model)"""
+    try:
+        genai.configure(api_key=api_key, transport="rest")
+        model = genai.GenerativeModel('gemini-2.0-flash-exp')
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                response_mime_type='image/png'
+            )
+        )
+        if response.candidates:
+            for part in response.candidates[0].content.parts:
+                if hasattr(part, 'inline_data') and part.inline_data:
+                    img_data = part.inline_data.data
+                    b64 = base64.b64encode(img_data).decode('utf-8')
+                    mime = part.inline_data.mime_type or 'image/png'
+                    return f'data:{mime};base64,{b64}'
+        return None
+    except Exception as e:
+        st.warning(f"Image gen failed for: {prompt[:50]}... Error: {str(e)[:100]}")
+        return None
+
+def generate_all_images(api_key, prompts, progress_bar=None):
+    """Generate all images from prompts list and return dict of id->data_uri"""
+    results = {}
+    total = len(prompts)
+    for i, p in enumerate(prompts):
+        if progress_bar:
+            progress_bar.progress((i + 1) / total, text=f"Generating image {i+1}/{total}: {p['section']}")
+        data_uri = generate_nb_image(api_key, p['prompt'])
+        if data_uri:
+            results[p['id']] = data_uri
+        time.sleep(1)  # Rate limit
+    return results
+
+def replace_images_in_html(html, image_map, prompts):
+    """Replace pollinations.ai URLs in HTML with generated image data URIs"""
+    import re
+    # Find all pollinations image URLs in order
+    pattern = r'src="(https://image\.pollinations\.ai/[^"]*)"'
+    matches = list(re.finditer(pattern, html))
+    # Map prompts to their order of appearance
+    # Build replacement in reverse to preserve positions
+    for idx, match in enumerate(reversed(matches)):
+        real_idx = len(matches) - 1 - idx
+        if real_idx < len(prompts):
+            pid = prompts[real_idx]['id']
+            if pid in image_map:
+                html = html[:match.start(1)] + image_map[pid] + html[match.end(1):]
+    return html
     
 
 # UI - Sidebar and Main
@@ -559,7 +609,7 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                 except Exception as e:
                     st.error(f"\U0001f6d1 \u062e\u0637\u0623: {str(e)}")
     if 'final_page' in st.session_state:
-        tab1, tab2, tab3, tab4, tab5 = st.tabs(["\U0001f4f1 \u0627\u0644\u0645\u0639\u0627\u064a\u0646\u0629 \u0627\u0644\u0628\u0635\u0631\u064a\u0629", "\U0001f4bb \u0643\u0648\u062f HTML", "\U0001f4e5 \u062a\u062d\u0645\u064a\u0644 JSON", "\U0001f4e4 YouCan HTML", "🎨 مولد البرومبتات"])
+        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["\U0001f4f1 \u0627\u0644\u0645\u0639\u0627\u064a\u0646\u0629 \u0627\u0644\u0628\u0635\u0631\u064a\u0629", "\U0001f4bb \u0643\u0648\u062f HTML", "\U0001f4e5 \u062a\u062d\u0645\u064a\u0644 JSON", "\U0001f4e4 YouCan HTML", "🎨 مولد البرومبتات", "🤖 توليد الصور AI"])
         with tab1:
             components.html(st.session_state.final_page, height=4000, scrolling=True)
         with tab2:
@@ -591,6 +641,27 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                 prompt_df = pd.DataFrame(prompts)
                 csv = prompt_df.to_csv(index=False)
                 st.download_button('Download Prompts CSV', csv, 'image_prompts.csv', 'text/csv')
+        with tab6:
+            if 'parsed_json' in st.session_state:
+                prompts = extract_image_prompts(st.session_state.parsed_json)
+                st.markdown("### 🤖 توليد الصور باستخدام Nano Banana AI")
+                st.info(f"سيتم توليد {len(prompts)} صورة وإدراجها تلقائياً في كود HTML")
+                if st.button("🚀 توليد جميع الصور وإدراجها في الصفحة"):
+                    progress = st.progress(0, text="جاري توليد الصور...")
+                    image_map = generate_all_images(global_api_key, prompts, progress)
+                    if image_map:
+                        new_html = replace_images_in_html(st.session_state.final_page, image_map, prompts)
+                        st.session_state.final_page = new_html
+                        st.session_state.generated_images = image_map
+                        st.success(f"✅ تم توليد {len(image_map)} صورة من {len(prompts)} وإدراجها في الصفحة!")
+                        st.rerun()
+                    else:
+                        st.error("فشل توليد الصور. تأكد من صلاحية API Key.")
+                if 'generated_images' in st.session_state:
+                    st.markdown(f"**عدد الصور المولدة:** {len(st.session_state.generated_images)}")
+                    st.markdown("✅ الصور مدرجة في كود HTML - انتقل لتبويب 'كود HTML' أو 'YouCan HTML' للنسخ")
+            else:
+                st.warning("قم بتوليد صفحة هبوط أولاً")                
     st.markdown("### \U0001f50d \u0627\u0644\u0628\u062d\u062b \u0627\u0644\u0645\u0639\u0645\u0642 \u0641\u064a \u0627\u0644\u0633\u0648\u0642")
     if st.button("\U0001f9e0 \u0627\u0633\u062a\u062e\u0631\u0627\u062c \u0648\u062b\u0627\u0626\u0642 \u0627\u0644\u0628\u064a\u0639"):
         if not global_api_key or not global_product_name:
