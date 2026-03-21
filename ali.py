@@ -27,7 +27,7 @@ st.markdown("""
 
 st.markdown('<div class="main-header"><h1>ALI Growth Engine Pro \U0001f680</h1><p>\u0645\u0646\u0635\u0629 \u0627\u0644\u0639\u0645\u0644\u064a\u0627\u062a \u0627\u0644\u062a\u0633\u0648\u064a\u0642\u064a\u0629 \u0627\u0644\u0645\u062a\u0643\u0627\u0645\u0644\u0629 | \u0635\u0648\u0631 AI \u0639\u0627\u0644\u064a\u0629 \u0627\u0644\u062c\u0648\u062f\u0629</p></div>', unsafe_allow_html=True)
 
-def get_ai_image(keyword, width=800, height=600, style="professional"):
+def get_ai_image(keyword, width=800, height=600, style="professional", context=""):
     safe_keyword = str(keyword).strip()
     if not safe_keyword or safe_keyword.lower() == "none":
         safe_keyword = "product"
@@ -41,8 +41,8 @@ def get_ai_image(keyword, width=800, height=600, style="professional"):
         "gif_step": f"step by step tutorial photo showing how to use {safe_keyword}, clean hands demonstration, bright lighting, instructional photography, 8k",
         "problem": f"frustrated person experiencing problem related to {safe_keyword}, worried expression, dramatic lighting, realistic, high quality, 8k",
         "solution": f"happy satisfied person after using {safe_keyword}, bright smile, positive mood, natural lighting, high quality, 8k",
-        "feature": f"detailed highlight of {safe_keyword}, clean modern aesthetic, studio lighting, detailed close up, commercial photography, 8k",
-        "review": f"customer selfie with {safe_keyword}, casual setting, smartphone photo style, realistic, genuine smile, 8k",
+        "feature": f"{safe_keyword} {context}, clean modern aesthetic, studio lighting, detailed close up, commercial photography, 8k",
+        "review": f"customer portrait selfie with {safe_keyword}, casual setting, smartphone photo style, realistic, genuine smile, 8k",
     }
     prompt = prompts.get(style, f"{safe_keyword} high quality realistic photo")
     encoded_prompt = urllib.parse.quote(prompt)
@@ -102,8 +102,8 @@ def generate_landing_page_json(api_key, product, category):
 {{
     "hero_headline": "\u0639\u0646\u0648\u0627\u0646 \u0631\u0626\u064a\u0633\u064a \u064a\u062e\u0637\u0641 \u0627\u0644\u0627\u0646\u062a\u0628\u0627\u0647",
     "hero_subheadline": "\u0639\u0646\u0648\u0627\u0646 \u0641\u0631\u0639\u064a",
-    "image_hero_search": "english keyword for product photo",
-    "image_hero_lifestyle_search": "english keyword lifestyle photo of person using product",
+    "image_hero_search": "detailed english description of the exact product in hero section, 5-8 words minimum",
+    "image_hero_lifestyle_search": "detailed english description of lifestyle photo showing person using this exact product",
     "image_hero_closeup_search": "english keyword close up detail of product",
     "trust_badges": ["\u0634\u062d\u0646 \u0645\u062c\u0627\u0646\u064a", "\u0627\u0644\u062f\u0641\u0639 \u0639\u0646\u062f \u0627\u0644\u0627\u0633\u062a\u0644\u0627\u0645", "\u0636\u0645\u0627\u0646 30 \u064a\u0648\u0645"],
     "social_proof_number": "+12,000",
@@ -111,33 +111,33 @@ def generate_landing_page_json(api_key, product, category):
     "problem_title": "\u0639\u0646\u0648\u0627\u0646 \u0642\u0633\u0645 \u0627\u0644\u0623\u0644\u0645",
     "problem_description": "\u0641\u0642\u0631\u0629 \u062a\u0635\u0641 \u0627\u0644\u0625\u062d\u0628\u0627\u0637",
     "problem_points": ["\u0645\u0634\u0643\u0644\u0629 1", "\u0645\u0634\u0643\u0644\u0629 2", "\u0645\u0634\u0643\u0644\u0629 3"],
-    "image_problem_search": "english keyword for problem visual matching the problem text",
+    "image_problem_search": "detailed english description showing the EXACT problem described above, 5-8 words minimum",
     "image_problem_2_search": "english keyword second problem visual",
     "solution_title": "\u0639\u0646\u0648\u0627\u0646 \u0627\u0644\u062d\u0644",
     "solution_description": "\u0641\u0642\u0631\u0629 \u0627\u0644\u062d\u0644",
-    "image_solution_search": "english keyword for solution matching solution text",
+    "image_solution_search": "detailed english description matching the EXACT solution described above, 5-8 words",
     "image_solution_2_search": "english keyword second solution visual",
     "image_before_search": "english keyword before",
     "image_after_search": "english keyword after",
     "features": [
-        {{"title": "\u0645\u064a\u0632\u0629 1", "desc": "\u0627\u0644\u0641\u0627\u0626\u062f\u0629", "icon": "sparkles", "image_search": "keyword matching this feature"}},
-        {{"title": "\u0645\u064a\u0632\u0629 2", "desc": "\u0627\u0644\u0641\u0627\u0626\u062f\u0629", "icon": "shield", "image_search": "keyword2"}},
-        {{"title": "\u0645\u064a\u0632\u0629 3", "desc": "\u0627\u0644\u0641\u0627\u0626\u062f\u0629", "icon": "heart", "image_search": "keyword3"}},
-        {{"title": "\u0645\u064a\u0632\u0629 4", "desc": "\u0627\u0644\u0641\u0627\u0626\u062f\u0629", "icon": "check", "image_search": "keyword4"}}
+        {{"title": "\u0645\u064a\u0632\u0629 1", "desc": "\u0627\u0644\u0641\u0627\u0626\u062f\u0629", "icon": "sparkles", "image_search": "detailed 5-8 word description that EXACTLY represents this specific feature title and description"}},
+        {{"title": "\u0645\u064a\u0632\u0629 2", "desc": "\u0627\u0644\u0641\u0627\u0626\u062f\u0629", "icon": "shield", "image_search": "detailed 5-8 word description matching this specific feature"}},
+        {{"title": "\u0645\u064a\u0632\u0629 3", "desc": "\u0627\u0644\u0641\u0627\u0626\u062f\u0629", "icon": "heart", "image_search": "detailed 5-8 word description matching this feature benefit"}},
+        {{"title": "\u0645\u064a\u0632\u0629 4", "desc": "\u0627\u0644\u0641\u0627\u0626\u062f\u0629", "icon": "check", "image_search": "detailed 5-8 word description matching this feature advantage"}}
     ],
     "ingredients": [
-        {{"name": "\u0645\u0643\u0648\u0646 1", "benefit": "\u0641\u0627\u0626\u062f\u062a\u0647", "image_search": "ingredient keyword"}},
-        {{"name": "\u0645\u0643\u0648\u0646 2", "benefit": "\u0641\u0627\u0626\u062f\u062a\u0647", "image_search": "ingredient keyword"}},
-        {{"name": "\u0645\u0643\u0648\u0646 3", "benefit": "\u0641\u0627\u0626\u062f\u062a\u0647", "image_search": "ingredient keyword"}}
+        {{"name": "\u0645\u0643\u0648\u0646 1", "benefit": "\u0641\u0627\u0626\u062f\u062a\u0647", "image_search": "the EXACT ingredient name as raw natural ingredient close up photo"}},
+        {{"name": "\u0645\u0643\u0648\u0646 2", "benefit": "\u0641\u0627\u0626\u062f\u062a\u0647", "image_search": "the EXACT ingredient name as raw natural ingredient close up photo"}},
+        {{"name": "\u0645\u0643\u0648\u0646 3", "benefit": "\u0641\u0627\u0626\u062f\u062a\u0647", "image_search": "the EXACT ingredient name as raw natural ingredient close up photo"}}
     ],
     "how_to_use": ["\u062e\u0637\u0648\u0629 1", "\u062e\u0637\u0648\u0629 2", "\u062e\u0637\u0648\u0629 3"],
-    "how_to_use_images": ["step 1 keyword", "step 2 keyword", "step 3 keyword"],
+    "how_to_use_images": ["detailed description of step 1 ACTION being performed", "detailed description of step 2 ACTION", "detailed description of step 3 ACTION"],
     "dimensions": {{"height": "15 cm", "width": "8 cm", "weight": "200g", "volume": "50ml", "image_search": "product with ruler measurement"}},
     "stats": [{{"number": "98%", "label": "\u0625\u062d\u0635\u0627\u0626\u064a\u0629 1"}}, {{"number": "+5000", "label": "\u0625\u062d\u0635\u0627\u0626\u064a\u0629 2"}}, {{"number": "4.9/5", "label": "\u0625\u062d\u0635\u0627\u0626\u064a\u0629 3"}}],
     "reviews": [
-        {{"name": "\u0633\u0627\u0631\u0629 \u0645.", "rating": 5, "comment": "\u062a\u0639\u0644\u064a\u0642 \u0648\u0627\u0642\u0639\u064a", "image_search": "happy arab woman selfie"}},
-        {{"name": "\u0623\u062d\u0645\u062f \u0639.", "rating": 5, "comment": "\u062a\u0639\u0644\u064a\u0642 \u0648\u0627\u0642\u0639\u064a", "image_search": "satisfied arab man"}},
-        {{"name": "\u0646\u0648\u0631\u0629 \u0643.", "rating": 4, "comment": "\u062a\u0639\u0644\u064a\u0642 \u0648\u0627\u0642\u0639\u064a", "image_search": "happy woman portrait"}}
+        {{"name": "\u0633\u0627\u0631\u0629 \u0645.", "rating": 5, "comment": "\u062a\u0639\u0644\u064a\u0642 \u0648\u0627\u0642\u0639\u064a", "image_search": "happy arab woman customer selfie portrait smiling"}},
+        {{"name": "\u0623\u062d\u0645\u062f \u0639.", "rating": 5, "comment": "\u062a\u0639\u0644\u064a\u0642 \u0648\u0627\u0642\u0639\u064a", "image_search": "satisfied arab man customer portrait casual confident"}},
+        {{"name": "\u0646\u0648\u0631\u0629 \u0643.", "rating": 4, "comment": "\u062a\u0639\u0644\u064a\u0642 \u0648\u0627\u0642\u0639\u064a", "image_search": "happy arab woman portrait natural lighting smiling"}}
     ],
     "pricing": {{"original": "399", "discounted": "199", "currency": "SAR", "discount_percent": "50%"}},
     "urgency_text": "\u0627\u0644\u0639\u0631\u0636 \u064a\u0646\u062a\u0647\u064a \u062e\u0644\u0627\u0644 24 \u0633\u0627\u0639\u0629!",
@@ -205,7 +205,7 @@ def build_landing_page_html(data, colors):
 
     features_html = ''
     for feat in data.get('features', [])[:4]:
-        feat_img = get_ai_image(feat.get('image_search', 'feature'), 300, 300, 'feature')
+        feat_img = get_ai_image(feat.get('image_search', 'feature'), 300, 300, 'feature', context=f"{feat.get('title','')} {feat.get('desc','')}")
         features_html += f'''<div class="feat-card">
             <img loading="lazy" decoding="async" src="{feat_img}" alt="{feat.get('title','')}">
             <h4>{feat.get('title','')}</h4>
@@ -245,7 +245,7 @@ def build_landing_page_html(data, colors):
     step_images = data.get('how_to_use_images', [])
     for i, step in enumerate(data.get('how_to_use', [])[:3], 1):
         step_kw = step_images[i-1] if i-1 < len(step_images) else f'step {i}'
-        step_img = get_ai_image(step_kw, 300, 250, 'gif_step')
+        step_img = get_ai_image(step_kw, 300, 250, 'gif_step', context=step)
         steps_html += f'''<div class="step-card">
             <div class="step-num">{i}</div>
             <img loading="lazy" decoding="async" src="{step_img}" alt="خطوة {i}">
