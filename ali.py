@@ -593,13 +593,13 @@ with st.sidebar:
     global_api_key = st.text_input("\U0001f511 Gemini API Key", type="password")
     global_product_name = st.text_area("\U0001f4e6 \u062a\u0641\u0627\u0635\u064a\u0644 \u0648\u0627\u0633\u0645 \u0627\u0644\u0645\u0646\u062a\u062c", placeholder="\u0645\u062b\u0627\u0644: \u0643\u0631\u064a\u0645 \u0643\u0648\u0644\u0627\u062c\u064a\u0646 \u0643\u0648\u0631\u064a \u0644\u0644\u0628\u0634\u0631\u0629")
     global_category = st.selectbox("\U0001f4e6 \u0641\u0626\u0629 \u0627\u0644\u0645\u0646\u062a\u062c", ["\U0001f484 \u0645\u0633\u062a\u062d\u0636\u0631\u0627\u062a \u062a\u062c\u0645\u064a\u0644 \u0648\u0639\u0646\u0627\u064a\u0629 (Cosmetics)", "\u2699\ufe0f \u0623\u062f\u0648\u0627\u062a \u0648\u0623\u062c\u0647\u0632\u0629 \u0630\u0643\u064a\u0629 (Gadgets)"])
-    uploaded_product_image = st.file_uploader("📷 صورة المنتج (مرجع لتوليد الصور)", type=["png", "jpg", "jpeg", "webp"])
-    product_image_b64 = None
-    if uploaded_product_image:
-        product_image_b64 = base64.b64encode(uploaded_product_image.read()).decode('utf-8')
-        uploaded_product_image.seek(0)
-        st.image(uploaded_product_image, caption="صورة المنتج المرفوعة", use_container_width=True)
-st.markdown("---")
+        uploaded_product_image = st.file_uploader("📷 صورة المنتج (مرجع لتوليد الصور)", type=["png", "jpg", "jpeg", "webp"])
+        product_image_b64 = None
+        if uploaded_product_image:
+            product_image_b64 = base64.b64encode(uploaded_product_image.read()).decode('utf-8')
+            uploaded_product_image.seek(0)
+            st.image(uploaded_product_image, caption="صورة المنتج المرفوعة", use_container_width=True)
+    st.markdown("---")
     st.header("\U0001f6e0\ufe0f \u0627\u062e\u062a\u0631 \u0627\u0644\u0623\u062f\u0627\u0629")
     app_mode = st.radio("\u0642\u0627\u0626\u0645\u0629 \u0627\u0644\u062a\u062d\u0643\u0645:", ["\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u0627\u062a \u0627\u0644\u0647\u0628\u0648\u0637", "\U0001f50d \u0628\u062d\u062b \u0627\u0644\u0633\u0648\u0642 \u0627\u0644\u0645\u0639\u0645\u0642 (SOP-1)", "\U0001f4b0 \u062d\u0627\u0633\u0628\u0629 \u0627\u0644\u062a\u0639\u0627\u062f\u0644 \u0627\u0644\u0645\u0627\u0644\u064a (Matrix)"])
     st.markdown("---")
