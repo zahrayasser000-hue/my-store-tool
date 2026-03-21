@@ -459,20 +459,20 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                 )
                 st.json(st.session_state.parsed_json)
             with tab4:
-            youcan_html = get_youcan_html(st.session_state.final_page)
-            st.info("انسخ هذا الكود والصقه في YouCan")
-            st.code(youcan_html, language="html")
-            st.download_button(label="تحميل YouCan HTML", data=youcan_html, file_name="youcan.html", mime="text/html")
+                youcan_html = get_youcan_html(st.session_state.final_page)
+                st.info("انسخ هذا الكود والصقه في YouCan")
+                st.code(youcan_html, language="html")
+                st.download_button(label="تحميل YouCan HTML", data=youcan_html, file_name="youcan.html", mime="text/html")
         with tab5:
-            if 'parsed_json' in st.session_state:
-                prompts = extract_image_prompts(st.session_state.parsed_json)
-                st.markdown("### 🎨 برومبتات الصور المطلوبة")
-                st.info("استخدم هذه البرومبتات لتوليد الصور بأداتك الخاصة")
-                for p in prompts:
-                    with st.expander(f"{p['id']} - {p['section']}"):
-                        st.code(p['prompt'], language='text')
-                        st.caption(f"Type: {p['type']} | Keyword: {p['keyword']}")
-                prompt_df = pd.DataFrame(prompts)
+                if 'parsed_json' in st.session_state:
+                    prompts = extract_image_prompts(st.session_state.parsed_json)
+                    st.markdown("### 🎨 برومبتات الصور المطلوبة")
+                    st.info("استخدم هذه البرومبتات لتوليد الصور بأداتك الخاصة")
+                        for p in prompts:
+                            with st.expander(f"{p['id']} - {p['section']}"):
+                            st.code(p['prompt'], language='text')
+                            st.caption(f"Type: {p['type']} | Keyword: {p['keyword']}")
+                    prompt_df = pd.DataFrame(prompts)
                 csv = prompt_df.to_csv(index=False)
                 st.download_button('Download Prompts CSV', csv, 'image_prompts.csv', 'text/csv')
     st.markdown("### \U0001f50d \u0627\u0644\u0628\u062d\u062b \u0627\u0644\u0645\u0639\u0645\u0642 \u0641\u064a \u0627\u0644\u0633\u0648\u0642")
