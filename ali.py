@@ -470,8 +470,8 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                     st.info("استخدم هذه البرومبتات لتوليد الصور بأداتك الخاصة")
                     for p in prompts:
                         with st.expander(f"{p['id']} - {p['section']}"):
-                        st.code(p['prompt'], language='text')
-                        st.caption(f"Type: {p['type']} | Keyword: {p['keyword']}")
+                            st.code(p['prompt'], language='text')
+                            st.caption(f"Type: {p['type']} | Keyword: {p['keyword']}")
                 prompt_df = pd.DataFrame(prompts)
             csv = prompt_df.to_csv(index=False)
             st.download_button('Download Prompts CSV', csv, 'image_prompts.csv', 'text/csv')
