@@ -522,7 +522,9 @@ def extract_image_prompts(data):
         add(f"step_{i+1}", step_imgs[i], "gif_step")
     for i, rev in enumerate(data.get('reviews', [])[:3], 1):
         add(f"review_{i}", rev.get('image_search','person'), "review")
-    return promptsdef generate_nb_image(api_key, prompt, aspect_ratio="1:1"):
+    return prompts
+
+def generate_nb_image(api_key, prompt, aspect_ratio="1:1"):
     """Generate image using Gemini Nano Banana (image generation model)"""
     try:
         genai.configure(api_key=api_key, transport="rest")
@@ -609,11 +611,51 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                 except Exception as e:
                     st.error(f"\U0001f6d1 \u062e\u0637\u0623: {str(e)}")
     if 'final_page' in st.session_state:
-        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs(["\U0001f4f1 \u0627\u0644\u0645\u0639\u0627\u064a\u0646\u0629 \u0627\u0644\u0628\u0635\u0631\u064a\u0629", "\U0001f4bb \u0643\u0648\u062f HTML", "\U0001f4e5 \u062a\u062d\u0645\u064a\u0644 JSON", "\U0001f4e4 YouCan HTML", "🎨 مولد البرومبتات", "🤖 توليد الصور AI"])
+        tab1, tab2, tab3, tab4, tab5 = st.tabs(["\U0001f4f1 \u0627\u0644\u0645\u0639\u0627\u064a\u0646\u0629 \u0627\u0644\u0628\u0635\u0631\u064a\u0629", "\U0001f916 \u062a\u0648\u0644\u064a\u062f \u0627\u0644\u0635\u0648\u0631 AI
+def generate_nb_image", "\U0001f4e5 \u062a\u062d\u0645\u064a\u0644 JSON", "\U0001f4e4 YouCan HTML", "🎨 مولد البرومبتات"])
         with tab1:
             components.html(st.session_state.final_page, height=4000, scrolling=True)
         with tab2:
-            st.code(st.session_state.final_page, language="html")
+            if 'parsed_json' in st.session_state:
+                st.markdown("### \U0001f916 توليد الصور بالذكاء الاصطناعي")
+                st.info("اضغط الزر لتوليد جميع الصور تلقائياً باستخدام Gemini وإدراجها في صفحة الهبوط")
+                prompts = extract_image_prompts(st.session_state.parsed_json)
+                if st.button("\U0001f680 توليد جميع الصور وإدراجها تلقائياً", key="gen_ai_imgs"):
+                    if not global_api_key:
+                        st.error("الرجاء إدخال مفتاح Gemini API")
+                    else:
+                        progress = st.progress(0)
+                        status = st.empty()
+                        generated = {}
+                        for i, p in enumerate(prompts):
+                            status.text(f"جاري توليد {p['id']}... ({i+1}/{len(prompts)})")
+                            try:
+                                img_data = generate_nb_image(global_api_key, p['prompt'])
+                                if img_data:
+                                    generated[p['id']] = img_data
+                            except Exception as e:
+                                st.warning(f"فشل توليد {p['id']}: {str(e)}")
+                            progress.progress((i+1)/len(prompts))
+                        status.text(f"تم توليد {len(generated)}/{len(prompts)} صورة!")
+                        if generated:
+                            st.session_state.generated_images = generated
+                            st.success(f"\u2705 تم توليد {len(generated)} صورة بنجاح!")
+                if 'generated_images' in st.session_state:
+                    st.markdown("#### الصور المولدة:")
+                    cols = st.columns(3)
+                    for i, (pid, img_b64) in enumerate(st.session_state.generated_images.items()):
+                        with cols[i % 3]:
+                                                        st.image(img_b64, caption=pid, use_column_width=True)
+                    html_with_imgs = st.session_state.final_page
+                    import re as _re
+                    poll_urls = _re.findall(r'https://image\.pollinations\.ai/prompt/[^"]+', html_with_imgs)
+                    gen_list = list(st.session_state.generated_images.values())
+                    for idx, url in enumerate(poll_urls):
+                        if idx < len(gen_list):
+                            html_with_imgs = html_with_imgs.replace(url, gen_list[idx], 1)
+                    st.session_state.final_page_ai = html_with_imgs
+                    st.success("تم إدراج الصور في كود HTML بنجاح!")
+                    st.download_button("تحميل HTML مع الصور", html_with_imgs, "landing_page_with_ai_images.html", "text/html")
         with tab3:
             if 'parsed_json' in st.session_state:
                 json_str = json.dumps(st.session_state.parsed_json, ensure_ascii=False, indent=2)
@@ -641,25 +683,6 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                 prompt_df = pd.DataFrame(prompts)
                 csv = prompt_df.to_csv(index=False)
                 st.download_button('Download Prompts CSV', csv, 'image_prompts.csv', 'text/csv')
-        with tab6:
-            if 'parsed_json' in st.session_state:
-                prompts = extract_image_prompts(st.session_state.parsed_json)
-                st.markdown("### 🤖 توليد الصور باستخدام Nano Banana AI")
-                st.info(f"سيتم توليد {len(prompts)} صورة وإدراجها تلقائياً في كود HTML")
-                if st.button("🚀 توليد جميع الصور وإدراجها في الصفحة"):
-                    progress = st.progress(0, text="جاري توليد الصور...")
-                    image_map = generate_all_images(global_api_key, prompts, progress)
-                    if image_map:
-                        new_html = replace_images_in_html(st.session_state.final_page, image_map, prompts)
-                        st.session_state.final_page = new_html
-                        st.session_state.generated_images = image_map
-                        st.success(f"✅ تم توليد {len(image_map)} صورة من {len(prompts)} وإدراجها في الصفحة!")
-                        st.rerun()
-                    else:
-                        st.error("فشل توليد الصور. تأكد من صلاحية API Key.")
-                if 'generated_images' in st.session_state:
-                    st.markdown(f"**عدد الصور المولدة:** {len(st.session_state.generated_images)}")
-                    st.markdown("✅ الصور مدرجة في كود HTML - انتقل لتبويب 'كود HTML' أو 'YouCan HTML' للنسخ")
             else:
                 st.warning("قم بتوليد صفحة هبوط أولاً")                
     st.markdown("### \U0001f50d \u0627\u0644\u0628\u062d\u062b \u0627\u0644\u0645\u0639\u0645\u0642 \u0641\u064a \u0627\u0644\u0633\u0648\u0642")
