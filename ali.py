@@ -261,7 +261,7 @@ def build_landing_page_html(data, colors):
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-//fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
 *{{margin:0;padding:0;box-sizing:border-box;}}
 body{{font-family:'Cairo',sans-serif;background:#fff;color:#1a1a2e;direction:rtl;}}
@@ -531,7 +531,7 @@ def generate_nb_image(api_key, prompt, aspect_ratio="1:1"):
         from google.genai import types as genai_types
         client = genai_client.Client(api_key=api_key)
         response = client.models.generate_content(
-            model='gemini-2.0-flash-preview-image-generation',
+            model='gemini-2.0-flash-exp',
             contents=prompt,
             config=genai_types.GenerateContentConfig(
                 response_modalities=['TEXT', 'IMAGE']
