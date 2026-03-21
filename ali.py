@@ -649,7 +649,7 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                     st.markdown("#### الصور المولدة:")
                     cols = st.columns(3)
                     for i, (pid, img_b64) in enumerate(st.session_state.generated_images.items()):
-                        with cols[i % 3]:
+                            with cols[i % 3]:
                                                         st.image(img_b64, caption=pid, use_column_width=True)
                 html_with_imgs = st.session_state.final_page
                 for p in prompts:
