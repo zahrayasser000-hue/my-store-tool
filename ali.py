@@ -186,17 +186,17 @@ def build_landing_page_html(data, colors):
     a = colors["accent"]
     g1 = colors["gradient1"]
     g2 = colors["gradient2"]
-    hero_img = get_ai_image(data.get('image_hero_search', 'product'), 900, 1100, 'product')
-    hero_lifestyle = get_ai_image(data.get('image_hero_lifestyle_search', 'person using product'), 800, 600, 'lifestyle')
-    hero_closeup = get_ai_image(data.get('image_hero_closeup_search', 'product detail'), 600, 600, 'product')
-    prob_img = get_ai_image(data.get('image_problem_search', 'worried person'), 700, 500, 'problem')
-    prob_img2 = get_ai_image(data.get('image_problem_2_search', 'skin problem'), 600, 400, 'problem')
-    sol_img = get_ai_image(data.get('image_solution_search', 'happy person'), 800, 600, 'solution')
-    sol_img2 = get_ai_image(data.get('image_solution_2_search', 'product result'), 600, 600, 'lifestyle')
-    before_img = get_ai_image(data.get('image_before_search', 'before treatment'), 500, 600, 'before_after')
-    after_img = get_ai_image(data.get('image_after_search', 'after treatment'), 500, 600, 'before_after')
+    hero_img = get_ai_image(data.get('image_hero_search', 'product'), 300, 350, 'product')
+    hero_lifestyle = get_ai_image(data.get('image_hero_lifestyle_search', 'person using product'), 400, 300, 'lifestyle')
+    hero_closeup = get_ai_image(data.get('image_hero_closeup_search', 'product detail'), 300, 300, 'product')
+    prob_img = get_ai_image(data.get('image_problem_search', 'worried person'), 350, 250, 'problem')
+    prob_img2 = get_ai_image(data.get('image_problem_2_search', 'skin problem'), 300, 200, 'problem')
+    sol_img = get_ai_image(data.get('image_solution_search', 'happy person'), 400, 300, 'solution')
+    sol_img2 = get_ai_image(data.get('image_solution_2_search', 'product result'), 300, 300, 'lifestyle')
+    before_img = get_ai_image(data.get('image_before_search', 'before treatment'), 300, 350, 'before_after')
+    after_img = get_ai_image(data.get('image_after_search', 'after treatment'), 300, 350, 'before_after')
     dims = data.get('dimensions', {})
-    dim_img = get_ai_image(dims.get('image_search', 'product dimensions'), 600, 600, 'dimensions')
+    dim_img = get_ai_image(dims.get('image_search', 'product dimensions'), 300, 300, 'dimensions')
     countdown_hours = data.get('countdown_hours', 24)
     badges_html = ""
     for badge in data.get('trust_badges', []):
@@ -208,14 +208,14 @@ def build_landing_page_html(data, colors):
     for feat in data.get('features', [])[:4]:
         feat_img = get_ai_image(feat.get('image_search', 'feature'), 400, 400, 'feature')
         features_html += f'''<div style="background:white;border-radius:16px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
-            <img src="{feat_img}" style="width:100%;height:200px;object-fit:cover;">
+            <img loading="lazy" decoding="async" src="{feat_img}" style="width:100%;height:200px;object-fit:cover;">
             <div style="padding:20px;text-align:center;"><h4 style="color:{p};margin-bottom:8px;">\u2728 {feat.get('title','')}</h4>
             <p style="color:#64748b;font-size:0.95rem;">{feat.get('desc','')}</p></div></div>'''
     ingredients_html = ""
     for ing in data.get('ingredients', [])[:3]:
         ing_img = get_ai_image(ing.get('image_search', 'natural ingredient'), 300, 300, 'ingredient')
         ingredients_html += f'''<div style="text-align:center;">
-            <img src="{ing_img}" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin:0 auto 15px;display:block;box-shadow:0 4px 15px rgba(0,0,0,0.1);">
+            <img loading="lazy" decoding="async" src="{ing_img}" style="width:120px;height:120px;border-radius:50%;object-fit:cover;margin:0 auto 15px;display:block;box-shadow:0 4px 15px rgba(0,0,0,0.1);">
             <h4 style="color:{p};margin-bottom:5px;">{ing.get('name','')}</h4>
             <p style="color:#64748b;font-size:0.9rem;">{ing.get('benefit','')}</p></div>'''
     steps_html = ""
@@ -225,7 +225,7 @@ def build_landing_page_html(data, colors):
         step_img = get_ai_image(step_kw, 500, 400, 'gif_step')
         direction = 'row' if i % 2 != 0 else 'row-reverse'
         steps_html += f'''<div style="display:flex;flex-direction:{direction};align-items:center;gap:25px;flex-wrap:wrap;margin-bottom:30px;background:white;border-radius:16px;padding:20px;box-shadow:0 4px 15px rgba(0,0,0,0.06);">
-            <img src="{step_img}" style="flex:1;min-width:220px;max-width:350px;border-radius:12px;">
+            <img loading="lazy" decoding="async" src="{step_img}" style="flex:1;min-width:220px;max-width:350px;border-radius:12px;">
             <div style="flex:1;min-width:220px;"><div style="width:50px;height:50px;background:linear-gradient(135deg,{g1},{g2});border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-weight:900;font-size:1.3rem;margin-bottom:12px;">{i}</div>
             <p style="font-size:1.1rem;color:#334155;line-height:1.7;">{step}</p></div></div>'''
     stats_html = ""
@@ -236,7 +236,7 @@ def build_landing_page_html(data, colors):
         stars = '\u2b50' * int(rev.get('rating', 5))
         rev_img = get_ai_image(rev.get('image_search', 'person portrait'), 150, 150, 'review')
         reviews_html += f'''<div style="background:white;border-radius:16px;padding:25px;box-shadow:0 4px 15px rgba(0,0,0,0.08);">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><img src="{rev_img}" style="width:55px;height:55px;border-radius:50%;object-fit:cover;">
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;"><img loading="lazy" decoding="async" src="{rev_img}" style="width:55px;height:55px;border-radius:50%;object-fit:cover;">
             <div><strong>{rev.get('name','')}</strong><br><span style="color:{a};">{stars}</span></div></div>
             <p style="color:#475569;font-style:italic;line-height:1.6;">\"{rev.get('comment','')}</p>
             <p style="color:{p};font-size:0.85rem;margin-top:8px;">\u2705 \u0645\u0634\u062a\u0631\u064a \u0645\u0648\u062b\u0642</p></div>'''
@@ -280,26 +280,26 @@ img {{ max-width:100%; height:auto; display:block; }}
                 <p style="color:rgba(255,255,255,0.85);font-size:1.15rem;line-height:1.7;margin-bottom:20px;">{data.get('hero_subheadline','')}</p>
                 <div style="display:flex;align-items:center;gap:10px;margin-bottom:25px;"><span style="color:{a};font-size:1.3rem;">\u2665</span><span style="color:white;font-weight:700;">{data.get('social_proof_number','')}</span><span style="color:rgba(255,255,255,0.8);">{data.get('social_proof_text','')}</span></div>
                 <a href="#order" class="btn">{cta} \u2794</a></div>
-            <div style="flex:1;min-width:280px;"><img src="{hero_img}" style="border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,0.3);">
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px;"><img src="{hero_lifestyle}" style="border-radius:12px;"><img src="{hero_closeup}" style="border-radius:12px;"></div></div></div></section>'''
+            <div style="flex:1;min-width:280px;"><img loading="lazy" decoding="async" src="{hero_img}" style="border-radius:20px;box-shadow:0 20px 50px rgba(0,0,0,0.3);">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:15px;"><img loading="lazy" decoding="async" src="{hero_lifestyle}" style="border-radius:12px;"><img loading="lazy" decoding="async" src="{hero_closeup}" style="border-radius:12px;"></div></div></div></section>'''
     html += f'''<section style="background:linear-gradient(135deg,{p},{g2});padding:35px 20px;"><div class="container" style="display:flex;justify-content:space-around;flex-wrap:wrap;gap:20px;">{stats_html}</div></section>'''
     html += f'''<section class="section" style="background:white;"><div class="container">
         <h2 class="section-title">\u26a0\ufe0f {data.get('problem_title','')}</h2>
-        <div class="img-text-row"><img src="{prob_img}"><div class="text-side">
+        <div class="img-text-row"><img loading="lazy" decoding="async" src="{prob_img}"><div class="text-side">
             <p style="color:#64748b;font-size:1.05rem;line-height:1.8;margin-bottom:20px;">{data.get('problem_description','')}</p>
             <ul style="list-style:none;">{problems_html}</ul></div></div>
-        <img src="{prob_img2}" style="max-width:500px;margin:20px auto;border-radius:16px;">
+        <img loading="lazy" decoding="async" src="{prob_img2}" style="max-width:500px;margin:20px auto;border-radius:16px;">
     </div></section>'''
     html += f'''<section class="section" style="background:{s};"><div class="container">
         <h2 class="section-title">\u2728 {data.get('solution_title','')}</h2>
-        <div class="img-text-row" style="flex-direction:row-reverse;"><img src="{sol_img}"><div class="text-side">
+        <div class="img-text-row" style="flex-direction:row-reverse;"><img loading="lazy" decoding="async" src="{sol_img}"><div class="text-side">
             <p style="color:#64748b;font-size:1.05rem;line-height:1.8;">{data.get('solution_description','')}</p></div></div>
-        <img src="{sol_img2}" style="max-width:500px;margin:20px auto;border-radius:16px;">
+        <img loading="lazy" decoding="async" src="{sol_img2}" style="max-width:500px;margin:20px auto;border-radius:16px;">
         <h3 style="text-align:center;color:{p};margin:30px 0 20px;">\u2728 \u062a\u062d\u0648\u0644 \u0645\u0630\u0647\u0644!</h3>
         <div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;">
-            <div style="text-align:center;"><img src="{before_img}" style="max-width:280px;border-radius:16px;"><p style="margin-top:8px;font-weight:700;color:#ef4444;">\u0642\u0628\u0644</p></div>
+            <div style="text-align:center;"><img loading="lazy" decoding="async" src="{before_img}" style="max-width:280px;border-radius:16px;"><p style="margin-top:8px;font-weight:700;color:#ef4444;">\u0642\u0628\u0644</p></div>
             <div style="font-size:2.5rem;color:{a};">\u27a1</div>
-            <div style="text-align:center;"><img src="{after_img}" style="max-width:280px;border-radius:16px;"><p style="margin-top:8px;font-weight:700;color:#22c55e;">\u0628\u0639\u062f</p></div></div>
+            <div style="text-align:center;"><img loading="lazy" decoding="async" src="{after_img}" style="max-width:280px;border-radius:16px;"><p style="margin-top:8px;font-weight:700;color:#22c55e;">\u0628\u0639\u062f</p></div></div>
     </div></section>'''
     html += f'''<section class="section" style="background:white;"><div class="container">
         <h2 class="section-title">\u0644\u0645\u0627\u0630\u0627 \u0647\u0630\u0627 \u0627\u0644\u0645\u0646\u062a\u062c \u0645\u062e\u062a\u0644\u0641\u061f</h2>
@@ -314,7 +314,7 @@ img {{ max-width:100%; height:auto; display:block; }}
     html += f'''<section class="section" style="background:{s};"><div class="container">
         <h2 class="section-title">\U0001f4cf \u0623\u0628\u0639\u0627\u062f \u0648\u062d\u062c\u0645 \u0627\u0644\u0645\u0646\u062a\u062c</h2>
         <div style="display:flex;align-items:center;gap:30px;flex-wrap:wrap;justify-content:center;">
-            <img src="{dim_img}" style="max-width:350px;border-radius:16px;">
+            <img loading="lazy" decoding="async" src="{dim_img}" style="max-width:350px;border-radius:16px;">
             <div style="min-width:250px;"><h4 style="color:{p};margin-bottom:15px;">\u0627\u0644\u0645\u0648\u0627\u0635\u0641\u0627\u062a \u0627\u0644\u062a\u0642\u0646\u064a\u0629</h4>
                 <table style="width:100%;border-collapse:collapse;"><tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:12px;font-weight:700;color:{p};">\u0627\u0644\u0627\u0631\u062a\u0641\u0627\u0639</td><td style="padding:12px;">{dims.get('height','')}</td></tr>
                 <tr style="border-bottom:1px solid #e2e8f0;"><td style="padding:12px;font-weight:700;color:{p};">\u0627\u0644\u0639\u0631\u0636</td><td style="padding:12px;">{dims.get('width','')}</td></tr>
