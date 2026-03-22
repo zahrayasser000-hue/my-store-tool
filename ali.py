@@ -690,10 +690,50 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                 )
                 st.json(st.session_state.parsed_json)
             with tab4:
-                youcan_html = get_youcan_html(st.session_state.get('final_page_ai', st.session_state.final_page))
-                st.info("انسخ هذا الكود والصقه في YouCan")
-                st.code(youcan_html, language="html")
-                st.download_button(label="تحميل YouCan HTML", data=youcan_html, file_name="youcan.html", mime="text/html")
+                            youcan_html = get_youcan_html(st.session_state.get('final_page_ai', st.session_state.final_page))
+            st.info("الكود مقسم حسب الأقسام - انسخ كل قسم والصقه في YouCan")
+            # Split by section comments
+            import re as _re2
+            section_names = {
+                'STYLE': '🎨 الأنماط (CSS)',
+                'TOPBAR': '📌 الشريط العلوي',
+                'HERO': '🏠 القسم الرئيسي (Hero)',
+                'STATS': '📊 الإحصائيات',
+                'PROBLEM': '😟 قسم المشكلة',
+                'SOLUTION': '✅ قسم الحل',
+                'BEFORE_AFTER': '🔄 قبل وبعد',
+                'FEATURES': '⭐ المميزات',
+                'INGREDIENTS': '🧪 المكونات',
+                'HOW_TO_USE': '📋 طريقة الاستخدام',
+                'REVIEWS': '💬 آراء العملاء',
+                'PRICING': '💰 التسعير',
+                'FAQ': '❓ الأسئلة الشائعة',
+                'GUARANTEE': '🛡️ الضمان',
+                'FINAL_CTA': '🚀 الدعوة النهائية',
+                'FOOTER': '📝 التذييل',
+            }
+            # Extract style block first
+            style_match = _re2.search(r'(<style>.*?</style>)', youcan_html, _re2.DOTALL)
+            if style_match:
+                with st.expander('🎨 الأنماط (CSS) - انسخ هذا أولاً', expanded=False):
+                    st.code(style_match.group(1), language='html')
+            # Split remaining content by <!-- SECTION --> comments
+            parts = _re2.split(r'(<!--\s*[A-Z_]+\s*-->)', youcan_html)
+            current_section = 'WRAPPER'
+            for part in parts:
+                comment_match = _re2.match(r'<!--\s*([A-Z_]+)\s*-->', part.strip())
+                if comment_match:
+                    current_section = comment_match.group(1)
+                    continue
+                content = part.strip()
+                if not content or content.startswith('<style'):
+                    continue
+                label = section_names.get(current_section, f'📦 {current_section}')
+                with st.expander(label, expanded=False):
+                    st.code(content, language='html')
+            st.markdown('---')
+            st.markdown('### 📥 تحميل الكود كاملاً')
+            st.download_button(label="تحميل YouCan HTML كاملاً", data=youcan_html, file_name="youcan.html", mime="text/html")
         with tab5:
                 if 'parsed_json' in st.session_state:
                     prompts = extract_image_prompts(st.session_state.parsed_json)
