@@ -755,66 +755,6 @@ def generate_youcan_json(html):
 
 def generate_nb_image(api_key, prompt, ref_b64=None):
     try:
-
-            from google import genai as gc
-
-def generate_youcan_json(html):
-    """Generate YouCan Page Builder compatible JSON from HTML."""
-    # Extract CSS
-    css_match = re.search(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
-    css_content = css_match.group(1).strip() if css_match else ''
-    # Extract JS
-    js_match = re.search(r'<script[^>]*>(.*?)</script>', html, re.DOTALL)
-    js_content = js_match.group(1).strip() if js_match else ''
-    # Extract body
-    body_match = re.search(r'<body[^>]*>(.*?)</body>', html, re.DOTALL)
-    body_html = body_match.group(1).strip() if body_match else html
-    # Remove script tags from body
-    body_html = re.sub(r'<script[^>]*>.*?</script>', '', body_html, flags=re.DOTALL)
-    # Split body into sections by main section divs
-    section_pattern = r'(<(?:div|section)[^>]*class="[^"]*(?:sec|hero|topbar|final)[^"]*"[^>]*>.*?</(?:div|section)>)'
-    raw_sections = re.split(r'(?=<(?:div|section)[^>]*class="[^"]*(?:sec-dark|sec-color|sec |hero|topbar|final))', body_html)
-    raw_sections = [s.strip() for s in raw_sections if s.strip()]
-    if not raw_sections:
-        raw_sections = [body_html]
-    sections = []
-    # Add CSS as Custom Code section
-    if css_content:
-        sections.append({
-            "id": str(uuid.uuid4()),
-            "type": "custom-code",
-            "data": {
-                "css": f'<style>{css_content}</style>',
-                "js": ""
-            },
-            "style": {},
-            "visibility": {"desktop": True, "tablet": True, "mobile": True}
-        })
-    # Add each HTML section as Html Editor
-    for i, sec_html in enumerate(raw_sections):
-        sections.append({
-            "id": str(uuid.uuid4()),
-            "type": "html-editor",
-            "data": {
-                "content": sec_html
-            },
-            "style": {},
-            "visibility": {"desktop": True, "tablet": True, "mobile": True}
-        })
-    # Add JS as Custom Code section
-    if js_content:
-        sections.append({
-            "id": str(uuid.uuid4()),
-            "type": "custom-code",
-            "data": {
-                "css": "",
-                "js": js_content
-            },
-            "style": {},
-            "visibility": {"desktop": True, "tablet": True, "mobile": True}
-        })
-    project = {"assets": [], "styles": [], "pages": [{"frames": [{"component": {"type": "wrapper", "components": [{"tagName": "div", "content": html}]}}], "id": str(uuid.uuid4())}]}; return json.dumps(project, ensure_ascii=False, indent=2)
-
         from google import genai as gc
         from google.genai import types as gt
         client = gc.Client(api_key=api_key)
