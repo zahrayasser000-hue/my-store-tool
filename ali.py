@@ -42,7 +42,7 @@ def get_ai_image(keyword, width=800, height=600, style="professional", context="
         "problem": f"frustrated person experiencing problem related to {safe_keyword}, worried expression, dramatic lighting, realistic, high quality, 8k",
         "solution": f"happy satisfied person after using {safe_keyword}, bright smile, positive mood, natural lighting, high quality, 8k",
         "feature": f"visual representation of {context} for {safe_keyword}, conceptual product benefit illustration, clean modern aesthetic, commercial photography, 8k",
-        "review": f"customer portrait selfie with {safe_keyword}, casual setting, smartphone photo style, realistic, genuine smile, 8k",
+        "review": f"close up headshot portrait photo of a real person face, front facing, natural skin texture, neutral background, soft lighting, professional portrait photography, 8k",
     }
     prompt = prompts.get(style, f"{safe_keyword} high quality realistic photo")
     encoded_prompt = urllib.parse.quote(prompt)
@@ -135,9 +135,9 @@ def generate_landing_page_json(api_key, product, category):
     "dimensions": {{"height": "15 cm", "width": "8 cm", "weight": "200g", "volume": "50ml", "image_search": "product with ruler measurement"}},
     "stats": [{{"number": "98%", "label": "\u0625\u062d\u0635\u0627\u0626\u064a\u0629 1"}}, {{"number": "+5000", "label": "\u0625\u062d\u0635\u0627\u0626\u064a\u0629 2"}}, {{"number": "4.9/5", "label": "\u0625\u062d\u0635\u0627\u0626\u064a\u0629 3"}}],
     "reviews": [
-        {{"name": "\u0633\u0627\u0631\u0629 \u0645.", "rating": 5, "comment": "\u062a\u0639\u0644\u064a\u0642 \u0648\u0627\u0642\u0639\u064a", "image_search": "happy arab woman customer selfie portrait smiling"}},
-        {{"name": "\u0623\u062d\u0645\u062f \u0639.", "rating": 5, "comment": "\u062a\u0639\u0644\u064a\u0642 \u0648\u0627\u0642\u0639\u064a", "image_search": "satisfied arab man customer portrait casual confident"}},
-        {{"name": "\u0646\u0648\u0631\u0629 \u0643.", "rating": 4, "comment": "\u062a\u0639\u0644\u064a\u0642 \u0648\u0627\u0642\u0639\u064a", "image_search": "happy arab woman portrait natural lighting smiling"}}
+        {{"name": "\u0633\u0627\u0631\u0629 \u0645.", "rating": 5, "comment": "\u062a\u0639\u0644\u064a\u0642 \u0648\u0627\u0642\u0639\u064a", "image_search": "close up face portrait of happy arab woman, headshot, natural skin, neutral background"}},
+        {{"name": "\u0623\u062d\u0645\u062f \u0639.", "rating": 5, "comment": "\u062a\u0639\u0644\u064a\u0642 \u0648\u0627\u0642\u0639\u064a", "image_search": "close up face portrait of confident arab man, headshot, natural skin, neutral background"}},
+        {{"name": "\u0646\u0648\u0631\u0629 \u0643.", "rating": 4, "comment": "\u062a\u0639\u0644\u064a\u0642 \u0648\u0627\u0642\u0639\u064a", "image_search": "close up face portrait of smiling arab woman, headshot, natural skin, neutral background"}}
     ],
     "pricing": {{"original": "399", "discounted": "199", "currency": "SAR", "discount_percent": "50%"}},
     "urgency_text": "\u0627\u0644\u0639\u0631\u0636 \u064a\u0646\u062a\u0647\u064a \u062e\u0644\u0627\u0644 24 \u0633\u0627\u0639\u0629!",
