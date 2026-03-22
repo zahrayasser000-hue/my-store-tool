@@ -8,6 +8,7 @@ import random
 import urllib.parse
 import base64
 import time
+import uuid
 
 st.set_page_config(page_title="ALI Engine Pro", layout="wide", page_icon="🚀")
 st.markdown("""<style>
@@ -736,6 +737,20 @@ def get_youcan_html(html):
     result = f'<style>\n{scoped}</style>\n<div class="ali-lp" style="direction:rtl;font-family:\'Cairo\',sans-serif;max-width:680px;margin:0 auto;">\n{body.strip()}\n</div>'
     return re.sub(r'\n\s*\n\s*\n', '\n\n', result).strip()
 
+def generate_youcan_json(html):
+    css_m = re.search(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
+    css = css_m.group(1).strip() if css_m else ''
+    js_m = re.search(r'<script[^>]*>(.*?)</script>', html, re.DOTALL)
+    js = js_m.group(1).strip() if js_m else ''
+    body_m = re.search(r'<body[^>]*>(.*?)</body>', html, re.DOTALL)
+    body = body_m.group(1).strip() if body_m else html
+    body = re.sub(r'<script[^>]*>.*?</script>', '', body, flags=re.DOTALL)
+    secs = []
+    if css: secs.append({"id": str(uuid.uuid4()), "type": "custom-code", "data": {"css": f'<style>{css}</style>', "js": ""}, "style": {}, "visibility": {"desktop": True, "tablet": True, "mobile": True}})
+    secs.append({"id": str(uuid.uuid4()), "type": "html-editor", "data": {"content": body}, "style": {}, "visibility": {"desktop": True, "tablet": True, "mobile": True}})
+    if js: secs.append({"id": str(uuid.uuid4()), "type": "custom-code", "data": {"css": "", "js": js}, "style": {}, "visibility": {"desktop": True, "tablet": True, "mobile": True}})
+    return json.dumps({"sections": secs}, ensure_ascii=False, indent=2)
+
 # ─── GEMINI IMAGE GEN ─────────────────────────────────────────────────────────
 
 def generate_nb_image(api_key, prompt, ref_b64=None):
@@ -940,6 +955,8 @@ if app_mode == "🏗️ منشئ صفحات الهبوط":
         with t4:
             src = st.session_state.get('lp_html_ai', st.session_state.lp_html)
             yc  = get_youcan_html(src)
+            yc_json = generate_youcan_json(src)
+            st.download_button("📥 تحميل YouCan JSON", yc_json, "youcan_page.json", "application/json", key="yc_json_dl")
             if 'lp_html_ai' in st.session_state:
                 st.success("✅ صور AI مدمجة base64 — جاهز لـ YouCan!")
             else:
