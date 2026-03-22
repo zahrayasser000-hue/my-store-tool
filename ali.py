@@ -576,15 +576,37 @@ def replace_images_in_html(html, image_map, prompts):
     # Find all pollinations image URLs in order
     pattern = r'src="(https://image\.pollinations\.ai/[^"]*)"'
     matches = list(re.finditer(pattern, html))
-    # Map prompts to their order of appearance
-    # Build replacement in reverse to preserve positions
-    for idx, match in enumerate(reversed(matches)):
-        real_idx = len(matches) - 1 - idx
-        if real_idx < len(prompts):
-            pid = prompts[real_idx]['id']
-            if pid in image_map:
-                html = html[:match.start(1)] + image_map[pid] + html[match.end(1):]
-    return html
+# Build a lookup: decode each prompt's URL to match against HTML URLs
+        prompt_url_map = {}
+        for p in prompts:
+            # Regenerate the URL pattern for this prompt (without seed)
+            keyword = p.get('keyword', '')
+            prompt_text = p.get('prompt', '')
+            encoded_prompt = urllib.parse.quote(prompt_text)
+            # Store the encoded prompt as key, prompt id as value
+            prompt_url_map[encoded_prompt] = p['id']
+        # For each pollinations URL in HTML, find matching prompt by URL content
+        for match in reversed(matches):
+            url = match.group(1)
+            # Extract the prompt part from the URL
+            if 'prompt/' in url:
+                url_prompt = url.split('prompt/')[1].split('?')[0]
+                # Find matching prompt id
+                best_pid = None
+                for enc_prompt, pid in prompt_url_map.items():
+                    if enc_prompt == url_prompt:
+                        best_pid = pid
+                        break
+                if not best_pid:
+                    # Fallback: try decoded comparison
+                    decoded_url = urllib.parse.unquote(url_prompt)
+                    for p in prompts:
+                        if p['prompt'] == decoded_url:
+                            best_pid = p['id']
+                            break
+                if best_pid and best_pid in image_map:
+                    html = html[:match.start(1)] + image_map[best_pid] + html[match.end(1):]
+        return html
     
 
 # UI - Sidebar and Main
