@@ -32,7 +32,7 @@ def get_ai_image(keyword, width=800, height=600, style="product", context=""):
         "feature":     f"visual representation {context} {safe} circular composition white background commercial 8k",
         "ingredient":  f"close up macro {safe} natural organic ingredient studio white background 8k",
         "gif_step":    f"hands tutorial step using {safe} clean demonstration bright lighting instructional 8k",
-        "review":      f"close up headshot portrait real person face neutral background soft lighting 8k",
+        "review":      f"happy satisfied customer avatar illustration digital art warm colors neutral background soft lighting 8k",
         "doctor":      f"professional arab doctor white coat hospital confident smile realistic 8k",
         "family":      f"happy arab family group {safe} warm home lighting authentic 8k",
         "hero_person": f"confident arab person using {safe} cinematic lighting editorial photography 8k",
