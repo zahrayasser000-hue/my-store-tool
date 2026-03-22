@@ -798,7 +798,7 @@ def generate_youcan_json(html):
             "style": {},
             "visibility": {"desktop": True, "tablet": True, "mobile": True}
         })
-    return json.dumps({"sections": sections}, ensure_ascii=False, indent=2)
+    project = {"assets": [], "styles": [], "pages": [{"frames": [{"component": {"type": "wrapper", "components": [{"tagName": "div", "content": html}]}}], "id": str(uuid.uuid4())}]}; return json.dumps(project, ensure_ascii=False, indent=2)
 
         from google import genai as gc
         from google.genai import types as gt
