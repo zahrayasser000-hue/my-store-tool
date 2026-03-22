@@ -756,7 +756,7 @@ def generate_youcan_json(html):
 def generate_nb_image(api_key, prompt, ref_b64=None):
     try:
 
-    import uuid
+            from google import genai as gc
 
 def generate_youcan_json(html):
     """Generate YouCan Page Builder compatible JSON from HTML."""
