@@ -42,7 +42,7 @@ def get_ai_image(keyword, width=800, height=600, style="professional", context="
         "problem": f"frustrated person experiencing problem related to {safe_keyword}, worried expression, dramatic lighting, realistic, high quality, 8k",
         "solution": f"happy satisfied person after using {safe_keyword}, bright smile, positive mood, natural lighting, high quality, 8k",
         "feature": f"visual representation of {context} for {safe_keyword}, conceptual product benefit illustration, clean modern aesthetic, commercial photography, 8k",
-        "review": f"close up headshot portrait photo of a real person face, front facing, natural skin texture, neutral background, soft lighting, professional portrait photography, 8k",
+        "review": f"{safe_keyword}, close up headshot portrait photo of a real person face, front facing, natural skin texture, neutral background, soft lighting, professional portrait photography, 8k",
     }
     prompt = prompts.get(style, f"{safe_keyword} high quality realistic photo")
     encoded_prompt = urllib.parse.quote(prompt)
@@ -496,9 +496,9 @@ def get_youcan_html(html):
 def extract_image_prompts(data):
     prompts = []
     idx = [1]
-    def add(section, keyword, img_type):
+    def add(section, keyword, img_type, context=""):
         pid = f"IMG_{idx[0]:02d}_{section.upper()}"
-        prompt = get_ai_image(keyword, 800, 600, img_type)
+        prompt = get_ai_image(keyword, 800, 600, img_type, context=context)
         decoded = urllib.parse.unquote(prompt.split('prompt/')[1].split('?')[0]) if 'prompt/' in prompt else keyword
         prompts.append({"id": pid, "section": section, "type": img_type, "keyword": keyword, "prompt": decoded})
         idx[0] += 1
@@ -514,7 +514,7 @@ def extract_image_prompts(data):
     dims = data.get('dimensions', {})
     add("dimensions", dims.get('image_search','dimensions'), "dimensions")
     for i, feat in enumerate(data.get('features', [])[:4], 1):
-        add(f"feature_{i}", feat.get('image_search','feature'), "feature")
+        add(f"feature_{i}", feat.get('image_search','feature'), "feature", feat.get('title','') + ' ' + feat.get('desc',''))
     for i, ing in enumerate(data.get('ingredients', [])[:3], 1):
         add(f"ingredient_{i}", ing.get('image_search','ingredient'), "ingredient")
     step_imgs = data.get('how_to_use_images', [])
