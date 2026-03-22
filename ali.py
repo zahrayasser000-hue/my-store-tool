@@ -41,7 +41,7 @@ def get_ai_image(keyword, width=800, height=600, style="professional", context="
         "gif_step": f"step by step tutorial photo showing how to use {safe_keyword}, clean hands demonstration, bright lighting, instructional photography, 8k",
         "problem": f"frustrated person experiencing problem related to {safe_keyword}, worried expression, dramatic lighting, realistic, high quality, 8k",
         "solution": f"happy satisfied person after using {safe_keyword}, bright smile, positive mood, natural lighting, high quality, 8k",
-        "feature": f"{safe_keyword} {context}, clean modern aesthetic, studio lighting, detailed close up, commercial photography, 8k",
+        "feature": f"visual representation of {context} for {safe_keyword}, conceptual product benefit illustration, clean modern aesthetic, commercial photography, 8k",
         "review": f"customer portrait selfie with {safe_keyword}, casual setting, smartphone photo style, realistic, genuine smile, 8k",
     }
     prompt = prompts.get(style, f"{safe_keyword} high quality realistic photo")
@@ -191,8 +191,8 @@ def build_landing_page_html(data, colors):
     hero_lifestyle = get_ai_image(data.get('image_hero_lifestyle_search', 'person using product'), 400, 300, 'lifestyle')
     prob_img = get_ai_image(data.get('image_problem_search', 'worried person'), 400, 300, 'problem')
     sol_img = get_ai_image(data.get('image_solution_search', 'happy person'), 400, 300, 'solution')
-    before_img = get_ai_image(data.get('image_before_search', 'before treatment'), 350, 350, 'before_after')
-    after_img = get_ai_image(data.get('image_after_search', 'after treatment'), 350, 350, 'before_after')
+    before_img = get_ai_image(data.get('image_before_search', 'before treatment'), 350, 350, 'problem')
+    after_img = get_ai_image(data.get('image_after_search', 'after treatment'), 350, 350, 'solution')
 
     pricing = data.get('pricing', {})
     cta = data.get('call_to_action', 'اطلب الآن')
@@ -509,8 +509,8 @@ def extract_image_prompts(data):
     add("problem2", data.get('image_problem_2_search','problem2'), "problem")
     add("solution", data.get('image_solution_search','solution'), "solution")
     add("solution2", data.get('image_solution_2_search','solution2'), "lifestyle")
-    add("before", data.get('image_before_search','before'), "before_after")
-    add("after", data.get('image_after_search','after'), "before_after")
+    add("before", data.get('image_before_search','before'), "problem")
+    add("after", data.get('image_after_search','after'), "solution")
     dims = data.get('dimensions', {})
     add("dimensions", dims.get('image_search','dimensions'), "dimensions")
     for i, feat in enumerate(data.get('features', [])[:4], 1):
@@ -682,7 +682,7 @@ if app_mode == "\U0001f3d7\ufe0f \u0645\u0646\u0634\u0626 \u0635\u0641\u062d\u06
                 )
                 st.json(st.session_state.parsed_json)
             with tab4:
-                youcan_html = get_youcan_html(st.session_state.final_page)
+                youcan_html = get_youcan_html(st.session_state.get('final_page_ai', st.session_state.final_page))
                 st.info("انسخ هذا الكود والصقه في YouCan")
                 st.code(youcan_html, language="html")
                 st.download_button(label="تحميل YouCan HTML", data=youcan_html, file_name="youcan.html", mime="text/html")
