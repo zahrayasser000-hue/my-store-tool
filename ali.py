@@ -237,9 +237,9 @@ def build_lp_html(data, colors, image_map=None):
     p=colors["primary"]; s=colors["secondary"]; a=colors["accent"]
     g1=colors["gradient1"]; g2=colors["gradient2"]
 
-    def img(key, kw, w, h, st_, ctx=""):
+    def img(key, kw, w, h, st_, context=""):
         if image_map and key in image_map: return image_map[key]
-        return get_ai_image(kw, w, h, st_, ctx)
+        return get_ai_image(kw, w, h, st_, context)
 
     # ── All images ──
     hero_person    = img("IMG_HERO_PERSON",   data.get('image_hero_person_search','person'),        600,700,"hero_person")
@@ -300,7 +300,7 @@ def build_lp_html(data, colors, image_map=None):
     step_imgs  = data.get('how_to_use_images',[])
     for i, step in enumerate(data.get('how_to_use',[])[:4], 1):
         sk = step_imgs[i-1] if i-1 < len(step_imgs) else f'step {i}'
-        si = img(f"IMG_STEP_{i}", sk, 400, 300, "gif_step", context=step)
+        si = img(f"IMG_STEP_{i}", sk, 400, 300, "gif_step", step)
         steps_html += f'''<div class="step-card">
 <img loading="lazy" src="{si}" alt="خطوة {i}">
 <div class="step-num">{i}</div>
