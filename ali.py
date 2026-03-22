@@ -841,7 +841,7 @@ if app_mode == "🏗️ منشئ صفحات الهبوط":
 
         with t1:
             preview = st.session_state.get('lp_html_ai', st.session_state.lp_html)
-            st.download_button("⬇️ تحميل HTML", preview, "landing_page.html", "text/html")
+            st.download_button("⬇️ تحميل HTML", preview, "landing_page.html", "text/html", key="dl_html_main")
             components.html(preview, height=6000, scrolling=True)
 
         with t2:
@@ -875,7 +875,7 @@ if app_mode == "🏗️ منشئ صفحات الهبوط":
                         new_html = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=generated)
                         st.session_state.lp_html_ai = new_html
                         st.success("✅ الصور مدمجة في HTML كـ base64!")
-                        st.download_button("⬇️ HTML + صور AI مدمجة", new_html, "lp_ai.html", "text/html")
+                        st.download_button("⬇️ HTML + صور AI مدمجة", new_html, "lp_ai.html", "text/html", key="dl_ai_html")
 
                 if 'lp_ai_images' in st.session_state:
                     st.markdown("#### 🖼️ الصور المولدة")
@@ -889,7 +889,7 @@ if app_mode == "🏗️ منشئ صفحات الهبوط":
             if 'lp_data' in st.session_state:
                 d = {k:v for k,v in st.session_state.lp_data.items() if k!='_product_name'}
                 js = json.dumps(d, ensure_ascii=False, indent=2)
-                st.download_button("📥 تحميل JSON", js, "lp.json","application/json")
+                st.download_button("📥 تحميل JSON", js, "lp.json","application/json", key="dl_lp_json")
                 st.json(d)
 
         with t4:
