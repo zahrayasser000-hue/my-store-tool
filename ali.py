@@ -899,7 +899,7 @@ if app_mode == "🏗️ منشئ صفحات الهبوط":
             src = st.session_state.get('lp_html_ai', st.session_state.lp_html)
             yc  = get_youcan_html(src)
             yc_json = generate_youcan_json(st.session_state.lp_html)
-            st.download_button("📥 تحميل YouCan JSON", yc_json, "youcan_page.json", "application/json", key="yc_json_dl")
+            st.download_button("📥 تحميل YouCan JSON", yc_json, "youcan_page.lp", "application/json", key="yc_json_dl")
             if 'lp_html_ai' in st.session_state:
                 st.success("✅ صور AI مدمجة base64 — جاهز لـ YouCan!")
             else:
@@ -929,7 +929,7 @@ if app_mode == "🏗️ منشئ صفحات الهبوط":
             st.download_button("📥 YouCan HTML كامل", yc, "youcan.html","text/html")
                         # YouCan JSON Export
             yc_json = generate_youcan_json(st.session_state.lp_html)
-            st.download_button("📥 YouCan JSON (استيراد مباشر)", yc_json, "youcan_page.json", "application/json", key="yc_json_dl")
+            st.download_button("📥 YouCan JSON (استيراد مباشر)", yc_json, "youcan_page.lp", "application/json", key="yc_json_dl")
 
         with t5:
             if 'lp_data' in st.session_state:
