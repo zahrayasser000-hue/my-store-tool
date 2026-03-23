@@ -752,7 +752,7 @@ def generate_youcan_json(html):
     if js:
         full_html += '<script>' + js + '</script>'
     sec_id = 'PBS-' + uuid.uuid4().hex[:20]
-    page = {"settings": {"page-direction": "rtl", "page-product-id": None, "is-full-width": True, "width": None, "center-elements": False, "background-color": "FFFFFF", "background-image": None, "background-repeat": "no-repeat", "background-position": "center", "background-size": "cover", "font-family": "Cairo", "font-size-desktop": 16, "font-size-mobile": 12, "text-color": "#1a1a1a", "content-alignment": "center", "section-alignment": "center", "margin-top": 0, "margin-right": 0, "margin-bottom": 0, "margin-left": 0}, "sections": [{"id": sec_id, "name": "html-editor", "blocks": {"parameters": {"htmlText": full_html}, "style": {"section-alignment": "center", "is-full-width": True, "width": None, "margin-top": 0, "margin-right": 0, "margin-bottom": 0, "margin-left": 0, "padding-top": 0, "padding-right": 0, "padding-bottom": 0, "padding-left": 0, "background-color": "transparent", "css-content": "{ }"}}, "label": "Html Editor", "children": None}]}
+    page = {"settings": {"page-direction": "rtl", "page-product-id": None, "is-full-width": True, "width": None, "center-elements": False, "background-color": "#FFFFFF", "background-image": None, "background-repeat": "no-repeat", "background-position": "center", "background-size": "cover", "font-family": "Cairo", "font-size-desktop": 16, "font-size-mobile": 12, "text-color": "#1a1a1a", "content-alignment": "center", "section-alignment": "center", "margin-top": 0, "margin-right": 0, "margin-bottom": 0, "margin-left": 0}, "sections": [{"id": sec_id, "name": "html-editor", "blocks": {"parameters": {"htmlText": full_html}, "style": {"section-alignment": "center", "is-full-width": True, "width": None, "margin-top": 0, "margin-right": 0, "margin-bottom": 0, "margin-left": 0, "padding-top": 0, "padding-right": 0, "padding-bottom": 0, "padding-left": 0, "background-color": "transparent", "css-content": "{ }"}}, "label": "Html Editor", "children": None}]}
     return json.dumps(page, ensure_ascii=False, indent=2)
 # ─── GEMINI IMAGE GEN ─────────────────────────────────────────────────────────
 
@@ -898,7 +898,6 @@ if app_mode == "🏗️ منشئ صفحات الهبوط":
         with t4:
             src = st.session_state.get('lp_html_ai', st.session_state.lp_html)
             yc  = get_youcan_html(src)
-            yc_json = generate_youcan_json(st.session_state.lp_html)
             st.download_button("📥 تحميل YouCan JSON", yc_json, "youcan_page.lp", "application/json", key="yc_json_dl")
             if 'lp_html_ai' in st.session_state:
                 st.success("✅ صور AI مدمجة base64 — جاهز لـ YouCan!")
@@ -928,7 +927,7 @@ if app_mode == "🏗️ منشئ صفحات الهبوط":
                     st.code(content, language='html')
             st.download_button("📥 YouCan HTML كامل", yc, "youcan.html","text/html")
                         # YouCan JSON Export
-            yc_json = generate_youcan_json(st.session_state.lp_html)
+            yc_json = generate_youcan_json(src)
             st.download_button("📥 YouCan JSON (استيراد مباشر)", yc_json, "youcan_page.lp", "application/json", key="yc_json_dl")
 
         with t5:
