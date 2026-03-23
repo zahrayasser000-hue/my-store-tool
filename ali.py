@@ -745,12 +745,15 @@ def generate_youcan_json(html):
     body_m = re.search(r'<body[^>]*>(.*?)</body>', html, re.DOTALL)
     body = body_m.group(1).strip() if body_m else html
     body = re.sub(r'<script[^>]*>.*?</script>', '', body, flags=re.DOTALL)
-    secs = []
-    if css: secs.append({"id": str(uuid.uuid4()), "type": "custom-code", "data": {"css": f'<style>{css}</style>', "js": ""}, "style": {}, "visibility": {"desktop": True, "tablet": True, "mobile": True}})
-    secs.append({"id": str(uuid.uuid4()), "type": "html-editor", "data": {"content": body}, "style": {}, "visibility": {"desktop": True, "tablet": True, "mobile": True}})
-    if js: secs.append({"id": str(uuid.uuid4()), "type": "custom-code", "data": {"css": "", "js": js}, "style": {}, "visibility": {"desktop": True, "tablet": True, "mobile": True}})
-    return json.dumps({"sections": secs}, ensure_ascii=False, indent=2)
-
+    full_html = ''
+    if css:
+        full_html += '<style>' + css + '</style>'
+    full_html += body
+    if js:
+        full_html += '<script>' + js + '</script>'
+    sec_id = 'PBS-' + uuid.uuid4().hex[:20]
+    page = {"settings": {"page-direction": "rtl", "page-product-id": None, "is-full-width": True, "width": None, "center-elements": False, "background-color": "#FFFFFF", "background-image": None, "background-repeat": "no-repeat", "background-position": "center", "background-size": "cover", "font-family": "Cairo", "font-size-desktop": 16, "font-size-mobile": 12, "text-color": "#1a1a1a", "content-alignment": "center", "section-alignment": "center", "margin-top": 0, "margin-right": 0, "margin-bottom": 0, "margin-left": 0}, "sections": [{"id": sec_id, "name": "html-editor", "blocks": {"parameters": {"htmlText": full_html}, "style": {"section-alignment": "center", "is-full-width": True, "width": None, "margin-top": 0, "margin-right": 0, "margin-bottom": 0, "margin-left": 0, "padding-top": 0, "padding-right": 0, "padding-bottom": 0, "padding-left": 0, "background-color": "transparent", "css-content": "{ }"}}, "label": "Html Editor", "children": None}]}
+    return json.dumps(page, ensure_ascii=False, indent=2)
 # ─── GEMINI IMAGE GEN ─────────────────────────────────────────────────────────
 
 def generate_nb_image(api_key, prompt, ref_b64=None):
