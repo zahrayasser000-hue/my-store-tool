@@ -928,7 +928,7 @@ if app_mode == "🏗️ منشئ صفحات الهبوط":
             st.download_button("📥 YouCan HTML كامل", yc, "youcan.html","text/html")
                         # YouCan JSON Export
             yc_json = generate_youcan_json(src)
-            st.download_button("📥 YouCan JSON (استيراد مباشر)", yc_json, "youcan_page.lp", "application/json", key="yc_json_dl")
+            st.download_button("📥 YouCan JSON (استيراد مباشر)", yc_json, "youcan_page.lp", "application/json", key="yc_html_dl")
 
         with t5:
             if 'lp_data' in st.session_state:
