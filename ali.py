@@ -791,12 +791,12 @@ app_mode = st.sidebar.radio("🛠️ الأداة:", [
 # LANDING PAGE BUILDER
 # ══════════════════════════════════════════════════════════════════════════════
 if app_mode == "🏗️ منشئ صفحات الهبوط":
-cols_info = st.columns(5)
-cols_info[0].metric("الأقسام","15")
-cols_info[1].metric("الصور","30+")
-cols_info[2].metric("أطباء","2")
-cols_info[3].metric("خطوات الاستخدام","4")
-cols_info[4].metric("مكونات","4")
+    cols_info = st.columns(5)
+    cols_info[0].metric("الأقسام","15")
+    cols_info[1].metric("الصور","30+")
+    cols_info[2].metric("أطباء","2")
+    cols_info[3].metric("خطوات الاستخدام","4")
+    cols_info[4].metric("مكونات","4")
 
 if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 30 صورة)"):
     if not global_api_key or not global_product_name:
