@@ -798,7 +798,7 @@ with st.sidebar:
     if uploaded_img:
         product_image_b64 = base64.b64encode(uploaded_img.read()).decode('utf-8')
         uploaded_img.seek(0)
-        st.image(uploaded_img, caption="صورة المنتج", use_container_width=True)
+        st.image(uploaded_img, caption="صورة المنتج", )
     st.markdown("---")
     app_mode = st.radio("🛠️ الأداة:", [
         "🏗️ منشئ صفحات الهبوط",
@@ -885,7 +885,7 @@ if app_mode == "🏗️ منشئ صفحات الهبوط":
                     cols3 = st.columns(3)
                     for i,(k,v) in enumerate(st.session_state.lp_ai_images.items()):
                         with cols3[i%3]:
-                            if v and v.startswith('data:'): st.image(v, caption=k, use_container_width=True)
+                            if v and v.startswith('data:'): st.image(v, caption=k)
                             else: st.caption(f"**{k}**: Pollinations")
 
         with t3:
