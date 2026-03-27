@@ -764,224 +764,224 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
         return img_url
     except Exception:
         return None
-    with st.sidebar:
-        st.header("⚙️ الإعدادات")
-        global_api_key        = st.text_input("🔑 Gemini API Key", type="password")
-        global_product_name   = st.text_area("📦 اسم وتفاصيل المنتج", placeholder="مثال: نظارات رؤية ليلية للقيادة")
-        global_category       = st.selectbox("📁 فئة المنتج", [
-            "💄 مستحضرات تجميل وعناية (Cosmetics)",
-                "⚙️ أدوات وأجهزة ذكية (Gadgets)",
-            "🌿 صحة ومكملات (Health)",
-            "👗 أزياء وموضة (Fashion)"
-        ])
-        uploaded_img = st.file_uploader("📷 صورة المنتج (مرجع AI)", type=["png","jpg","jpeg","webp"])
-        product_image_b64 = None
-        if uploaded_img:
-            product_image_b64 = base64.b64encode(uploaded_img.read()).decode('utf-8')
-            uploaded_img.seek(0)
-            st.image(uploaded_img, caption="صورة المنتج", )
-        st.markdown("---")
-        app_mode = st.radio("🛠️ الأداة:", [
-            "🏗️ منشئ صفحات الهبوط",
-            "🔍 بحث السوق المعمق (SOP-1)",
-            "💰 حاسبة التعادل المالي (Matrix)"
-        ])
+with st.sidebar:
+st.header("⚙️ الإعدادات")
+global_api_key        = st.text_input("🔑 Gemini API Key", type="password")
+global_product_name   = st.text_area("📦 اسم وتفاصيل المنتج", placeholder="مثال: نظارات رؤية ليلية للقيادة")
+global_category       = st.selectbox("📁 فئة المنتج", [
+    "💄 مستحضرات تجميل وعناية (Cosmetics)",
+            "⚙️ أدوات وأجهزة ذكية (Gadgets)",
+        "🌿 صحة ومكملات (Health)",
+        "👗 أزياء وموضة (Fashion)"
+    ])
+    uploaded_img = st.file_uploader("📷 صورة المنتج (مرجع AI)", type=["png","jpg","jpeg","webp"])
+    product_image_b64 = None
+    if uploaded_img:
+        product_image_b64 = base64.b64encode(uploaded_img.read()).decode('utf-8')
+        uploaded_img.seek(0)
+        st.image(uploaded_img, caption="صورة المنتج", )
+    st.markdown("---")
+    app_mode = st.radio("🛠️ الأداة:", [
+        "🏗️ منشئ صفحات الهبوط",
+        "🔍 بحث السوق المعمق (SOP-1)",
+        "💰 حاسبة التعادل المالي (Matrix)"
+    ])
 
 # ══════════════════════════════════════════════════════════════════════════════
 # LANDING PAGE BUILDER
 # ══════════════════════════════════════════════════════════════════════════════
 if app_mode == "🏗️ منشئ صفحات الهبوط":
-    cols_info = st.columns(5)
-    cols_info[0].metric("الأقسام","15")
-    cols_info[1].metric("الصور","30+")
-    cols_info[2].metric("أطباء","2")
-    cols_info[3].metric("خطوات الاستخدام","4")
-    cols_info[4].metric("مكونات","4")
+cols_info = st.columns(5)
+cols_info[0].metric("الأقسام","15")
+cols_info[1].metric("الصور","30+")
+cols_info[2].metric("أطباء","2")
+cols_info[3].metric("خطوات الاستخدام","4")
+cols_info[4].metric("مكونات","4")
 
-    if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 30 صورة)"):
-        if not global_api_key or not global_product_name:
-            st.error("الرجاء إدخال مفتاح API واسم المنتج.")
+if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 30 صورة)"):
+    if not global_api_key or not global_product_name:
+        st.error("الرجاء إدخال مفتاح API واسم المنتج.")
+    else:
+        with st.spinner("🤖 جاري بناء الصفحة..."):
+            try:
+                raw  = generate_lp_json(global_api_key, global_product_name, global_category)
+                try:    data = json.loads(raw)
+                except:
+                    fixed = re.sub(r',\s*([}\]])', r'\1', raw)
+                    data  = json.loads(fixed)
+                data['_product_name'] = global_product_name
+                colors = detect_colors(global_product_name, global_category)
+                st.session_state.lp_data    = data
+                st.session_state.lp_colors  = colors
+                st.session_state.lp_html    = build_lp_html(data, colors)
+                st.session_state.pop('lp_ai_images', None)
+                st.session_state.pop('lp_html_ai',   None)
+                st.success("🎉 تم! 15 قسم + 30 صورة Pollinations")
+            except Exception as e:
+                st.error(f"🛑 {str(e)}")
+
+if 'lp_html' in st.session_state:
+    t1,t2,t3,t4,t5 = st.tabs(["📱 المعاينة","🤖 صور AI","📥 JSON","📤 YouCan","🎨 برومبتات"])
+
+    with t1:
+        preview = st.session_state.get('lp_html_ai', st.session_state.lp_html)
+        st.download_button("⬇️ تحميل HTML", preview, "landing_page.html", "text/html", key="dl_html_main")
+        components.html(preview, height=6000, scrolling=True)
+
+    with t2:
+        st.markdown("### 🤖 توليد الصور بـ Gemini AI ودمجها")
+        if 'lp_data' not in st.session_state:
+            st.warning("ولّد الصفحة أولاً.")
         else:
-            with st.spinner("🤖 جاري بناء الصفحة..."):
-                try:
-                    raw  = generate_lp_json(global_api_key, global_product_name, global_category)
-                    try:    data = json.loads(raw)
-                    except:
-                        fixed = re.sub(r',\s*([}\]])', r'\1', raw)
-                        data  = json.loads(fixed)
-                    data['_product_name'] = global_product_name
-                    colors = detect_colors(global_product_name, global_category)
-                    st.session_state.lp_data    = data
-                    st.session_state.lp_colors  = colors
-                    st.session_state.lp_html    = build_lp_html(data, colors)
-                    st.session_state.pop('lp_ai_images', None)
-                    st.session_state.pop('lp_html_ai',   None)
-                    st.success("🎉 تم! 15 قسم + 30 صورة Pollinations")
-                except Exception as e:
-                    st.error(f"🛑 {str(e)}")
+            slots = extract_image_slots(st.session_state.lp_data)
+            c1,c2 = st.columns(2)
+            with c1: use_ref = st.checkbox("استخدام صورة المنتج مرجعاً", value=bool(product_image_b64))
+            with c2: st.metric("إجمالي الصور", len(slots))
 
-    if 'lp_html' in st.session_state:
-        t1,t2,t3,t4,t5 = st.tabs(["📱 المعاينة","🤖 صور AI","📥 JSON","📤 YouCan","🎨 برومبتات"])
+            if st.button("🚀 توليد جميع الصور ودمجها في HTML", key="gen_ai"):
+                if not global_api_key: st.error("أدخل مفتاح API")
+                else:
+                    prog = st.progress(0); status = st.empty()
+                    generated = {}
+                    ref = product_image_b64 if use_ref else None
+                    for i, slot in enumerate(slots):
+                        status.text(f"⏳ {slot['key']} ({i+1}/{len(slots)})")
+                        img_data = generate_nb_image(
+                            global_api_key,
+                            f"Professional commercial photo. {slot['prompt']}. 8k ultra high quality. no text no letters no words no writing no captions.",
+                            ref_b64=ref
+                        )
+                        generated[slot['key']] = img_data or get_ai_image(slot['keyword'],800,600,slot['type'])
+                        prog.progress((i+1)/len(slots))
+                        time.sleep(0.4)
+                    status.success(f"✅ {len(generated)} صورة!")
+                    st.session_state.lp_ai_images = generated
+                    new_html = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=generated)
+                    st.session_state.lp_html_ai = new_html
+                    st.success("✅ الصور مدمجة في HTML كـ base64!")
+                    st.download_button("⬇️ HTML + صور AI مدمجة", new_html, "lp_ai.html", "text/html", key="dl_ai_html")
 
-        with t1:
-            preview = st.session_state.get('lp_html_ai', st.session_state.lp_html)
-            st.download_button("⬇️ تحميل HTML", preview, "landing_page.html", "text/html", key="dl_html_main")
-            components.html(preview, height=6000, scrolling=True)
+            if 'lp_ai_images' in st.session_state:
+                st.markdown("#### 🖼️ الصور المولدة")
+                cols3 = st.columns(3)
+                for i,(k,v) in enumerate(st.session_state.lp_ai_images.items()):
+                    with cols3[i%3]:
+                        if v: st.image(v, caption=k)
+                        else: st.caption(k)
 
-        with t2:
-            st.markdown("### 🤖 توليد الصور بـ Gemini AI ودمجها")
-            if 'lp_data' not in st.session_state:
-                st.warning("ولّد الصفحة أولاً.")
-            else:
-                slots = extract_image_slots(st.session_state.lp_data)
-                c1,c2 = st.columns(2)
-                with c1: use_ref = st.checkbox("استخدام صورة المنتج مرجعاً", value=bool(product_image_b64))
-                with c2: st.metric("إجمالي الصور", len(slots))
+    with t3:
+        if 'lp_data' in st.session_state:
+            d = {k:v for k,v in st.session_state.lp_data.items() if k!='_product_name'}
+            js = json.dumps(d, ensure_ascii=False, indent=2)
+            st.download_button("📥 تحميل JSON", js, "lp.json","application/json", key="dl_lp_json")
+            st.json(d)
 
-                if st.button("🚀 توليد جميع الصور ودمجها في HTML", key="gen_ai"):
-                    if not global_api_key: st.error("أدخل مفتاح API")
-                    else:
-                        prog = st.progress(0); status = st.empty()
-                        generated = {}
-                        ref = product_image_b64 if use_ref else None
-                        for i, slot in enumerate(slots):
-                            status.text(f"⏳ {slot['key']} ({i+1}/{len(slots)})")
-                            img_data = generate_nb_image(
-                                global_api_key,
-                                f"Professional commercial photo. {slot['prompt']}. 8k ultra high quality. no text no letters no words no writing no captions.",
-                                ref_b64=ref
-                            )
-                            generated[slot['key']] = img_data or get_ai_image(slot['keyword'],800,600,slot['type'])
-                            prog.progress((i+1)/len(slots))
-                            time.sleep(0.4)
-                        status.success(f"✅ {len(generated)} صورة!")
-                        st.session_state.lp_ai_images = generated
-                        new_html = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=generated)
-                        st.session_state.lp_html_ai = new_html
-                        st.success("✅ الصور مدمجة في HTML كـ base64!")
-                        st.download_button("⬇️ HTML + صور AI مدمجة", new_html, "lp_ai.html", "text/html", key="dl_ai_html")
+    with t4:
+        src = st.session_state.get('lp_html_ai', st.session_state.lp_html)
+        yc = get_youcan_html(src)
+        st.download_button("📥 تحميل YouCan JSON", generate_youcan_json(src), "youcan_page.lp", "application/json", key="yc_json_dl")
+        if 'lp_html_ai' in st.session_state:
+            st.success("✅ صور AI مدمجة base64 — جاهز لـ YouCan!")
+        else:
+            st.info("💡 ولّد صور AI أولاً لدمجها.")
 
-                if 'lp_ai_images' in st.session_state:
-                    st.markdown("#### 🖼️ الصور المولدة")
-                    cols3 = st.columns(3)
-                    for i,(k,v) in enumerate(st.session_state.lp_ai_images.items()):
-                        with cols3[i%3]:
-                            if v: st.image(v, caption=k)
-                            else: st.caption(k)
+        section_map = {
+            'S1':'📌 TOPBAR','S2':'🏠 Hero','S3':'📊 Stats','S4':'😟 المشكلة',
+            'S5':'✅ الحل','S6':'🔄 قبل/بعد','S7':'👨‍⚕️ الأطباء','S8':'👨‍👩‍👧 الثقة',
+            'S9':'⭐ المميزات','S10':'🌿 المكونات','S11':'📋 طريقة الاستخدام',
+            'S12':'📐 الأبعاد','S13':'💬 المراجعات','S14':'💰 التسعير','S15':'🚀 Final CTA',
+            'FAQ':'❓ FAQ','GUARANTEE':'🛡️ الضمان',
+        }
+        sm2 = re.search(r'(<style>.*?</style>)', yc, re.DOTALL)
+        if sm2:
+            with st.expander("🎨 CSS (انسخ أولاً)", expanded=False):
+                st.code(sm2.group(1), language='html')
+        parts = re.split(r'(<!--\s*S\d+[^>]*-->)', yc)
+        cur = 'START'
+        for part in parts:
+            cm = re.match(r'<!--\s*(S\d+|FAQ|GUARANTEE)', part.strip())
+            if cm: cur = cm.group(1); continue
+            content = part.strip()
+            if not content or content.startswith('<style'): continue
+            label = section_map.get(cur, f'📦 {cur}')
+            with st.expander(label, expanded=False):
+                st.code(content, language='html')
+        st.download_button("📥 YouCan HTML كامل", yc, "youcan.html","text/html")
+                    # YouCan JSON Export
+        yc_json = generate_youcan_json(src)
+        st.download_button("📥 YouCan JSON (استيراد مباشر)", yc_json, "youcan_page.lp", "application/json", key="yc_html_dl")
 
-        with t3:
-            if 'lp_data' in st.session_state:
-                d = {k:v for k,v in st.session_state.lp_data.items() if k!='_product_name'}
-                js = json.dumps(d, ensure_ascii=False, indent=2)
-                st.download_button("📥 تحميل JSON", js, "lp.json","application/json", key="dl_lp_json")
-                st.json(d)
-
-        with t4:
-            src = st.session_state.get('lp_html_ai', st.session_state.lp_html)
-            yc = get_youcan_html(src)
-            st.download_button("📥 تحميل YouCan JSON", generate_youcan_json(src), "youcan_page.lp", "application/json", key="yc_json_dl")
-            if 'lp_html_ai' in st.session_state:
-                st.success("✅ صور AI مدمجة base64 — جاهز لـ YouCan!")
-            else:
-                st.info("💡 ولّد صور AI أولاً لدمجها.")
-
-            section_map = {
-                'S1':'📌 TOPBAR','S2':'🏠 Hero','S3':'📊 Stats','S4':'😟 المشكلة',
-                'S5':'✅ الحل','S6':'🔄 قبل/بعد','S7':'👨‍⚕️ الأطباء','S8':'👨‍👩‍👧 الثقة',
-                'S9':'⭐ المميزات','S10':'🌿 المكونات','S11':'📋 طريقة الاستخدام',
-                'S12':'📐 الأبعاد','S13':'💬 المراجعات','S14':'💰 التسعير','S15':'🚀 Final CTA',
-                'FAQ':'❓ FAQ','GUARANTEE':'🛡️ الضمان',
-            }
-            sm2 = re.search(r'(<style>.*?</style>)', yc, re.DOTALL)
-            if sm2:
-                with st.expander("🎨 CSS (انسخ أولاً)", expanded=False):
-                    st.code(sm2.group(1), language='html')
-            parts = re.split(r'(<!--\s*S\d+[^>]*-->)', yc)
-            cur = 'START'
-            for part in parts:
-                cm = re.match(r'<!--\s*(S\d+|FAQ|GUARANTEE)', part.strip())
-                if cm: cur = cm.group(1); continue
-                content = part.strip()
-                if not content or content.startswith('<style'): continue
-                label = section_map.get(cur, f'📦 {cur}')
-                with st.expander(label, expanded=False):
-                    st.code(content, language='html')
-            st.download_button("📥 YouCan HTML كامل", yc, "youcan.html","text/html")
-                        # YouCan JSON Export
-            yc_json = generate_youcan_json(src)
-            st.download_button("📥 YouCan JSON (استيراد مباشر)", yc_json, "youcan_page.lp", "application/json", key="yc_html_dl")
-
-        with t5:
-            if 'lp_data' in st.session_state:
-                slots = extract_image_slots(st.session_state.lp_data)
-                st.markdown(f"### 🎨 {len(slots)} برومبت صورة")
-                for slot in slots:
-                    with st.expander(f"🖼️ {slot['key']} — {slot['section']}"):
-                        st.code(slot['prompt'])
-                        st.caption(f"Type: {slot['type']} | Keyword: {slot['keyword']}")
-                st.download_button("📥 CSV", pd.DataFrame(slots).to_csv(index=False), "prompts.csv","text/csv")
+    with t5:
+        if 'lp_data' in st.session_state:
+            slots = extract_image_slots(st.session_state.lp_data)
+            st.markdown(f"### 🎨 {len(slots)} برومبت صورة")
+            for slot in slots:
+                with st.expander(f"🖼️ {slot['key']} — {slot['section']}"):
+                    st.code(slot['prompt'])
+                    st.caption(f"Type: {slot['type']} | Keyword: {slot['keyword']}")
+            st.download_button("📥 CSV", pd.DataFrame(slots).to_csv(index=False), "prompts.csv","text/csv")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SOP-1
 # ══════════════════════════════════════════════════════════════════════════════
 elif app_mode == "🔍 بحث السوق المعمق (SOP-1)":
-    st.markdown("### 🔍 البحث العميق في السوق")
-    if st.button("🧠 استخراج وثائق البيع"):
-        if not global_api_key or not global_product_name:
-            st.error("أدخل مفتاح API واسم المنتج.")
-        else:
-            with st.spinner("جاري البحث..."):
-                try:
-                    res = generate_deep_research(global_api_key, global_product_name, global_category)
-                    st.session_state.deep_res = res
-                    st.success("✅ اكتمل!")
-                except Exception as e:
-                    st.error(f"🛑 {str(e)}")
-    if 'deep_res' in st.session_state:
-        st.markdown(st.session_state.deep_res)
-        st.download_button("📥 تحميل التقرير", st.session_state.deep_res, "deep_research.md","text/markdown")
+st.markdown("### 🔍 البحث العميق في السوق")
+if st.button("🧠 استخراج وثائق البيع"):
+    if not global_api_key or not global_product_name:
+        st.error("أدخل مفتاح API واسم المنتج.")
+    else:
+        with st.spinner("جاري البحث..."):
+            try:
+                res = generate_deep_research(global_api_key, global_product_name, global_category)
+                st.session_state.deep_res = res
+                st.success("✅ اكتمل!")
+            except Exception as e:
+                st.error(f"🛑 {str(e)}")
+if 'deep_res' in st.session_state:
+    st.markdown(st.session_state.deep_res)
+    st.download_button("📥 تحميل التقرير", st.session_state.deep_res, "deep_research.md","text/markdown")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # MATRIX
 # ══════════════════════════════════════════════════════════════════════════════
 elif app_mode == "💰 حاسبة التعادل المالي (Matrix)":
-    st.markdown("### 💰 حاسبة التعادل المالي")
-    c1,c2 = st.columns(2)
-    with c1:
-        cost  = st.number_input("💵 تكلفة المنتج",        min_value=0.0, value=50.0,  step=1.0)
-        price = st.number_input("🏷️ سعر البيع",            min_value=0.0, value=199.0, step=1.0)
-        cod   = st.number_input("🚚 رسوم COD/التوصيل",    min_value=0.0, value=20.0,  step=1.0)
-        ret   = st.slider("↩️ نسبة الإرجاع (%)", 0, 100, 20)
-    with c2:
-        budget= st.number_input("📢 ميزانية الإعلان (يومي)", min_value=0.0, value=100.0, step=5.0)
-        cpc   = st.number_input("👆 تكلفة النقرة CPC",       min_value=0.01, value=0.5,  step=0.01)
-        cvr   = st.slider("🎯 معدل التحويل (%)", 0.1, 20.0, 2.0, step=0.1)
-    if st.button("📊 احسب"):
-        clicks    = budget/cpc
-        orders    = clicks*(cvr/100)
-        returned  = orders*(ret/100)
-        fulfilled = orders-returned
-        revenue   = fulfilled*price
-        total_c   = orders*cost + orders*cod + budget
-        profit    = revenue-total_c
-        roas      = revenue/budget if budget>0 else 0
-        cpa       = budget/orders  if orders>0 else 0
-        margin    = profit/revenue*100 if revenue>0 else 0
-        st.markdown("---")
-        m1,m2,m3,m4 = st.columns(4)
-        m1.metric("🛒 الطلبات",f"{orders:.0f}")
-        m2.metric("✅ المنفذة", f"{fulfilled:.0f}")
-        m3.metric("💰 الإيراد", f"{revenue:.0f}")
-        m4.metric("📈 الربح",   f"{profit:.0f}", delta="✅ ربح" if profit>0 else "❌ خسارة")
-        st.markdown("---")
-        r1,r2,r3,r4 = st.columns(4)
-        r1.metric("🎯 ROAS",      f"{roas:.2f}x")
-        r2.metric("💸 CPA",       f"{cpa:.2f}")
-        r3.metric("📉 هامش الربح",f"{margin:.1f}%")
-        r4.metric("↩️ المرتجعة",  f"{returned:.0f}")
-        if profit>0: st.success(f"✅ مربحة! ربح {profit:.2f} مقابل إنفاق {budget:.0f}")
-        else:        st.error(f"❌ خاسرة! خسارة {abs(profit):.2f}")
-        with st.expander("📊 تفاصيل"):
-            st.write(f"- نقرات: {clicks:.0f} | طلبات: {orders:.0f} | منفذة: {fulfilled:.0f}")
-            st.write(f"- تكلفة بضاعة: {orders*cost:.0f} | COD: {orders*cod:.0f} | إعلان: {budget:.0f}")
-            st.write(f"- إجمالي تكاليف: {total_c:.0f} | إيراد: {revenue:.0f} | ربح: {profit:.0f}")
+st.markdown("### 💰 حاسبة التعادل المالي")
+c1,c2 = st.columns(2)
+with c1:
+    cost  = st.number_input("💵 تكلفة المنتج",        min_value=0.0, value=50.0,  step=1.0)
+    price = st.number_input("🏷️ سعر البيع",            min_value=0.0, value=199.0, step=1.0)
+    cod   = st.number_input("🚚 رسوم COD/التوصيل",    min_value=0.0, value=20.0,  step=1.0)
+    ret   = st.slider("↩️ نسبة الإرجاع (%)", 0, 100, 20)
+with c2:
+    budget= st.number_input("📢 ميزانية الإعلان (يومي)", min_value=0.0, value=100.0, step=5.0)
+    cpc   = st.number_input("👆 تكلفة النقرة CPC",       min_value=0.01, value=0.5,  step=0.01)
+    cvr   = st.slider("🎯 معدل التحويل (%)", 0.1, 20.0, 2.0, step=0.1)
+if st.button("📊 احسب"):
+    clicks    = budget/cpc
+    orders    = clicks*(cvr/100)
+    returned  = orders*(ret/100)
+    fulfilled = orders-returned
+    revenue   = fulfilled*price
+    total_c   = orders*cost + orders*cod + budget
+    profit    = revenue-total_c
+    roas      = revenue/budget if budget>0 else 0
+    cpa       = budget/orders  if orders>0 else 0
+    margin    = profit/revenue*100 if revenue>0 else 0
+    st.markdown("---")
+    m1,m2,m3,m4 = st.columns(4)
+    m1.metric("🛒 الطلبات",f"{orders:.0f}")
+    m2.metric("✅ المنفذة", f"{fulfilled:.0f}")
+    m3.metric("💰 الإيراد", f"{revenue:.0f}")
+    m4.metric("📈 الربح",   f"{profit:.0f}", delta="✅ ربح" if profit>0 else "❌ خسارة")
+    st.markdown("---")
+    r1,r2,r3,r4 = st.columns(4)
+    r1.metric("🎯 ROAS",      f"{roas:.2f}x")
+    r2.metric("💸 CPA",       f"{cpa:.2f}")
+    r3.metric("📉 هامش الربح",f"{margin:.1f}%")
+    r4.metric("↩️ المرتجعة",  f"{returned:.0f}")
+    if profit>0: st.success(f"✅ مربحة! ربح {profit:.2f} مقابل إنفاق {budget:.0f}")
+    else:        st.error(f"❌ خاسرة! خسارة {abs(profit):.2f}")
+    with st.expander("📊 تفاصيل"):
+        st.write(f"- نقرات: {clicks:.0f} | طلبات: {orders:.0f} | منفذة: {fulfilled:.0f}")
+        st.write(f"- تكلفة بضاعة: {orders*cost:.0f} | COD: {orders*cod:.0f} | إعلان: {budget:.0f}")
+        st.write(f"- إجمالي تكاليف: {total_c:.0f} | إيراد: {revenue:.0f} | ربح: {profit:.0f}")
