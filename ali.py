@@ -764,27 +764,27 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
         return img_url
     except Exception:
         return None
-with st.sidebar:
-    st.header("⚙️ الإعدادات")
-    global_api_key        = st.text_input("🔑 Gemini API Key", type="password")
-    global_product_name   = st.text_area("📦 اسم وتفاصيل المنتج", placeholder="مثال: نظارات رؤية ليلية للقيادة")
-    global_category       = st.selectbox("📁 فئة المنتج", [
-        "💄 مستحضرات تجميل وعناية (Cosmetics)",
-                "⚙️ أدوات وأجهزة ذكية (Gadgets)",
-            "🌿 صحة ومكملات (Health)",
-            "👗 أزياء وموضة (Fashion)"
-        ])
-    uploaded_img = st.file_uploader("📷 صورة المنتج (مرجع AI)", type=["png","jpg","jpeg","webp"])
-    product_image_b64 = None
-    if uploaded_img:
-        product_image_b64 = base64.b64encode(uploaded_img.read()).decode('utf-8')
-        uploaded_img.seek(0)
-        st.image(uploaded_img, caption="صورة المنتج", )
-    st.markdown("---")
-    app_mode = st.radio("🛠️ الأداة:", [
-        "🏗️ منشئ صفحات الهبوط",
-        "🔍 بحث السوق المعمق (SOP-1)",
-        "💰 حاسبة التعادل المالي (Matrix)"
+# SIDEBAR CONFIG
+st.sidebar.header("⚙️ الإعدادات")
+global_api_key        = st.sidebar.text_input("🔑 Gemini API Key", type="password")
+global_product_name   = st.sidebar.text_area("📦 اسم وتفاصيل المنتج", placeholder="مثال: نظارات رؤية ليلية للقيادة")
+global_category       = st.sidebar.selectbox("📁 فئة المنتج", [
+    "💄 مستحضرات تجميل وعناية (Cosmetics)",
+            "⚙️ أدوات وأجهزة ذكية (Gadgets)",
+        "🌿 صحة ومكملات (Health)",
+        "👗 أزياء وموضة (Fashion)"
+    ])
+uploaded_img = st.sidebar.file_uploader("📷 صورة المنتج (مرجع AI)", type=["png","jpg","jpeg","webp"])
+product_image_b64 = None
+if uploaded_img:
+    product_image_b64 = base64.b64encode(uploaded_img.read()).decode('utf-8')
+    uploaded_img.seek(0)
+    st.sidebar.image(uploaded_img, caption="صورة المنتج", )
+st.sidebar.markdown("---")
+app_mode = st.sidebar.radio("🛠️ الأداة:", [
+    "🏗️ منشئ صفحات الهبوط",
+    "🔍 بحث السوق المعمق (SOP-1)",
+    "💰 حاسبة التعادل المالي (Matrix)"
 ])
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -967,13 +967,13 @@ if st.button("📊 احسب"):
     roas      = revenue/budget if budget>0 else 0
     cpa       = budget/orders  if orders>0 else 0
     margin    = profit/revenue*100 if revenue>0 else 0
-    st.markdown("---")
+    st.sidebar.markdown("---")
     m1,m2,m3,m4 = st.columns(4)
     m1.metric("🛒 الطلبات",f"{orders:.0f}")
     m2.metric("✅ المنفذة", f"{fulfilled:.0f}")
     m3.metric("💰 الإيراد", f"{revenue:.0f}")
     m4.metric("📈 الربح",   f"{profit:.0f}", delta="✅ ربح" if profit>0 else "❌ خسارة")
-    st.markdown("---")
+    st.sidebar.markdown("---")
     r1,r2,r3,r4 = st.columns(4)
     r1.metric("🎯 ROAS",      f"{roas:.2f}x")
     r2.metric("💸 CPA",       f"{cpa:.2f}")
