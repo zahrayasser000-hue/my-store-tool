@@ -722,7 +722,7 @@ def get_youcan_html(html):
     for m in re.finditer(r'(@media[^{]+\{)(.*?)(\})\s*\}', style_content, re.DOTALL):
         inner = ''.join(f'.ali-lp {rm.group(1).strip()}{{{rm.group(2).strip()}}}\n'
                         for rm in re.finditer(r'([^{]+)\{([^}]+)\}', m.group(2)))
-        scoped += f'{m.group(1)}\n{inner}}}\n'
+gemini-2.0-flash-preview-image-generation
     for m in re.finditer(r'((?:[.#\w][^{{@]*?))\{{([^}}]+)\}}', style_content):
         sel = m.group(1).strip(); rules = m.group(2).strip()
         if not sel or not rules or sel.startswith('@'): continue
@@ -749,7 +749,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
         else:
             contents = prompt
         resp = client.models.generate_content(
-            model='gemini-2.0-flash-exp-image-generation',
+                        model='gemini-2.0-flash-preview-image-generation',
             contents=contents,
             config=gt.GenerateContentConfig(response_modalities=['TEXT','IMAGE'])
         )
