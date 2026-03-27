@@ -774,18 +774,18 @@ with st.sidebar:
             "🌿 صحة ومكملات (Health)",
             "👗 أزياء وموضة (Fashion)"
         ])
-        uploaded_img = st.file_uploader("📷 صورة المنتج (مرجع AI)", type=["png","jpg","jpeg","webp"])
-        product_image_b64 = None
-        if uploaded_img:
-            product_image_b64 = base64.b64encode(uploaded_img.read()).decode('utf-8')
-            uploaded_img.seek(0)
-            st.image(uploaded_img, caption="صورة المنتج", )
-        st.markdown("---")
-        app_mode = st.radio("🛠️ الأداة:", [
-            "🏗️ منشئ صفحات الهبوط",
-            "🔍 بحث السوق المعمق (SOP-1)",
-            "💰 حاسبة التعادل المالي (Matrix)"
-    ])
+    uploaded_img = st.file_uploader("📷 صورة المنتج (مرجع AI)", type=["png","jpg","jpeg","webp"])
+    product_image_b64 = None
+    if uploaded_img:
+        product_image_b64 = base64.b64encode(uploaded_img.read()).decode('utf-8')
+        uploaded_img.seek(0)
+        st.image(uploaded_img, caption="صورة المنتج", )
+    st.markdown("---")
+    app_mode = st.radio("🛠️ الأداة:", [
+        "🏗️ منشئ صفحات الهبوط",
+        "🔍 بحث السوق المعمق (SOP-1)",
+        "💰 حاسبة التعادل المالي (Matrix)"
+])
 
 # ══════════════════════════════════════════════════════════════════════════════
 # LANDING PAGE BUILDER
