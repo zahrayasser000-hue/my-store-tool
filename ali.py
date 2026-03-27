@@ -757,26 +757,13 @@ def generate_youcan_json(html):
 # ─── GEMINI IMAGE GEN ─────────────────────────────────────────────────────────
 
 def generate_nb_image(api_key, prompt, ref_b64=None):
+    # Use Pollinations for memory-efficient image generation (no base64 in RAM)
     try:
-        from google import genai as gc
-        from google.genai import types as gt
-        client = gc.Client(api_key=api_key)
-        if ref_b64:
-            ref_part = gt.Part.from_bytes(data=base64.b64decode(ref_b64), mime_type='image/png')
-            contents = [ref_part, prompt]
-        else:
-            contents = prompt
-        resp = client.models.generate_content(
-            model='gemini-2.5-flash-image',
-            contents=contents,
-            config=gt.GenerateContentConfig(response_modalities=['TEXT','IMAGE'])
-        )
-        if resp.candidates:
-            for part in resp.candidates[0].content.parts:
-                if hasattr(part,'inline_data') and part.inline_data:
-                    b64 = base64.b64encode(part.inline_data.data).decode('utf-8')
-                    return f'data:{part.inline_data.mime_type or "image/png"};base64,{b64}'
-        return None
+        import urllib.parse, random
+        clean_prompt = prompt[:300] + " no text no letters no words no writing"
+        seed = random.randint(1, 999999)
+        url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(clean_prompt)}?width=800&height=600&nologo=true&nofeed=true&model=flux&seed={seed}"
+        return url
     except Exception as e:
         st.warning(f"Image gen error: {str(e)[:150]}")
         return None
