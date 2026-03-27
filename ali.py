@@ -737,43 +737,35 @@ def get_youcan_html(html):
     result = f'<style>\n{scoped}</style>\n<div class="ali-lp" style="direction:rtl;font-family:\'Cairo\',sans-serif;max-width:680px;margin:0 auto;">\n{body.strip()}\n</div>'
     return re.sub(r'\n\s*\n\s*\n', '\n\n', result).strip()
 
-def generate_youcan_json(html):
-    css_m = re.search(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
-    css = css_m.group(1).strip() if css_m else ''
-    js_m = re.search(r'<script[^>]*>(.*?)</script>', html, re.DOTALL)
-    js = js_m.group(1).strip() if js_m else ''
-    body_m = re.search(r'<body[^>]*>(.*?)</body>', html, re.DOTALL)
-    body = body_m.group(1).strip() if body_m else html
-    body = re.sub(r'<script[^>]*>.*?</script>', '', body, flags=re.DOTALL)
-    full_html = ''
-    if css:
-        full_html += '<style>' + css + '</style>'
-    full_html += body
-    if js:
-        full_html += '<script>' + js + '</script>'
-    sec_id = 'PBS-' + uuid.uuid4().hex[:20]
-    page = {"settings": {"page-direction": "rtl", "page-product-id": None, "is-full-width": True, "width": None, "center-elements": False, "background-color": "#FFFFFF", "background-image": None, "background-repeat": "no-repeat", "background-position": "center", "background-size": "cover", "font-family": "Cairo", "font-size-desktop": 16, "font-size-mobile": 12, "text-color": "#1a1a1a", "content-alignment": "center", "section-alignment": "center", "margin-top": 0, "margin-right": 0, "margin-bottom": 0, "margin-left": 0}, "sections": [{"id": sec_id, "name": "html-editor", "blocks": {"parameters": {"htmlText": full_html}, "style": {"section-alignment": "center", "is-full-width": True, "width": None, "margin-top": 0, "margin-right": 0, "margin-bottom": 0, "margin-left": 0, "padding-top": 0, "padding-right": 0, "padding-bottom": 0, "padding-left": 0, "background-color": "transparent", "css-content": "{ }"}}, "label": "Html Editor", "children": None}]}
-    return json.dumps(page, ensure_ascii=False, indent=2)
-# ─── GEMINI IMAGE GEN ─────────────────────────────────────────────────────────
-
 def generate_nb_image(api_key, prompt, ref_b64=None):
-    # Fetch image from Pollinations and convert to base64 for embedding
     try:
-        import urllib.parse, random, requests, base64
-        clean_prompt = prompt[:300] + " no text no letters no words no writing"
-        seed = random.randint(1, 999999)
-        url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(clean_prompt)}?width=800&height=600&nologo=true&nofeed=true&model=flux&seed={seed}"
-        resp = requests.get(url, timeout=30)
-        if resp.status_code == 200:
-            mime = resp.headers.get('content-type', 'image/jpeg').split(';')[0]
-            b64 = base64.b64encode(resp.content).decode('utf-8')
-            return f'data:{mime};base64,{b64}'
-        return url
+        from google import genai as gc
+        from google.genai import types as gt
+        import gc as garbage
+        client = gc.Client(api_key=api_key)
+        if ref_b64:
+            ref_part = gt.Part.from_bytes(data=base64.b64decode(ref_b64), mime_type='image/png')
+            contents = [ref_part, prompt]
+        else:
+            contents = prompt
+        resp = client.models.generate_content(
+            model='gemini-2.0-flash-exp-image-generation',
+            contents=contents,
+            config=gt.GenerateContentConfig(response_modalities=['TEXT','IMAGE'])
+        )
+        result = None
+        if resp.candidates:
+            for part in resp.candidates[0].content.parts:
+                if hasattr(part,'inline_data') and part.inline_data:
+                    b64 = base64.b64encode(part.inline_data.data).decode('utf-8')
+                    result = f'data:{part.inline_data.mime_type or "image/png"};base64,{b64}'
+                    break
+        del resp
+        garbage.collect()
+        return result
     except Exception as e:
         st.warning(f"Image gen error: {str(e)[:150]}")
         return None
-
-
 with st.sidebar:
     st.header("⚙️ الإعدادات")
     global_api_key        = st.text_input("🔑 Gemini API Key", type="password")
