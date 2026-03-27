@@ -757,18 +757,22 @@ def generate_youcan_json(html):
 # ─── GEMINI IMAGE GEN ─────────────────────────────────────────────────────────
 
 def generate_nb_image(api_key, prompt, ref_b64=None):
-    # Use Pollinations for memory-efficient image generation (no base64 in RAM)
+    # Fetch image from Pollinations and convert to base64 for embedding
     try:
-        import urllib.parse, random
+        import urllib.parse, random, requests, base64
         clean_prompt = prompt[:300] + " no text no letters no words no writing"
         seed = random.randint(1, 999999)
         url = f"https://image.pollinations.ai/prompt/{urllib.parse.quote(clean_prompt)}?width=800&height=600&nologo=true&nofeed=true&model=flux&seed={seed}"
+        resp = requests.get(url, timeout=30)
+        if resp.status_code == 200:
+            mime = resp.headers.get('content-type', 'image/jpeg').split(';')[0]
+            b64 = base64.b64encode(resp.content).decode('utf-8')
+            return f'data:{mime};base64,{b64}'
         return url
     except Exception as e:
         st.warning(f"Image gen error: {str(e)[:150]}")
         return None
 
-# ─── UI ───────────────────────────────────────────────────────────────────────
 
 with st.sidebar:
     st.header("⚙️ الإعدادات")
@@ -776,7 +780,7 @@ with st.sidebar:
     global_product_name   = st.text_area("📦 اسم وتفاصيل المنتج", placeholder="مثال: نظارات رؤية ليلية للقيادة")
     global_category       = st.selectbox("📁 فئة المنتج", [
         "💄 مستحضرات تجميل وعناية (Cosmetics)",
-        "⚙️ أدوات وأجهزة ذكية (Gadgets)",
+            "⚙️ أدوات وأجهزة ذكية (Gadgets)",
         "🌿 صحة ومكملات (Health)",
         "👗 أزياء وموضة (Fashion)"
     ])
