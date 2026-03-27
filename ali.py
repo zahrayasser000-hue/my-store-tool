@@ -755,35 +755,40 @@ def get_youcan_html(html):
     return re.sub(r'\n\s*\n\s*\n', '\n\n', result).strip()
 
 def generate_nb_image(api_key, prompt, ref_b64=None):
+    """Generate image using Gemini imagen or fallback to Pollinations"""
+    import urllib.request as _ur
+    import urllib.parse as _up
+    import gc as garbage
+    # Try Gemini imagen-3
     try:
-        from google import genai as gc
-        from google.genai import types as gt
-        import gc as garbage
-        client = gc.Client(api_key=api_key)
-        if ref_b64:
-            ref_part = gt.Part.from_bytes(data=base64.b64decode(ref_b64), mime_type='image/png')
-            contents = [ref_part, prompt]
-        else:
-            contents = prompt
-        resp = client.models.generate_content(
-                        model='gemini-2.0-flash-preview-image-generation',
-            contents=contents,
-            config=gt.GenerateContentConfig(response_modalities=['TEXT','IMAGE'])
-        )
-        result = None
-        if resp.candidates:
-            for part in resp.candidates[0].content.parts:
-                if hasattr(part,'inline_data') and part.inline_data:
-                    b64 = base64.b64encode(part.inline_data.data).decode('utf-8')
-                    result = f'data:{part.inline_data.mime_type or "image/png"};base64,{b64}'
-                    break
-        del resp
-        garbage.collect()
-        return result
-    except Exception as e:
-        st.warning(f"Image gen error: {str(e)[:150]}")
+        import google.generativeai as _genai
+        _genai.configure(api_key=api_key)
+        from google.generativeai import GenerativeModel
+        # Use imagen via REST
+        import requests as _req
+        headers = {"Content-Type": "application/json"}
+        body = {"instances": [{"prompt": prompt}], "parameters": {"sampleCount": 1}}
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key={api_key}"
+        r = _req.post(url, json=body, headers=headers, timeout=30)
+        if r.status_code == 200:
+            data = r.json()
+            if data.get('predictions'):
+                b64 = data['predictions'][0].get('bytesBase64Encoded','')
+                if b64:
+                    return f'data:image/png;base64,{b64}'
+    except Exception as e1:
+        pass
+    # Fallback: Pollinations AI (always works, free)
+    try:
+        safe_prompt = _up.quote(prompt + ' no text no letters no watermark', safe='')
+        seed = random.randint(1, 999999)
+        img_url = f"https://image.pollinations.ai/prompt/{safe_prompt}?width=800&height=600&nologo=true&nofeed=true&model=flux&seed={seed}"
+        with _ur.urlopen(img_url, timeout=25) as resp:
+            img_bytes = resp.read()
+        b64 = base64.b64encode(img_bytes).decode('utf-8')
+        return f'data:image/jpeg;base64,{b64}'
+    except Exception as e2:
         return None
-with st.sidebar:
     st.header("⚙️ الإعدادات")
     global_api_key        = st.text_input("🔑 Gemini API Key", type="password")
     global_product_name   = st.text_area("📦 اسم وتفاصيل المنتج", placeholder="مثال: نظارات رؤية ليلية للقيادة")
