@@ -1,1 +1,519 @@
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  Clapperboard, Video, Mic, Eye, Zap, Loader2, AlertTriangle,
+  PlayCircle, Clock, Target, CheckCircle2, X, Volume2,
+  Image as ImageIcon, Heart, MessageCircle, Edit3, Save,
+  Download, Copy, Sparkles, Star, Lightbulb, Terminal, FileText, Activity
+} from 'lucide-react';
+
+
+const apiKey = "";
+
+
+// دالة تحويل الصوت من PCM16 إلى WAV (ثابتة ومستقرة)
+function pcmToWav(base64Pcm, sampleRate = 24000) {
+  try {
+    const binaryString = atob(base64Pcm);
+    const pcmBuffer = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) pcmBuffer[i] = binaryString.charCodeAt(i);
+   
+    const numChannels = 1;
+    const bitsPerSample = 16;
+    const byteRate = sampleRate * numChannels * (bitsPerSample / 8);
+    const blockAlign = numChannels * (bitsPerSample / 8);
+    const wavHeader = new ArrayBuffer(44);
+    const view = new DataView(wavHeader);
+   
+    const writeString = (view, offset, string) => {
+      for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
+    };
+
+
+    writeString(view, 0, 'RIFF');
+    view.setUint32(4, 36 + pcmBuffer.byteLength, true);
+    writeString(view, 8, 'WAVE');
+    writeString(view, 12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, byteRate, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bitsPerSample, true);
+    writeString(view, 36, 'data');
+    view.setUint32(40, pcmBuffer.byteLength, true);
+   
+    const wavBytes = new Uint8Array(44 + pcmBuffer.byteLength);
+    wavBytes.set(new Uint8Array(wavHeader), 0);
+    wavBytes.set(new Uint8Array(pcmBuffer), 44);
+    return new Blob([wavBytes], { type: 'audio/wav' });
+  } catch (e) { return null; }
+}
+
+
+export default function VideoStudioApp() {
+  const [productName, setProductName] = useState("");
+  const [pains, setPains] = useState("");
+  const [desires, setDesires] = useState("");
+  const [sellingAngles, setSellingAngles] = useState("");
+  const [dialect, setDialect] = useState("العربية الفصحى");
+  const [voiceType, setVoiceType] = useState("Female");
+ 
+  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("");
+  const [results, setResults] = useState([]);
+  const [error, setError] = useState("");
+
+
+  const [generatingVideoIndex, setGeneratingVideoIndex] = useState(-1);
+  const [activeVideo, setActiveVideo] = useState(null);
+  const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
+  const [imageLoading, setImageLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
+ 
+  const audioRef = useRef(null);
+
+
+  // توليد السكريبتات بهيكل Schema إجباري لمنع انهيار النظام
+  const generateScripts = async () => {
+    if (!productName || !pains || !desires || !sellingAngles) {
+      setError("أيها الإمبراطور، يرجى ملء جميع المعطيات الاستراتيجية أولاً لتوليد سكريبتات دقيقة.");
+      return;
+    }
+   
+    setLoading(true);
+    setError("");
+    setResults([]);
+    setStatus("جاري تحليل المعطيات وكتابة الـ 5 سكريبتات...");
+
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+    const promptText = `أنت أعظم مخرج إعلانات. المنتج: ${productName}.
+    الآلام: ${pains} | الرغبات: ${desires} | زوايا البيع: ${sellingAngles}.
+    اللهجة المطلوبة: "${dialect}".
+    المطلوب: 5 سكريبتات فيديو.
+    التزم حرفياً بالهيكل المطلوب للبيانات.`;
+
+
+    const payload = {
+      contents: [{ parts: [{ text: promptText }] }],
+      generationConfig: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: "OBJECT",
+          properties: {
+            scripts: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  style_name: { type: "STRING" },
+                  hook_secret: { type: "STRING" },
+                  full_video_prompt: { type: "STRING" },
+                  scenes: {
+                    type: "ARRAY",
+                    items: {
+                      type: "OBJECT",
+                      properties: {
+                        time: { type: "STRING" },
+                        visual: { type: "STRING" },
+                        audio: { type: "STRING" }
+                      },
+                      required: ["time", "visual", "audio"]
+                    }
+                  }
+                },
+                required: ["style_name", "hook_secret", "full_video_prompt", "scenes"]
+              }
+            }
+          },
+          required: ["scripts"]
+        }
+      }
+    };
+
+
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+
+      if (!res.ok) throw new Error("فشل الاتصال بمحرك الذكاء الاصطناعي");
+     
+      const data = await res.json();
+      const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+     
+      if (!text) throw new Error("لم يتم استلام نص من الخادم");
+     
+      const parsedData = JSON.parse(text);
+      if (parsedData.scripts && parsedData.scripts.length > 0) {
+          setResults(parsedData.scripts);
+      } else {
+          throw new Error("تنسيق البيانات غير صحيح");
+      }
+      setStatus("");
+    } catch (err) {
+      console.error(err);
+      setError("حدث خطأ في استخراج السكريبتات. يرجى المحاولة مرة أخرى.");
+      setStatus("");
+    }
+    setLoading(false);
+  };
+
+
+  const updateScene = (sIdx, sceneIdx, field, value) => {
+    const newResults = [...results];
+    if (newResults[sIdx] && newResults[sIdx].scenes[sceneIdx]) {
+      newResults[sIdx].scenes[sceneIdx][field] = value;
+      setResults(newResults);
+    }
+  };
+
+
+  // محرك توليد الفيديو (محمي ضد الأعطال)
+  const generateVideoPreview = async (script, index) => {
+    setGeneratingVideoIndex(index);
+    setStatus("جاري توليد الصوت والصورة لكل المشاهد...");
+    const voiceName = voiceType === "Female" ? "Aoede" : "Charon";
+   
+    try {
+      const scenePromises = (script.scenes || []).map(async (scene) => {
+        // 1. توليد الصورة (مضمونة)
+        const safeVisual = scene.visual ? scene.visual.substring(0, 100) : "product";
+        const imagePrompt = `high quality commercial photography, cinematic lighting, ${safeVisual}`;
+        const imgUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=720&height=1280&nologo=true&seed=${Math.floor(Math.random() * 100000)}`;
+
+
+        // 2. توليد الصوت (محمي ضد الأخطاء)
+        let audioUrl = null;
+        try {
+          if (scene.audio && scene.audio.trim() !== "") {
+              const ttsPayload = {
+                contents: [{ parts: [{ text: scene.audio }] }],
+                generationConfig: {
+                  responseModalities: ["AUDIO"],
+                  speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: voiceName } } }
+                },
+                model: "gemini-2.5-flash-preview-tts"
+              };
+             
+              const ttsRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(ttsPayload)
+              });
+             
+              if (ttsRes.ok) {
+                  const ttsData = await ttsRes.json();
+                  const pcmBase64 = ttsData.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+                  if (pcmBase64) {
+                    const audioBlob = pcmToWav(pcmBase64, 24000);
+                    if (audioBlob) audioUrl = URL.createObjectURL(audioBlob);
+                  }
+              }
+          }
+        } catch (e) {
+            console.warn("TTS Error for scene, skipping audio for this scene.");
+        }
+
+
+        return { ...scene, imgUrl, audioUrl };
+      });
+
+
+      const videoScenes = await Promise.all(scenePromises);
+     
+      // إجبار فتح النافذة حتى لو فشلت بعض الميديا
+      setActiveVideo({ scriptInfo: script, scenes: videoScenes });
+      setCurrentSceneIndex(0);
+      setImageLoading(true);
+      setStatus("");
+    } catch (e) {
+      console.error(e);
+      setError("حدث خطأ غير متوقع أثناء تجميع الفيديو.");
+      setStatus("");
+    }
+    setGeneratingVideoIndex(-1);
+  };
+
+
+  // التحكم بمشغل الفيديو المدمج
+  useEffect(() => {
+    if (activeVideo && activeVideo.scenes && audioRef.current && !imageLoading) {
+      const currentScene = activeVideo.scenes[currentSceneIndex];
+      if (currentScene && currentScene.audioUrl) {
+        audioRef.current.src = currentScene.audioUrl;
+        audioRef.current.play().catch(() => {
+           console.log("Auto-play blocked, waiting for user.");
+        });
+      } else {
+        // إذا لم يكن هناك صوت، ننتقل بعد 4 ثوانٍ
+        const timer = setTimeout(() => handleAudioEnded(), 4000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [activeVideo, currentSceneIndex, imageLoading]);
+
+
+  const handleAudioEnded = () => {
+    if (activeVideo && activeVideo.scenes && currentSceneIndex < activeVideo.scenes.length - 1) {
+      setImageLoading(true);
+      setCurrentSceneIndex(prev => prev + 1);
+    }
+  };
+
+
+  const closeVideo = () => {
+    setActiveVideo(null);
+    if(audioRef.current) audioRef.current.pause();
+  };
+
+
+  // ميزة تصدير وتحميل الفيديو
+  const downloadVideoPlan = () => {
+    if(!activeVideo) return;
+    setIsExporting(true);
+   
+    setTimeout(() => {
+        // إنشاء ملف HTML مستقل يعمل كمشغل فيديو للمشاهد
+        let htmlContent = `<!DOCTYPE html><html dir="rtl"><head><meta charset="utf-8"><title>${activeVideo.scriptInfo.style_name}</title><style>body{background:#0f172a;color:#fff;font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;overflow:hidden;} #player{width:360px;height:640px;background:#000;position:relative;border-radius:20px;border:4px solid #333;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.5);} .text-overlay{position:absolute;bottom:40px;left:20px;right:20px;background:rgba(0,0,0,0.8);padding:15px;border-radius:15px;text-align:center;font-size:18px;font-weight:bold;line-height:1.5;border:1px solid rgba(255,255,255,0.2);} .start-btn{background:#10b981;color:#fff;border:none;padding:15px 30px;font-size:18px;font-weight:bold;border-radius:50px;cursor:pointer;margin-top:20px;} .img-bg{width:100%;height:100%;object-fit:cover;}</style></head><body>`;
+        htmlContent += `<h2>🎬 ${activeVideo.scriptInfo.style_name}</h2><div id="player"><div id="content" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#1e293b;">اضغط تشغيل للبدء</div></div>`;
+        htmlContent += `<button class="start-btn" onclick="playAd()">▶ تشغيل الإعلان</button>`;
+       
+        // تضمين البيانات
+        const safeScenes = activeVideo.scenes.map(s => ({
+            img: s.imgUrl || '', text: s.audio || '', audio: s.audioUrl || ''
+        }));
+       
+        htmlContent += `<script>
+            const scenes = ${JSON.stringify(safeScenes)};
+            let current = 0;
+            function playAd() {
+                if(current >= scenes.length) { current = 0; } // Loop
+                const s = scenes[current];
+                const content = document.getElementById('content');
+                let html = '';
+                if(s.img) html += '<img src="'+s.img+'" class="img-bg"/>';
+                if(s.text) html += '<div class="text-overlay">'+s.text+'</div>';
+                content.innerHTML = html;
+               
+                if(s.audio) {
+                    let a = new Audio(s.audio);
+                    a.play().catch(e => console.log(e));
+                    a.onended = () => { current++; playAd(); };
+                } else {
+                    setTimeout(() => { current++; playAd(); }, 4000);
+                }
+            }
+        </script></body></html>`;
+
+
+        const blob = new Blob([htmlContent], {type: 'text/html'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ALI_Video_${activeVideo.scriptInfo.style_name.replace(/\s+/g, '_')}.html`;
+        a.click();
+       
+        setIsExporting(false);
+    }, 1500);
+  };
+
+
+  const copyToClipboard = (text) => {
+    const el = document.createElement('textarea');
+    el.value = text;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  };
+
+
+  return (
+    <div dir="rtl" className="min-h-screen bg-slate-50 font-sans text-right pb-20">
+      {/* Header */}
+      <div className="bg-[#0f172a] text-white py-12 px-6 border-b-4 border-indigo-500 shadow-2xl text-center relative overflow-hidden">
+        <h1 className="text-4xl md:text-5xl font-black flex items-center justify-center gap-3 mb-3 relative z-10">
+          <Clapperboard className="w-10 h-10 text-indigo-400" />
+          ALI Video Empire <span className="bg-emerald-500 px-3 py-1 rounded-full text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/30">Stable V5</span>
+        </h1>
+        <p className="text-slate-400 font-bold relative z-10 italic">النسخة المستقرة - محمية ضد الانهيار مع ميزة تحميل الفيديو</p>
+      </div>
+
+
+      <div className="max-w-7xl mx-auto px-6 mt-8 flex flex-col xl:flex-row gap-8">
+        {/* Sidebar */}
+        <div className="w-full xl:w-1/3">
+          <div className="bg-white p-6 rounded-2xl shadow-xl border border-slate-200 sticky top-6">
+            <h2 className="text-xl font-black mb-6 flex items-center gap-2 border-b pb-4"><Target className="text-red-500" /> لوحة القيادة</h2>
+           
+            <div className="space-y-4">
+              <input className="w-full p-3 bg-slate-50 border rounded-xl font-bold outline-none focus:ring-2 focus:ring-indigo-500" value={productName} onChange={(e) => setProductName(e.target.value)} placeholder="اسم المنتج *" />
+              <textarea className="w-full p-3 bg-red-50/20 border-red-100 border rounded-xl h-20 text-sm outline-none focus:ring-2 focus:ring-red-500" value={pains} onChange={(e) => setPains(e.target.value)} placeholder="الآلام (Pains) *" />
+              <textarea className="w-full p-3 bg-emerald-50/20 border-emerald-100 border rounded-xl h-20 text-sm outline-none focus:ring-2 focus:ring-emerald-500" value={desires} onChange={(e) => setDesires(e.target.value)} placeholder="الرغبات (Desires) *" />
+              <textarea className="w-full p-3 bg-amber-50/20 border-amber-100 border rounded-xl h-20 text-sm outline-none focus:ring-2 focus:ring-amber-500" value={sellingAngles} onChange={(e) => setSellingAngles(e.target.value)} placeholder="زوايا البيع (Angles) *" />
+             
+              <div className="grid grid-cols-2 gap-3">
+                <select className="p-2 bg-slate-50 border rounded-lg text-sm font-bold outline-none" value={dialect} onChange={(e) => setDialect(e.target.value)}>
+                  <option>العربية الفصحى</option><option>الدارجة المغربية</option><option>اللهجة الخليجية</option>
+                </select>
+                <select className="p-2 bg-slate-50 border rounded-lg text-sm font-bold outline-none" value={voiceType} onChange={(e) => setVoiceType(e.target.value)}>
+                  <option value="Female">صوت أنثى</option><option value="Male">صوت ذكر</option>
+                </select>
+              </div>
+            </div>
+
+
+            <button onClick={generateScripts} disabled={loading} className="w-full mt-6 py-4 rounded-xl font-black text-lg text-white bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-600/30 flex justify-center items-center gap-2 transition-all active:scale-95">
+              {loading ? <><Loader2 className="animate-spin w-6 h-6" /> جاري التوليد...</> : <><Sparkles className="w-6 h-6" /> توليد 5 سكريبتات</>}
+            </button>
+           
+            {status && (
+                <div className="mt-4 p-3 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center justify-center gap-2 text-indigo-700 text-xs font-black uppercase">
+                    <Activity className="w-4 h-4 animate-pulse" /> {status}
+                </div>
+            )}
+          </div>
+        </div>
+
+
+        {/* Results Area */}
+        <div className="w-full xl:w-2/3">
+          {error && <div className="bg-red-50 p-5 rounded-xl text-red-700 font-bold mb-6 border-r-4 border-red-500 flex items-center gap-2 shadow-sm"><AlertTriangle /> {error}</div>}
+         
+          {results.length > 0 && results.map((script, sIdx) => (
+            <div key={sIdx} className="bg-white rounded-3xl border shadow-xl overflow-hidden mb-10 border-slate-100 transition-all hover:border-indigo-300">
+              <div className="bg-slate-800 p-6 text-white flex justify-between items-center">
+                <h3 className="font-black text-xl flex items-center gap-2 tracking-tight"><FileText className="text-indigo-400 w-6 h-6" /> {script.style_name}</h3>
+                <button
+                  onClick={() => generateVideoPreview(script, sIdx)}
+                  disabled={generatingVideoIndex !== -1}
+                  className="bg-emerald-500 hover:bg-emerald-400 px-6 py-3 rounded-xl font-black flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-emerald-500/30"
+                >
+                  {generatingVideoIndex === sIdx ? <><Loader2 className="animate-spin w-5 h-5" /> جاري التجميع...</> : <><PlayCircle className="w-5 h-5" /> تشغيل المعاينة</>}
+                </button>
+              </div>
+
+
+              {/* Master Prompt Section */}
+              <div className="p-6 bg-slate-900 border-b border-slate-800">
+                <div className="flex justify-between items-center mb-3">
+                    <h4 className="text-indigo-400 font-black text-[10px] uppercase tracking-widest flex items-center gap-2">
+                        <Terminal className="w-4 h-4" /> Runway / Sora Master Prompt
+                    </h4>
+                    <button onClick={() => copyToClipboard(script.full_video_prompt)} className="bg-white/10 hover:bg-white/20 p-2 rounded-lg text-white transition-all flex items-center gap-2 text-xs font-bold">
+                        <Copy className="w-3 h-3" /> نسخ البرومت
+                    </button>
+                </div>
+                <div className="font-mono text-[12px] text-slate-300 leading-relaxed max-h-32 overflow-y-auto bg-black/40 p-4 rounded-xl border border-white/10 shadow-inner">
+                    {script.full_video_prompt}
+                </div>
+              </div>
+
+
+              <div className="p-6 space-y-4">
+                {script.scenes && script.scenes.map((scene, sceneIdx) => (
+                  <div key={sceneIdx} className="grid grid-cols-1 md:grid-cols-2 gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-200 relative group">
+                    <div className="absolute -right-2 top-1/2 -translate-y-1/2 bg-indigo-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-black shadow-lg border-2 border-white z-10">{sceneIdx + 1}</div>
+                    <div>
+                      <label className="text-[10px] font-black text-slate-400 mb-1 flex items-center gap-1 uppercase tracking-widest italic"><ImageIcon className="w-3 h-3" /> الوصف البصري للصورة</label>
+                      <textarea className="w-full p-3 bg-white border rounded-xl text-xs h-16 shadow-inner focus:ring-2 focus:ring-indigo-500 outline-none transition-all" value={scene.visual} onChange={(e) => updateScene(sIdx, sceneIdx, 'visual', e.target.value)} />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-black text-slate-400 mb-1 flex items-center gap-1 uppercase tracking-widest italic"><Mic className="w-3 h-3" /> التعليق الصوتي (قابل للتعديل)</label>
+                      <textarea className="w-full p-3 bg-white border rounded-xl text-xs h-16 shadow-inner font-bold focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-indigo-900" value={scene.audio} onChange={(e) => updateScene(sIdx, sceneIdx, 'audio', e.target.value)} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+
+      {/* نافذة مشغل الفيديو مع زر التحميل الجبار */}
+      {activeVideo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4 backdrop-blur-md">
+          <div className="bg-slate-900 w-full max-w-[400px] rounded-[2.5rem] overflow-hidden shadow-[0_0_100px_rgba(16,185,129,0.3)] relative border-4 border-slate-700 flex flex-col h-[85vh]">
+           
+            {/* Header Modal */}
+            <div className="flex justify-between items-center p-5 absolute top-0 w-full z-40 bg-gradient-to-b from-black/80 to-transparent">
+              <div className="flex items-center gap-2 bg-black/50 px-3 py-1.5 rounded-full backdrop-blur-md border border-white/10">
+                <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                <span className="text-white text-[10px] font-black uppercase tracking-widest">Live Studio</span>
+              </div>
+              <button onClick={closeVideo} className="bg-white/10 p-2 rounded-full text-white hover:bg-red-500 transition-all shadow-xl backdrop-blur-md"><X className="w-5 h-5" /></button>
+            </div>
+           
+            {/* Video Screen */}
+            <div className="relative flex-grow bg-black flex items-center justify-center overflow-hidden">
+              {imageLoading && (
+                <div className="absolute inset-0 z-20 bg-slate-900 flex flex-col items-center justify-center text-white">
+                  <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mb-3" />
+                  <p className="font-black text-xs uppercase tracking-widest text-emerald-400">Loading Media...</p>
+                </div>
+              )}
+             
+              {activeVideo.scenes && activeVideo.scenes[currentSceneIndex] && (
+                <img
+                    src={activeVideo.scenes[currentSceneIndex].imgUrl}
+                    className={`w-full h-full object-cover animate-pulse-slow transition-all duration-1000 ${imageLoading ? 'scale-125 blur-xl opacity-0' : 'scale-100 blur-0 opacity-100'}`}
+                    onLoad={() => setImageLoading(false)}
+                    onError={() => setImageLoading(false)}
+                />
+              )}
+             
+              <div className="absolute bottom-28 w-full px-5 text-center z-30">
+                <div className="bg-black/80 backdrop-blur-xl text-white font-black text-lg p-4 rounded-2xl border border-white/20 shadow-2xl">
+                  {activeVideo.scenes && activeVideo.scenes[currentSceneIndex] ? activeVideo.scenes[currentSceneIndex].audio : ""}
+                </div>
+              </div>
+
+
+              {/* Engagement Overlay */}
+              <div className="absolute right-4 bottom-44 flex flex-col gap-4 text-white z-30 opacity-90 drop-shadow-md">
+                <div className="flex flex-col items-center"><Heart className="w-8 h-8 fill-red-500 text-red-500" /><span className="text-[10px] font-black mt-1">12K</span></div>
+                <div className="flex flex-col items-center"><MessageCircle className="w-8 h-8" /><span className="text-[10px] font-black mt-1">850</span></div>
+              </div>
+            </div>
+
+
+            {/* Footer Modal with DOWNLOAD BUTTON */}
+            <div className="bg-slate-900 p-5 border-t border-slate-800 z-40 relative">
+              <div className="flex gap-1.5 mb-4">
+                {(activeVideo.scenes || []).map((_, i) => (
+                  <div key={i} className={`h-1.5 rounded-full flex-grow transition-all duration-500 ${i === currentSceneIndex ? 'bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.8)]' : i < currentSceneIndex ? 'bg-slate-600' : 'bg-slate-800'}`}></div>
+                ))}
+              </div>
+              <div className="flex justify-between items-center">
+                <div className="text-slate-400 text-[10px] font-black uppercase tracking-wider">
+                    Scene {currentSceneIndex + 1} / {activeVideo.scenes.length}
+                </div>
+               
+                {/* 🔴 زر التحميل الفعلي 🔴 */}
+                <button
+                  onClick={downloadVideoPlan}
+                  disabled={isExporting}
+                  className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white px-5 py-2.5 rounded-xl text-xs font-black uppercase flex items-center gap-2 transition-all shadow-lg active:scale-95"
+                >
+                  {isExporting ? <><Loader2 className="w-4 h-4 animate-spin" /> جاري التصدير...</> : <><Download className="w-4 h-4" /> تصدير الفيديو</>}
+                </button>
+              </div>
+            </div>
+            <audio ref={audioRef} onEnded={handleAudioEnded} className="hidden" />
+          </div>
+        </div>
+      )}
+      <style>{`
+        .animate-pulse-slow { animation: pulseSlow 8s infinite alternate; }
+        @keyframes pulseSlow { 0% { transform: scale(1); } 100% { transform: scale(1.1); } }
+      `}</style>
+    </div>
+  );
+}
 
