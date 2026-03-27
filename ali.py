@@ -713,6 +713,24 @@ a{{text-decoration:none;}}
 
 # ─── YOUCAN EXPORT ────────────────────────────────────────────────────────────
 
+def generate_youcan_json(html):
+    """Wrap HTML in YouCan-compatible page JSON format"""
+    import json as _json
+    yc_html = get_youcan_html(html)
+    page_json = {
+        "sections": [
+            {
+                "id": "custom_html_1",
+                "type": "custom_html",
+                "settings": {
+                    "html": yc_html
+                }
+            }
+        ]
+    }
+    return _json.dumps(page_json, ensure_ascii=False, indent=2)
+
+
 def get_youcan_html(html):
     sm = re.search(r'<style[^>]*>(.*?)</style>', html, re.DOTALL)
     style_content = sm.group(1) if sm else ''
