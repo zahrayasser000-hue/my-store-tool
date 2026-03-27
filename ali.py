@@ -765,26 +765,26 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
     except Exception:
         return None
 with st.sidebar:
-st.header("⚙️ الإعدادات")
-global_api_key        = st.text_input("🔑 Gemini API Key", type="password")
-global_product_name   = st.text_area("📦 اسم وتفاصيل المنتج", placeholder="مثال: نظارات رؤية ليلية للقيادة")
-global_category       = st.selectbox("📁 فئة المنتج", [
-    "💄 مستحضرات تجميل وعناية (Cosmetics)",
-            "⚙️ أدوات وأجهزة ذكية (Gadgets)",
-        "🌿 صحة ومكملات (Health)",
-        "👗 أزياء وموضة (Fashion)"
-    ])
-    uploaded_img = st.file_uploader("📷 صورة المنتج (مرجع AI)", type=["png","jpg","jpeg","webp"])
-    product_image_b64 = None
-    if uploaded_img:
-        product_image_b64 = base64.b64encode(uploaded_img.read()).decode('utf-8')
-        uploaded_img.seek(0)
-        st.image(uploaded_img, caption="صورة المنتج", )
-    st.markdown("---")
-    app_mode = st.radio("🛠️ الأداة:", [
-        "🏗️ منشئ صفحات الهبوط",
-        "🔍 بحث السوق المعمق (SOP-1)",
-        "💰 حاسبة التعادل المالي (Matrix)"
+    st.header("⚙️ الإعدادات")
+    global_api_key        = st.text_input("🔑 Gemini API Key", type="password")
+    global_product_name   = st.text_area("📦 اسم وتفاصيل المنتج", placeholder="مثال: نظارات رؤية ليلية للقيادة")
+    global_category       = st.selectbox("📁 فئة المنتج", [
+        "💄 مستحضرات تجميل وعناية (Cosmetics)",
+                "⚙️ أدوات وأجهزة ذكية (Gadgets)",
+            "🌿 صحة ومكملات (Health)",
+            "👗 أزياء وموضة (Fashion)"
+        ])
+        uploaded_img = st.file_uploader("📷 صورة المنتج (مرجع AI)", type=["png","jpg","jpeg","webp"])
+        product_image_b64 = None
+        if uploaded_img:
+            product_image_b64 = base64.b64encode(uploaded_img.read()).decode('utf-8')
+            uploaded_img.seek(0)
+            st.image(uploaded_img, caption="صورة المنتج", )
+        st.markdown("---")
+        app_mode = st.radio("🛠️ الأداة:", [
+            "🏗️ منشئ صفحات الهبوط",
+            "🔍 بحث السوق المعمق (SOP-1)",
+            "💰 حاسبة التعادل المالي (Matrix)"
     ])
 
 # ══════════════════════════════════════════════════════════════════════════════
