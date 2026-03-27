@@ -755,62 +755,37 @@ def get_youcan_html(html):
     return re.sub(r'\n\s*\n\s*\n', '\n\n', result).strip()
 
 def generate_nb_image(api_key, prompt, ref_b64=None):
-    """Generate image using Gemini imagen or fallback to Pollinations"""
-    import urllib.request as _ur
-    import urllib.parse as _up
-    import gc as garbage
-    # Try Gemini imagen-3
+    """Generate image - returns Pollinations URL directly (fast, no download needed)"""
     try:
-        import google.generativeai as _genai
-        _genai.configure(api_key=api_key)
-        from google.generativeai import GenerativeModel
-        # Use imagen via REST
-        import requests as _req
-        headers = {"Content-Type": "application/json"}
-        body = {"instances": [{"prompt": prompt}], "parameters": {"sampleCount": 1}}
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key={api_key}"
-        r = _req.post(url, json=body, headers=headers, timeout=30)
-        if r.status_code == 200:
-            data = r.json()
-            if data.get('predictions'):
-                b64 = data['predictions'][0].get('bytesBase64Encoded','')
-                if b64:
-                    return f'data:image/png;base64,{b64}'
-    except Exception as e1:
-        pass
-    # Fallback: Pollinations AI (always works, free)
-    try:
-        safe_prompt = _up.quote(prompt + ' no text no letters no watermark', safe='')
+        import urllib.parse as _up
+        safe_prompt = _up.quote(prompt + ' no text no letters no watermark no writing', safe='')
         seed = random.randint(1, 999999)
         img_url = f"https://image.pollinations.ai/prompt/{safe_prompt}?width=800&height=600&nologo=true&nofeed=true&model=flux&seed={seed}"
-        with _ur.urlopen(img_url, timeout=25) as resp:
-            img_bytes = resp.read()
-        b64 = base64.b64encode(img_bytes).decode('utf-8')
-        return f'data:image/jpeg;base64,{b64}'
-    except Exception as e2:
+        return img_url
+    except Exception:
         return None
-with st.sidebar:
-      st.header("⚙️ الإعدادات")
-      global_api_key        = st.text_input("🔑 Gemini API Key", type="password")
-      global_product_name   = st.text_area("📦 اسم وتفاصيل المنتج", placeholder="مثال: نظارات رؤية ليلية للقيادة")
-      global_category       = st.selectbox("📁 فئة المنتج", [
-          "💄 مستحضرات تجميل وعناية (Cosmetics)",
-              "⚙️ أدوات وأجهزة ذكية (Gadgets)",
-          "🌿 صحة ومكملات (Health)",
-          "👗 أزياء وموضة (Fashion)"
-      ])
-      uploaded_img = st.file_uploader("📷 صورة المنتج (مرجع AI)", type=["png","jpg","jpeg","webp"])
-      product_image_b64 = None
-      if uploaded_img:
-          product_image_b64 = base64.b64encode(uploaded_img.read()).decode('utf-8')
-          uploaded_img.seek(0)
-          st.image(uploaded_img, caption="صورة المنتج", )
-      st.markdown("---")
-      app_mode = st.radio("🛠️ الأداة:", [
-          "🏗️ منشئ صفحات الهبوط",
-          "🔍 بحث السوق المعمق (SOP-1)",
-          "💰 حاسبة التعادل المالي (Matrix)"
-      ])
+        with st.sidebar:
+        st.header("⚙️ الإعدادات")
+        global_api_key        = st.text_input("🔑 Gemini API Key", type="password")
+        global_product_name   = st.text_area("📦 اسم وتفاصيل المنتج", placeholder="مثال: نظارات رؤية ليلية للقيادة")
+        global_category       = st.selectbox("📁 فئة المنتج", [
+            "💄 مستحضرات تجميل وعناية (Cosmetics)",
+                "⚙️ أدوات وأجهزة ذكية (Gadgets)",
+            "🌿 صحة ومكملات (Health)",
+            "👗 أزياء وموضة (Fashion)"
+        ])
+        uploaded_img = st.file_uploader("📷 صورة المنتج (مرجع AI)", type=["png","jpg","jpeg","webp"])
+        product_image_b64 = None
+        if uploaded_img:
+            product_image_b64 = base64.b64encode(uploaded_img.read()).decode('utf-8')
+            uploaded_img.seek(0)
+            st.image(uploaded_img, caption="صورة المنتج", )
+        st.markdown("---")
+        app_mode = st.radio("🛠️ الأداة:", [
+            "🏗️ منشئ صفحات الهبوط",
+            "🔍 بحث السوق المعمق (SOP-1)",
+            "💰 حاسبة التعادل المالي (Matrix)"
+        ])
 
 # ══════════════════════════════════════════════════════════════════════════════
 # LANDING PAGE BUILDER
