@@ -11,5 +11,7 @@ jobs:
     steps:
       - name: Ping Streamlit App
         run: |
-          curl -s -o /dev/null -w "%{http_code}" https://ali-video-empire-xjhprjhpaa2jy7qk7lepl2.streamlit.app/ || true
-          echo "App pinged at $(date)"
+          curl -s -o /dev/null -w "%{http_code}" https://ali-video-empire-xjhprjhpaa2jy7qk7lepl2.streamlit.app/
+          echo "Streamlit App pinged at $(date)"
+          curl -s -o /dev/null -w "%{http_code}" https://ali-engine-pro.onrender.com/
+          echo "Render App pinged at $(date)"
