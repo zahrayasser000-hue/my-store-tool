@@ -866,8 +866,8 @@ if app_mode == "🏗️ منشئ صفحات الهبوط":
                     cols3 = st.columns(3)
                     for i,(k,v) in enumerate(st.session_state.lp_ai_images.items()):
                         with cols3[i%3]:
-                            if v and v.startswith('data:'): st.image(v, caption=k)
-                            else: st.caption(f"**{k}**: Pollinations")
+                            if v: st.image(v, caption=k)
+                            else: st.caption(k)
 
         with t3:
             if 'lp_data' in st.session_state:
