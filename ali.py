@@ -72,7 +72,7 @@ def get_model(api_key):
             if 'generateContent' in m.supported_generation_methods and 'flash' in m.name.lower():
                 st.session_state.model_name = m.name; return m.name
     except: pass
-    st.session_state.model_name = "gemini-pro"; return "gemini-pro"
+    st.session_state.model_name = "gemini-2.0-flash"; return "gemini-2.0-flash"
 
 # ─── JSON GENERATION ──────────────────────────────────────────────────────────
 
