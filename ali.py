@@ -754,22 +754,47 @@ def get_youcan_html(html):
     result = f'<style>\n{scoped}</style>\n<div class="ali-lp" style="direction:rtl;font-family:\'Cairo\',sans-serif;max-width:680px;margin:0 auto;">\n{body.strip()}\n</div>'
     return re.sub(r'\n\s*\n\s*\n', '\n\n', result).strip()
 
-def generate_nb_image(api_key, prompt, ref_b64=None):
-    """Generate image - returns Pollinations URL directly (fast, no download needed)"""
-    try:
-        import urllib.parse as _up
-        safe_prompt = _up.quote(prompt + ' no text no letters no watermark no writing', safe='')
-        seed = random.randint(1, 999999)
-        img_url = f"https://picsum.photos/800/600?random={seed}"
-        import requests as _rq; import base64 as _b64
-        resp = _rq.get(img_url, timeout=30)
-        if resp.status_code == 200 and len(resp.content) > 1000:
-            b = _b64.b64encode(resp.content).decode()
-            return f'data:image/jpeg;base64,{b}'
-        return img_url
-    except Exception:
-        return None
 # SIDEBAR CONFIG
+def generate_nb_image(api_key, prompt, ref_b64=None):
+    """Generate image using Gemini native image generation"""
+    try:
+        from google import genai as genai_new
+        from google.genai import types as genai_types
+        client = genai_new.Client(api_key=api_key)
+        contents = []
+        if ref_b64:
+            import io
+            img_bytes = base64.b64decode(ref_b64)
+            from PIL import Image as PILImage
+            ref_img = PILImage.open(io.BytesIO(img_bytes))
+            contents.append(ref_img)
+            contents.append(f"Based on this product image, generate: {prompt}. Professional commercial photo, 8k, no text no letters no words.")
+        else:
+            contents.append(f"{prompt}. Professional commercial photo, 8k quality, no text no letters no words no writing.")
+        response = client.models.generate_content(
+            model='gemini-2.0-flash-exp',
+            contents=contents,
+            config=genai_types.GenerateContentConfig(
+                response_modalities=['IMAGE'],
+            )
+        )
+        for part in response.candidates[0].content.parts:
+            if hasattr(part, 'inline_data') and part.inline_data:
+                b = base64.b64encode(part.inline_data.data).decode()
+                return f'data:image/png;base64,{b}'
+        return None
+    except Exception as e:
+        try:
+            seed = random.randint(1, 999999)
+            import requests as _rq
+            resp = _rq.get(f'https://picsum.photos/800/600?random={seed}', timeout=15)
+            if resp.status_code == 200 and len(resp.content) > 1000:
+                b = base64.b64encode(resp.content).decode()
+                return f'data:image/jpeg;base64,{b}'
+        except:
+            pass
+        return None
+
 st.sidebar.header("⚙️ الإعدادات")
 global_api_key        = st.sidebar.text_input("🔑 Gemini API Key", type="password")
 global_product_name   = st.sidebar.text_area("📦 اسم وتفاصيل المنتج", placeholder="مثال: نظارات رؤية ليلية للقيادة")
