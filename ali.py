@@ -44,7 +44,7 @@ def get_ai_image(keyword, width=800, height=600, style="product", context=""):
     }
     prompt = pm.get(style, f"{safe} high quality realistic commercial photo 8k") + " no text no letters no words no writing" + " no text no letters no words no writing"
     seed = random.randint(1, 999999)
-    return f"https://image.pollinations.ai/prompt/{urllib.parse.quote(prompt + ' no text no letters no words')}?width={width}&height={height}&nologo=true&nofeed=true&model=flux&seed={seed}"
+    return f"https://picsum.photos/{width}/{height}?random={seed}"
 
 AUTO_COLORS = {
     "skincare":  {"primary":"#be185d","secondary":"#fdf2f8","accent":"#f59e0b","gradient1":"#be185d","gradient2":"#ec4899"},
@@ -760,7 +760,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
         import urllib.parse as _up
         safe_prompt = _up.quote(prompt + ' no text no letters no watermark no writing', safe='')
         seed = random.randint(1, 999999)
-        img_url = f"https://image.pollinations.ai/prompt/{safe_prompt}?width=800&height=600&nologo=true&nofeed=true&model=flux&seed={seed}"
+                img_url = f"https://picsum.photos/800/600?random={seed}"
         import requests as _rq; import base64 as _b64
         resp = _rq.get(img_url, timeout=30)
         if resp.status_code == 200 and len(resp.content) > 1000:
