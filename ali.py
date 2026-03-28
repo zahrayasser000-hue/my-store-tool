@@ -884,7 +884,7 @@ if 'lp_html' in st.session_state:
                         if img_data:
                             generated[slot['key']] = img_data
                         prog.progress((i+1)/len(slots))
-                        time.sleep(0.4)
+                        import gc; gc.collect(); time.sleep(2)
                     status.success(f"✅ {len(generated)} صورة!")
                     st.session_state.lp_ai_images = generated
                     new_html = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=generated)
