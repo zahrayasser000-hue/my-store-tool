@@ -790,12 +790,9 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
                     del _pil, _buf
                     import gc; gc.collect()
                     return f'data:image/jpeg;base64,{b}'
-                st.warning('No image in Gemini response')
-        return None
+                return None
     except Exception as e:
-    
-                st.warning(f'Image gen error: {e}')
-            return None
+        return None
 
 st.sidebar.header("⚙️ الإعدادات")
 global_api_key        = st.sidebar.text_input("🔑 Gemini API Key", type="password")
