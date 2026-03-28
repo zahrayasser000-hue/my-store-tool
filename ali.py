@@ -772,14 +772,14 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
         else:
             contents.append(f"{prompt}. Professional commercial photo, 8k quality, no text no letters no words no writing.")
         response = client.models.generate_content(
-            model='gemini-2.0-flash-exp',
+            model='gemini-2.5-flash-image',
             contents=contents,
             config=genai_types.GenerateContentConfig(
-                response_modalities=['IMAGE'],
+                response_modalities=['TEXT', 'IMAGE'],
             )
-        )
-        for part in response.candidates[0].content.parts:
-            if hasattr(part, 'inline_data') and part.inline_data:
+                    )
+                for part in response.candidates[0].content.parts:
+    if hasattr(part, 'inline_data') and part.inline_data:
                 b = base64.b64encode(part.inline_data.data).decode()
                 return f'data:image/png;base64,{b}'
         return None
