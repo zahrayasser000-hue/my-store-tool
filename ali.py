@@ -853,7 +853,7 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
                     st.session_state.lp_html = build_lp_html(data, colors)
                     st.session_state.pop('lp_ai_images', None)
                     st.session_state.pop('lp_html_ai', None)
-                        st.success("🎉 تم! 15 قسم — ارفع صورة المنتج لتوليد صور AI")
+                    st.success("🎉 تم! 15 قسم — ارفع صورة المنتج لتوليد صور AI")
                 
             except Exception as e:
                 st.error(f"🛑 {str(e)}")
