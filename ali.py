@@ -772,7 +772,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
         else:
             contents.append(f"{prompt}. Professional commercial photo, 8k quality, no text no letters no words no writing.")
         response = client.models.generate_content(
-            model='gemini-2.5-flash-preview-image-generation',
+            model='gemini-2.0-flash-preview-image-generation',
             contents=contents,
             config=genai_types.GenerateContentConfig(
                 response_modalities=['TEXT', 'IMAGE'],
@@ -790,9 +790,11 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
                     del _pil, _buf
                     import gc; gc.collect()
                     return f'data:image/jpeg;base64,{b}'
+                st.warning('No image in Gemini response')
         return None
     except Exception as e:
     
+                st.warning(f'Image gen error: {e}')
         return None
 
 st.sidebar.header("⚙️ الإعدادات")
