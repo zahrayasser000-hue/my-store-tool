@@ -842,11 +842,11 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
                 colors = detect_colors(global_product_name, global_category)
                 st.session_state.lp_data  = data
                 st.session_state.lp_colors = colors
-                    st.session_state.lp_html = build_lp_html(data, colors)
-                    st.session_state.pop('lp_ai_images', None)
-                    st.session_state.pop('lp_html_ai', None)
-                    st.success("🎉 تم توليد 15 قسم! انتقل لتاب 'صور AI' لتوليد 30 صورة بـ Gemini ودمجها تلقائياً")
-                
+                st.session_state.lp_html = build_lp_html(data, colors)
+                st.session_state.pop('lp_ai_images', None)
+                st.session_state.pop('lp_html_ai', None)
+                st.success("🎉 تم توليد 15 قسم! انتقل لتاب 'صور AI' لتوليد 30 صورة بـ Gemini ودمجها تلقائياً")
+            
             except Exception as e:
                 st.error(f"🛑 {str(e)}")
 
