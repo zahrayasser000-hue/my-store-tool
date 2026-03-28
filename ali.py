@@ -871,7 +871,7 @@ if 'lp_html' in st.session_state:
                 cols3 = st.columns(3)
                 for i,(k,v) in enumerate(st.session_state.lp_ai_images.items()):
                     with cols3[i%3]:
-                        if v: st.image(v, caption=k)
+                        if v: st.image(base64.b64decode(v.split(',')[1]) if v.startswith('data:') else v, caption=k)
                         else: st.caption(k)
 
     with t3:
