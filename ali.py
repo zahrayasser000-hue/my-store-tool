@@ -761,6 +761,11 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
         safe_prompt = _up.quote(prompt + ' no text no letters no watermark no writing', safe='')
         seed = random.randint(1, 999999)
         img_url = f"https://image.pollinations.ai/prompt/{safe_prompt}?width=800&height=600&nologo=true&nofeed=true&model=flux&seed={seed}"
+        import requests as _rq; import base64 as _b64
+        resp = _rq.get(img_url, timeout=30)
+        if resp.status_code == 200 and len(resp.content) > 1000:
+            b = _b64.b64encode(resp.content).decode()
+            return f'data:image/jpeg;base64,{b}'
         return img_url
     except Exception:
         return None
