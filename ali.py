@@ -792,7 +792,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
                     return f'data:image/jpeg;base64,{b}'
         return None
     except Exception as e:
-            st.warning(f'Image gen error: {e}')
+    
         return None
 
 st.sidebar.header("⚙️ الإعدادات")
