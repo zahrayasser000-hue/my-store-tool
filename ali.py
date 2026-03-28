@@ -44,7 +44,7 @@ def get_ai_image(keyword, width=800, height=600, style="product", context=""):
     }
     prompt = pm.get(style, f"{safe} high quality realistic commercial photo 8k") + " no text no letters no words no writing"
     encoded = urllib.parse.quote(prompt)
-    return f"https://placehold.co/{width}x{height}/1e40af/white?text={urllib.parse.quote(safe[:30])}"
+    return f"https://image.pollinations.ai/prompt/{encoded}?width={width}&height={height}&nologo=true&seed={random.randint(1,99999)}"
 
 AUTO_COLORS = {
     "skincare":  {"primary":"#be185d","secondary":"#fdf2f8","accent":"#f59e0b","gradient1":"#be185d","gradient2":"#ec4899"},
