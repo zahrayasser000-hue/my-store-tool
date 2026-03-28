@@ -925,63 +925,63 @@ if 'lp_html' in st.session_state:
 # SOP-1
 # ══════════════════════════════════════════════════════════════════════════════
 elif app_mode == "🔍 بحث السوق المعمق (SOP-1)":
-st.markdown("### 🔍 البحث العميق في السوق")
-if st.button("🧠 استخراج وثائق البيع"):
-    if not global_api_key or not global_product_name:
-        st.error("أدخل مفتاح API واسم المنتج.")
-    else:
-        with st.spinner("جاري البحث..."):
-            try:
-                res = generate_deep_research(global_api_key, global_product_name, global_category)
-                st.session_state.deep_res = res
-                st.success("✅ اكتمل!")
-            except Exception as e:
-                st.error(f"🛑 {str(e)}")
-if 'deep_res' in st.session_state:
-    st.markdown(st.session_state.deep_res)
+    st.markdown("### 🔍 البحث العميق في السوق")
+    if st.button("🧠 استخراج وثائق البيع"):
+        if not global_api_key or not global_product_name:
+            st.error("أدخل مفتاح API واسم المنتج.")
+        else:
+            with st.spinner("جاري البحث..."):
+                try:
+                    res = generate_deep_research(global_api_key, global_product_name, global_category)
+                    st.session_state.deep_res = res
+                    st.success("✅ اكتمل!")
+                except Exception as e:
+                    st.error(f"🛑 {str(e)}")
+    if 'deep_res' in st.session_state:
+        st.markdown(st.session_state.deep_res)
     st.download_button("📥 تحميل التقرير", st.session_state.deep_res, "deep_research.md","text/markdown")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # MATRIX
 # ══════════════════════════════════════════════════════════════════════════════
 elif app_mode == "💰 حاسبة التعادل المالي (Matrix)":
-st.markdown("### 💰 حاسبة التعادل المالي")
-c1,c2 = st.columns(2)
-with c1:
-    cost  = st.number_input("💵 تكلفة المنتج",        min_value=0.0, value=50.0,  step=1.0)
-    price = st.number_input("🏷️ سعر البيع",            min_value=0.0, value=199.0, step=1.0)
-    cod   = st.number_input("🚚 رسوم COD/التوصيل",    min_value=0.0, value=20.0,  step=1.0)
-    ret   = st.slider("↩️ نسبة الإرجاع (%)", 0, 100, 20)
-with c2:
-    budget= st.number_input("📢 ميزانية الإعلان (يومي)", min_value=0.0, value=100.0, step=5.0)
-    cpc   = st.number_input("👆 تكلفة النقرة CPC",       min_value=0.01, value=0.5,  step=0.01)
-    cvr   = st.slider("🎯 معدل التحويل (%)", 0.1, 20.0, 2.0, step=0.1)
-if st.button("📊 احسب"):
-    clicks    = budget/cpc
-    orders    = clicks*(cvr/100)
-    returned  = orders*(ret/100)
-    fulfilled = orders-returned
-    revenue   = fulfilled*price
-    total_c   = orders*cost + orders*cod + budget
-    profit    = revenue-total_c
-    roas      = revenue/budget if budget>0 else 0
-    cpa       = budget/orders  if orders>0 else 0
-    margin    = profit/revenue*100 if revenue>0 else 0
-    st.sidebar.markdown("---")
-    m1,m2,m3,m4 = st.columns(4)
-    m1.metric("🛒 الطلبات",f"{orders:.0f}")
-    m2.metric("✅ المنفذة", f"{fulfilled:.0f}")
-    m3.metric("💰 الإيراد", f"{revenue:.0f}")
-    m4.metric("📈 الربح",   f"{profit:.0f}", delta="✅ ربح" if profit>0 else "❌ خسارة")
-    st.sidebar.markdown("---")
-    r1,r2,r3,r4 = st.columns(4)
-    r1.metric("🎯 ROAS",      f"{roas:.2f}x")
-    r2.metric("💸 CPA",       f"{cpa:.2f}")
-    r3.metric("📉 هامش الربح",f"{margin:.1f}%")
-    r4.metric("↩️ المرتجعة",  f"{returned:.0f}")
-    if profit>0: st.success(f"✅ مربحة! ربح {profit:.2f} مقابل إنفاق {budget:.0f}")
-    else:        st.error(f"❌ خاسرة! خسارة {abs(profit):.2f}")
-    with st.expander("📊 تفاصيل"):
-        st.write(f"- نقرات: {clicks:.0f} | طلبات: {orders:.0f} | منفذة: {fulfilled:.0f}")
-        st.write(f"- تكلفة بضاعة: {orders*cost:.0f} | COD: {orders*cod:.0f} | إعلان: {budget:.0f}")
+    st.markdown("### 💰 حاسبة التعادل المالي")
+    c1,c2 = st.columns(2)
+    with c1:
+        cost  = st.number_input("💵 تكلفة المنتج",        min_value=0.0, value=50.0,  step=1.0)
+        price = st.number_input("🏷️ سعر البيع",            min_value=0.0, value=199.0, step=1.0)
+        cod   = st.number_input("🚚 رسوم COD/التوصيل",    min_value=0.0, value=20.0,  step=1.0)
+        ret   = st.slider("↩️ نسبة الإرجاع (%)", 0, 100, 20)
+    with c2:
+        budget= st.number_input("📢 ميزانية الإعلان (يومي)", min_value=0.0, value=100.0, step=5.0)
+        cpc   = st.number_input("👆 تكلفة النقرة CPC",       min_value=0.01, value=0.5,  step=0.01)
+        cvr   = st.slider("🎯 معدل التحويل (%)", 0.1, 20.0, 2.0, step=0.1)
+    if st.button("📊 احسب"):
+        clicks    = budget/cpc
+        orders    = clicks*(cvr/100)
+        returned  = orders*(ret/100)
+        fulfilled = orders-returned
+        revenue   = fulfilled*price
+        total_c   = orders*cost + orders*cod + budget
+        profit    = revenue-total_c
+        roas      = revenue/budget if budget>0 else 0
+        cpa       = budget/orders  if orders>0 else 0
+        margin    = profit/revenue*100 if revenue>0 else 0
+        st.sidebar.markdown("---")
+        m1,m2,m3,m4 = st.columns(4)
+        m1.metric("🛒 الطلبات",f"{orders:.0f}")
+        m2.metric("✅ المنفذة", f"{fulfilled:.0f}")
+        m3.metric("💰 الإيراد", f"{revenue:.0f}")
+        m4.metric("📈 الربح",   f"{profit:.0f}", delta="✅ ربح" if profit>0 else "❌ خسارة")
+        st.sidebar.markdown("---")
+        r1,r2,r3,r4 = st.columns(4)
+        r1.metric("🎯 ROAS",      f"{roas:.2f}x")
+        r2.metric("💸 CPA",       f"{cpa:.2f}")
+        r3.metric("📉 هامش الربح",f"{margin:.1f}%")
+        r4.metric("↩️ المرتجعة",  f"{returned:.0f}")
+        if profit>0: st.success(f"✅ مربحة! ربح {profit:.2f} مقابل إنفاق {budget:.0f}")
+        else:        st.error(f"❌ خاسرة! خسارة {abs(profit):.2f}")
+        with st.expander("📊 تفاصيل"):
+            st.write(f"- نقرات: {clicks:.0f} | طلبات: {orders:.0f} | منفذة: {fulfilled:.0f}")
+            st.write(f"- تكلفة بضاعة: {orders*cost:.0f} | COD: {orders*cod:.0f} | إعلان: {budget:.0f}")
         st.write(f"- إجمالي تكاليف: {total_c:.0f} | إيراد: {revenue:.0f} | ربح: {profit:.0f}")
