@@ -42,9 +42,9 @@ def get_ai_image(keyword, width=800, height=600, style="product", context=""):
         "after":       f"clear AFTER state {safe} problem solved dramatic improvement 8k",
         "dimensions":  f"{safe} product flat lay ruler measurement size reference clean white background 8k",
     }
-    prompt = pm.get(style, f"{safe} high quality realistic commercial photo 8k") + " no text no letters no words no writing" + " no text no letters no words no writing"
-    svg = f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}"><rect width="100%" height="100%" fill="%23e2e8f0"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="14" fill="%2394a3b8" font-family="Arial">📷 {safe[:30]}</text></svg>'
-    return f"data:image/svg+xml,{svg}"
+        prompt = pm.get(style, f"{safe} high quality realistic commercial photo 8k") + " no text no letters no words no writing"
+    encoded = urllib.parse.quote(prompt)
+    return f"https://image.pollinations.ai/prompt/{encoded}?width={width}&height={height}&nologo=true&seed={random.randint(1,99999)}"
 
 AUTO_COLORS = {
     "skincare":  {"primary":"#be185d","secondary":"#fdf2f8","accent":"#f59e0b","gradient1":"#be185d","gradient2":"#ec4899"},
