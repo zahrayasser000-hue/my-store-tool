@@ -778,7 +778,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
                 response_modalities=['TEXT', 'IMAGE'],
             )
                     )
-            for part in response.candidates[0].content.parts:
+        for part in response.candidates[0].content.parts:
             if hasattr(part, 'inline_data') and part.inline_data:
                 b = base64.b64encode(part.inline_data.data).decode()
                 return f'data:image/png;base64,{b}'
