@@ -761,7 +761,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
     try:
         import io
         from PIL import Image as PILImage
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key={api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp-image-generation:generateContent?key={api_key}"
         full_prompt = f"{prompt}. Professional commercial photo, 8k quality, no text no letters no words no writing."
         if ref_b64:
             payload = {
@@ -792,8 +792,10 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
                 del _pil, _buf
                 import gc; gc.collect()
                 return f'data:image/jpeg;base64,{b}'
+        st.warning(f'No image in response: {str(data)[:300]}')
         return None
     except Exception as e:
+        st.warning(f'IMG ERR: {str(e)[:200]}')
         return None
 st.sidebar.header("⚙️ الإعدادات")
 global_api_key        = st.sidebar.text_input("🔑 Gemini API Key", type="password")
