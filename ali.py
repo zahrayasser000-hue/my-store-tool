@@ -42,7 +42,7 @@ def get_ai_image(keyword, width=800, height=600, style="product", context=""):
         "after":       f"clear AFTER state {safe} problem solved dramatic improvement 8k",
         "dimensions":  f"{safe} product flat lay ruler measurement size reference clean white background 8k",
     }
-        prompt = pm.get(style, f"{safe} high quality realistic commercial photo 8k") + " no text no letters no words no writing"
+    prompt = pm.get(style, f"{safe} high quality realistic commercial photo 8k") + " no text no letters no words no writing"
     encoded = urllib.parse.quote(prompt)
     return f"https://image.pollinations.ai/prompt/{encoded}?width={width}&height={height}&nologo=true&seed={random.randint(1,99999)}"
 
