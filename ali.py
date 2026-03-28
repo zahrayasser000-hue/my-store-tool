@@ -43,8 +43,8 @@ def get_ai_image(keyword, width=800, height=600, style="product", context=""):
         "dimensions":  f"{safe} product flat lay ruler measurement size reference clean white background 8k",
     }
     prompt = pm.get(style, f"{safe} high quality realistic commercial photo 8k") + " no text no letters no words no writing" + " no text no letters no words no writing"
-    seed = random.randint(1, 999999)
-    return f"https://picsum.photos/{width}/{height}?random={seed}"
+        svg = f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height}"><rect width="100%" height="100%" fill="%23e2e8f0"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="14" fill="%2394a3b8" font-family="Arial">📷 {safe[:30]}</text></svg>'
+    return f"data:image/svg+xml,{svg}"
 
 AUTO_COLORS = {
     "skincare":  {"primary":"#be185d","secondary":"#fdf2f8","accent":"#f59e0b","gradient1":"#be185d","gradient2":"#ec4899"},
@@ -784,15 +784,6 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
                 return f'data:image/png;base64,{b}'
         return None
     except Exception as e:
-        try:
-            seed = random.randint(1, 999999)
-            import requests as _rq
-            resp = _rq.get(f'https://picsum.photos/800/600?random={seed}', timeout=15)
-            if resp.status_code == 200 and len(resp.content) > 1000:
-                b = base64.b64encode(resp.content).decode()
-                return f'data:image/jpeg;base64,{b}'
-        except:
-            pass
         return None
 
 st.sidebar.header("⚙️ الإعدادات")
@@ -841,12 +832,29 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
                     data  = json.loads(fixed)
                 data['_product_name'] = global_product_name
                 colors = detect_colors(global_product_name, global_category)
-                st.session_state.lp_data    = data
-                st.session_state.lp_colors  = colors
-                st.session_state.lp_html    = build_lp_html(data, colors)
-                st.session_state.pop('lp_ai_images', None)
-                st.session_state.pop('lp_html_ai',   None)
-                st.success("🎉 تم! 15 قسم + 30 صورة Pollinations")
+                    st.session_state.lp_data  = data
+                    st.session_state.lp_colors = colors
+                    if product_image_b64:
+                        st.info("📷 جاري توليد الصور بالذكاء الاصطناعي...")
+                        slots = extract_image_slots(data)
+                        generated = {}
+                        prog = st.progress(0)
+                        for i, slot in enumerate(slots):
+                            img_data = generate_nb_image(global_api_key, f"Professional commercial photo. {slot['prompt']}. 8k. no text no letters.", ref_b64=product_image_b64)
+                            if img_data:
+                                generated[slot['key']] = img_data
+                            prog.progress((i+1)/len(slots))
+                            time.sleep(0.3)
+                        st.session_state.lp_ai_images = generated
+                        st.session_state.lp_html = build_lp_html(data, colors, image_map=generated)
+                        st.session_state.lp_html_ai = st.session_state.lp_html
+                        st.success(f"🎉 تم! 15 قسم + {len(generated)} صورة AI مدمجة!")
+                    else:
+                        st.session_state.lp_html = build_lp_html(data, colors)
+                        st.session_state.pop('lp_ai_images', None)
+                        st.session_state.pop('lp_html_ai', None)
+                        st.success("🎉 تم! 15 قسم — ارفع صورة المنتج لتوليد صور AI")
+                
             except Exception as e:
                 st.error(f"🛑 {str(e)}")
 
@@ -881,7 +889,8 @@ if 'lp_html' in st.session_state:
                             f"Professional commercial photo. {slot['prompt']}. 8k ultra high quality. no text no letters no words no writing no captions.",
                             ref_b64=ref
                         )
-                        generated[slot['key']] = img_data or get_ai_image(slot['keyword'],800,600,slot['type'])
+                        if img_data:
+                            generated[slot['key']] = img_data
                         prog.progress((i+1)/len(slots))
                         time.sleep(0.4)
                     status.success(f"✅ {len(generated)} صورة!")
