@@ -789,7 +789,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
                     b = base64.b64encode(_buf.getvalue()).decode()
                     del _pil, _buf
                     import gc; gc.collect()
-                    return f'data:image/jpeg;base64,{b}
+                    return f'data:image/jpeg;base64,{b}'
         return None
     except Exception as e:
         return None
