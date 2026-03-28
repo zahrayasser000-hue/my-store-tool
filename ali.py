@@ -795,7 +795,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
     except Exception as e:
     
                 st.warning(f'Image gen error: {e}')
-        return None
+            return None
 
 st.sidebar.header("⚙️ الإعدادات")
 global_api_key        = st.sidebar.text_input("🔑 Gemini API Key", type="password")
