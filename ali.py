@@ -760,7 +760,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
         import urllib.parse as _up
         safe_prompt = _up.quote(prompt + ' no text no letters no watermark no writing', safe='')
         seed = random.randint(1, 999999)
-                img_url = f"https://picsum.photos/800/600?random={seed}"
+            img_url = f"https://picsum.photos/800/600?random={seed}"
         import requests as _rq; import base64 as _b64
         resp = _rq.get(img_url, timeout=30)
         if resp.status_code == 200 and len(resp.content) > 1000:
