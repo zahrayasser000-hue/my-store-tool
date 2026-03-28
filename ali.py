@@ -793,7 +793,6 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
                 return None
     except Exception as e:
         return None
-
 st.sidebar.header("⚙️ الإعدادات")
 global_api_key        = st.sidebar.text_input("🔑 Gemini API Key", type="password")
 global_product_name   = st.sidebar.text_area("📦 اسم وتفاصيل المنتج", placeholder="مثال: نظارات رؤية ليلية للقيادة")
