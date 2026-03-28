@@ -834,26 +834,10 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
                 colors = detect_colors(global_product_name, global_category)
                 st.session_state.lp_data  = data
                 st.session_state.lp_colors = colors
-                if product_image_b64:
-                    st.info("📷 جاري توليد الصور بالذكاء الاصطناعي...")
-                    slots = extract_image_slots(data)
-                    generated = {}
-                    prog = st.progress(0)
-                    for i, slot in enumerate(slots):
-                        img_data = generate_nb_image(global_api_key, f"Professional commercial photo. {slot['prompt']}. 8k. no text no letters.", ref_b64=product_image_b64)
-                        if img_data:
-                            generated[slot['key']] = img_data
-                        prog.progress((i+1)/len(slots))
-                        time.sleep(0.3)
-                    st.session_state.lp_ai_images = generated
-                    st.session_state.lp_html = build_lp_html(data, colors, image_map=generated)
-                    st.session_state.lp_html_ai = st.session_state.lp_html
-                    st.success(f"🎉 تم! 15 قسم + {len(generated)} صورة AI مدمجة!")
-                else:
                     st.session_state.lp_html = build_lp_html(data, colors)
                     st.session_state.pop('lp_ai_images', None)
                     st.session_state.pop('lp_html_ai', None)
-                    st.success("🎉 تم! 15 قسم — ارفع صورة المنتج لتوليد صور AI")
+                    st.success("🎉 تم توليد 15 قسم! انتقل لتاب 'صور AI' لتوليد 30 صورة بـ Gemini ودمجها تلقائياً")
                 
             except Exception as e:
                 st.error(f"🛑 {str(e)}")
