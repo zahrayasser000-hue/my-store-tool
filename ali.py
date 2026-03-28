@@ -9,6 +9,7 @@ import urllib.parse
 import base64
 import time
 import uuid
+import requests
 
 st.set_page_config(page_title="ALI Engine Pro", layout="wide", page_icon="🚀")
 st.markdown("""<style>
@@ -756,41 +757,42 @@ def get_youcan_html(html):
 
 # SIDEBAR CONFIG
 def generate_nb_image(api_key, prompt, ref_b64=None):
-    """Generate image using Gemini native image generation"""
+    """Generate image using Gemini REST API directly"""
     try:
-        from google import genai as genai_new
-        from google.genai import types as genai_types
-        client = genai_new.Client(api_key=api_key)
-        contents = []
+        import io
+        from PIL import Image as PILImage
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key={api_key}"
+        full_prompt = f"{prompt}. Professional commercial photo, 8k quality, no text no letters no words no writing."
         if ref_b64:
-            import io
-            img_bytes = base64.b64decode(ref_b64)
-            from PIL import Image as PILImage
-            ref_img = PILImage.open(io.BytesIO(img_bytes))
-            contents.append(ref_img)
-            contents.append(f"Based on this product image, generate: {prompt}. Professional commercial photo, 8k, no text no letters no words.")
+            payload = {
+                "contents": [{
+                    "parts": [
+                        {"inline_data": {"mime_type": "image/jpeg", "data": ref_b64}},
+                        {"text": f"Based on this product image, generate: {full_prompt}"}
+                    ]
+                }],
+                "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}
+            }
         else:
-            contents.append(f"{prompt}. Professional commercial photo, 8k quality, no text no letters no words no writing.")
-        response = client.models.generate_content(
-            model='gemini-2.0-flash-preview-image-generation',
-            contents=contents,
-            config=genai_types.GenerateContentConfig(
-                response_modalities=['TEXT', 'IMAGE'],
-            )
-                    )
-        for part in response.candidates[0].content.parts:
-                if hasattr(part, 'inline_data') and part.inline_data:
-                    import io as _io
-                    from PIL import Image as _PILImg
-                    _pil = _PILImg.open(_io.BytesIO(part.inline_data.data))
-                    _pil.thumbnail((400, 400))
-                    _buf = _io.BytesIO()
-                    _pil.convert('RGB').save(_buf, format='JPEG', quality=65, optimize=True)
-                    b = base64.b64encode(_buf.getvalue()).decode()
-                    del _pil, _buf
-                    import gc; gc.collect()
-                    return f'data:image/jpeg;base64,{b}'
-                return None
+            payload = {
+                "contents": [{"parts": [{"text": full_prompt}]}],
+                "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}
+            }
+        resp = requests.post(url, json=payload, timeout=90)
+        resp.raise_for_status()
+        data = resp.json()
+        for part in data.get("candidates", [{}])[0].get("content", {}).get("parts", []):
+            if "inlineData" in part:
+                img_bytes = base64.b64decode(part["inlineData"]["data"])
+                _pil = PILImage.open(io.BytesIO(img_bytes))
+                _pil.thumbnail((400, 400))
+                _buf = io.BytesIO()
+                _pil.convert('RGB').save(_buf, format='JPEG', quality=65, optimize=True)
+                b = base64.b64encode(_buf.getvalue()).decode()
+                del _pil, _buf
+                import gc; gc.collect()
+                return f'data:image/jpeg;base64,{b}'
+        return None
     except Exception as e:
         return None
 st.sidebar.header("⚙️ الإعدادات")
