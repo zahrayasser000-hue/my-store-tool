@@ -779,7 +779,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
             )
                     )
         for part in response.candidates[0].content.parts:
-                        if hasattr(part, 'inline_data') and part.inline_data:
+                    if hasattr(part, 'inline_data') and part.inline_data:
                 import io as _io
                 from PIL import Image as _PILImg
                 _pil = _PILImg.open(_io.BytesIO(part.inline_data.data))
