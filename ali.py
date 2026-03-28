@@ -779,17 +779,17 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
             )
                     )
         for part in response.candidates[0].content.parts:
-                    if hasattr(part, 'inline_data') and part.inline_data:
-                import io as _io
-                from PIL import Image as _PILImg
-                _pil = _PILImg.open(_io.BytesIO(part.inline_data.data))
-                _pil.thumbnail((400, 400))
-                _buf = _io.BytesIO()
-                _pil.convert('RGB').save(_buf, format='JPEG', quality=65, optimize=True)
-                b = base64.b64encode(_buf.getvalue()).decode()
-                del _pil, _buf
-                import gc; gc.collect()
-                return f'data:image/jpeg;base64,{b}
+                if hasattr(part, 'inline_data') and part.inline_data:
+                    import io as _io
+                    from PIL import Image as _PILImg
+                    _pil = _PILImg.open(_io.BytesIO(part.inline_data.data))
+                    _pil.thumbnail((400, 400))
+                    _buf = _io.BytesIO()
+                    _pil.convert('RGB').save(_buf, format='JPEG', quality=65, optimize=True)
+                    b = base64.b64encode(_buf.getvalue()).decode()
+                    del _pil, _buf
+                    import gc; gc.collect()
+                    return f'data:image/jpeg;base64,{b}
         return None
     except Exception as e:
         return None
