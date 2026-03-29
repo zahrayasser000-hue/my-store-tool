@@ -857,7 +857,10 @@ if 'lp_html' in st.session_state:
     t1,t2,t3,t4,t5 = st.tabs(["📱 المعاينة","🤖 صور AI","📥 JSON","📤 YouCan","🎨 برومبتات"])
 
     with t1:
-        preview = st.session_state.get('lp_html_ai', st.session_state.lp_html)
+                if 'lp_ai_images' in st.session_state and st.session_state.lp_ai_images:
+            preview = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=st.session_state.lp_ai_images)
+        else:
+            preview = st.session_state.lp_html
         st.download_button("⬇️ تحميل HTML", preview, "landing_page.html", "text/html", key="dl_html_main")
         components.html(preview, height=6000, scrolling=True)
 
@@ -887,7 +890,7 @@ if 'lp_html' in st.session_state:
                         if img_data:
                             generated[slot['key']] = img_data; st.session_state['lp_ai_images'] = dict(generated)
                         prog.progress((i+1)/len(slots))
-                        import gc; gc.collect(); time.sleep(2)
+                        import gc; gc.collect(); time.sleep(5)
                     status.success(f"✅ {len(generated)} صورة!")
                     st.session_state.lp_ai_images = generated
                     new_html = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=generated)
@@ -911,10 +914,13 @@ if 'lp_html' in st.session_state:
             st.json(d)
 
     with t4:
-        src = st.session_state.get('lp_html_ai', st.session_state.lp_html)
+                if 'lp_ai_images' in st.session_state and st.session_state.lp_ai_images:
+            src = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=st.session_state.lp_ai_images)
+        else:
+            src = st.session_state.lp_html
         yc = get_youcan_html(src)
         st.download_button("📥 تحميل YouCan JSON", generate_youcan_json(src), "youcan_page.lp", "application/json", key="yc_json_dl")
-        if 'lp_html_ai' in st.session_state:
+        if 'lp_ai_images' in st.session_state:
             st.success("✅ صور AI مدمجة base64 — جاهز لـ YouCan!")
         else:
             st.info("💡 ولّد صور AI أولاً لدمجها.")
