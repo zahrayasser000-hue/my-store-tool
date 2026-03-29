@@ -912,7 +912,7 @@ if 'lp_html' in st.session_state:
 
     with t4:
                 src = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=st.session_state.get('lp_ai_images'))
-        yc = get_youcan_html(src)
+                    yc = get_youcan_html(src)
         st.download_button("📥 تحميل YouCan JSON", generate_youcan_json(src), "youcan_page.lp", "application/json", key="yc_json_dl")
         if 'lp_ai_images' in st.session_state:
             st.success("✅ صور AI مدمجة base64 — جاهز لـ YouCan!")
