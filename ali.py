@@ -885,13 +885,13 @@ if 'lp_html' in st.session_state:
                             ref_b64=ref
                         )
                         if img_data:
-                            generated[slot['key']] = img_data
+                            generated[slot['key']] = img_data; st.session_state['lp_ai_images'] = dict(generated)
                         prog.progress((i+1)/len(slots))
                         import gc; gc.collect(); time.sleep(2)
                     status.success(f"✅ {len(generated)} صورة!")
                     st.session_state.lp_ai_images = generated
                     new_html = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=generated)
-                    st.session_state.lp_html_ai = new_html
+                    st.session_state.lp_html_ai = new_html                         except Exception as e:                             st.warning(f'HTML build error: {str(e)[:200]}')
                     st.success("✅ الصور مدمجة في HTML كـ base64!")
                     st.download_button("⬇️ HTML + صور AI مدمجة", new_html, "lp_ai.html", "text/html", key="dl_ai_html")
 
