@@ -891,7 +891,7 @@ if 'lp_html' in st.session_state:
                     status.success(f"✅ {len(generated)} صورة!")
                     st.session_state.lp_ai_images = generated
                     new_html = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=generated)
-                    st.session_state.lp_html_ai = new_html                         except Exception as e:                             st.warning(f'HTML build error: {str(e)[:200]}')
+                    st.session_state.lp_html_ai = new_html
                     st.success("✅ الصور مدمجة في HTML كـ base64!")
                     st.download_button("⬇️ HTML + صور AI مدمجة", new_html, "lp_ai.html", "text/html", key="dl_ai_html")
 
