@@ -761,7 +761,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
     try:
         import io
         from PIL import Image as PILImage
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
         full_prompt = f"{prompt}. Professional commercial photo, 8k quality, no text no letters no words no writing."
         if ref_b64:
             payload = {
