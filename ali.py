@@ -857,10 +857,7 @@ if 'lp_html' in st.session_state:
     t1,t2,t3,t4,t5 = st.tabs(["📱 المعاينة","🤖 صور AI","📥 JSON","📤 YouCan","🎨 برومبتات"])
 
     with t1:
-                if 'lp_ai_images' in st.session_state and st.session_state.lp_ai_images:
-            preview = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=st.session_state.lp_ai_images)
-        else:
-            preview = st.session_state.lp_html
+                            preview = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=st.session_state.get('lp_ai_images'))
         st.download_button("⬇️ تحميل HTML", preview, "landing_page.html", "text/html", key="dl_html_main")
         components.html(preview, height=6000, scrolling=True)
 
@@ -914,10 +911,7 @@ if 'lp_html' in st.session_state:
             st.json(d)
 
     with t4:
-                if 'lp_ai_images' in st.session_state and st.session_state.lp_ai_images:
-            src = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=st.session_state.lp_ai_images)
-        else:
-            src = st.session_state.lp_html
+                            src = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=st.session_state.get('lp_ai_images'))
         yc = get_youcan_html(src)
         st.download_button("📥 تحميل YouCan JSON", generate_youcan_json(src), "youcan_page.lp", "application/json", key="yc_json_dl")
         if 'lp_ai_images' in st.session_state:
