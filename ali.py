@@ -841,8 +841,8 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
                 except:
                     fixed = re.sub(r',\s*([}\]])', r'\1', raw)
                     data  = json.loads(fixed)
-                data['_product_name'] = global_product_name
-                colors = detect_colors(global_product_name, global_category)
+            data['_product_name'] = global_product_name
+            colors = detect_colors(global_product_name, global_category)
                 st.session_state.lp_data  = data
                 st.session_state.lp_colors = colors
                 st.session_state.lp_html = build_lp_html(data, colors)
@@ -857,7 +857,7 @@ if 'lp_html' in st.session_state:
     t1,t2,t3,t4,t5 = st.tabs(["📱 المعاينة","🤖 صور AI","📥 JSON","📤 YouCan","🎨 برومبتات"])
 
     with t1:
-                            preview = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=st.session_state.get('lp_ai_images'))
+                    preview = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=st.session_state.get('lp_ai_images'))
         st.download_button("⬇️ تحميل HTML", preview, "landing_page.html", "text/html", key="dl_html_main")
         components.html(preview, height=6000, scrolling=True)
 
