@@ -799,7 +799,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
         return None
 st.sidebar.header("⚙️ الإعدادات")
 global_api_key        = st.sidebar.text_input("🔑 Gemini API Key", type="password")
-global_product_name   = st.sidebar.text_area("📦 اسم وتفاصيل المنتج", placeholder="مثال: نظارات رؤية ليلية للقيادة")
+global_product_name   = st.sidebar.text_input("📦 اسم وتفاصيل المنتج", placeholder="مثال: نظارات رؤية ليلية للقيادة")
 global_category       = st.sidebar.selectbox("📁 فئة المنتج", [
     "💄 مستحضرات تجميل وعناية (Cosmetics)",
             "⚙️ أدوات وأجهزة ذكية (Gadgets)",
