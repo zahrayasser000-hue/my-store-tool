@@ -857,8 +857,8 @@ if 'lp_html' in st.session_state:
     t1,t2,t3,t4,t5 = st.tabs(["📱 المعاينة","🤖 صور AI","📥 JSON","📤 YouCan","🎨 برومبتات"])
 
     with t1:
-                    preview = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=st.session_state.get('lp_ai_images'))
-        st.download_button("⬇️ تحميل HTML", preview, "landing_page.html", "text/html", key="dl_html_main")
+            preview = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=st.session_state.get('lp_ai_images'))
+            st.download_button("⬇️ تحميل HTML", preview, "landing_page.html", "text/html", key="dl_html_main")
         components.html(preview, height=6000, scrolling=True)
 
     with t2:
