@@ -832,7 +832,6 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
         with st.spinner("🤖 جاري بناء الصفحة..."):
             try:
                 raw  = generate_lp_json(global_api_key, global_product_name, global_category)
-                                    print(f'DEBUG: JSON generated, length={len(raw)}')
                 try:    data = json.loads(raw)
                 except:
                     fixed = re.sub(r',\s*([}\]])', r'\1', raw)
@@ -842,12 +841,11 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
                     st.session_state.lp_data  = data
                     st.session_state.lp_colors = colors
                     st.session_state.lp_html = build_lp_html(data, colors)
-                                        # === AUTO GENERATE AI IMAGES ===
+                    # === AUTO GENERATE AI IMAGES ===
                     st.info("🤖 جاري توليد الصور بالذكاء الاصطناعي ودمجها تلقائياً...")
                     slots = extract_image_slots(data)
                     generated = {}
                     ref = product_image_b64 if product_image_b64 else None
-                                        print('DEBUG: Starting AI image generation...')
                     prog = st.progress(0)
                     status_txt = st.empty()
                     for i, slot in enumerate(slots):
@@ -904,7 +902,15 @@ if 'lp_html' in st.session_state:
                             ref_b64=ref
                         )
                         if img_data:
+<<<<<<< HEAD
+                            generated[slot['key']] = img_data
+                                                else:
+                        fb_p = slot['prompt'] + ' no text no letters no words'
+                        enc_fb = urllib.parse.quote(fb_p)
+                        generated[slot['key']] = f'https://image.pollinations.ai/prompt/{enc_fb}?width=600&height=400&nologo=true&seed={random.randint(1,99999)}'
+=======
                             generated[slot['key']] = img_data; st.session_state['lp_ai_images'] = dict(generated)
+>>>>>>> 9a4dbf779d73f3ab7b95c58adaa6cabd8f575b87
                         prog.progress((i+1)/len(slots))
                         import gc; gc.collect(); time.sleep(5)
                     status.success(f"✅ {len(generated)} صورة!")
