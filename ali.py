@@ -10,6 +10,7 @@ import base64
 import time
 import uuid
 import requests
+import traceback
 
 st.set_page_config(page_title="ALI Engine Pro", layout="wide", page_icon="🚀")
 st.markdown("""<style>
@@ -831,6 +832,7 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
         with st.spinner("🤖 جاري بناء الصفحة..."):
             try:
                 raw  = generate_lp_json(global_api_key, global_product_name, global_category)
+                                    print(f'DEBUG: JSON generated, length={len(raw)}')
                 try:    data = json.loads(raw)
                 except:
                     fixed = re.sub(r',\s*([}\]])', r'\1', raw)
@@ -845,6 +847,7 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
                     slots = extract_image_slots(data)
                     generated = {}
                     ref = product_image_b64 if product_image_b64 else None
+                                        print('DEBUG: Starting AI image generation...')
                     prog = st.progress(0)
                     status_txt = st.empty()
                     for i, slot in enumerate(slots):
@@ -867,7 +870,7 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
                     st.session_state.lp_html_ai = new_html
                     st.success(f"🎉 تم توليد {len(generated)} صورة ودمجها تلقائياً في صفحة الهبوط!")
             except Exception as e:
-                st.error(f"🛑 {str(e)}")
+                traceback.print_exc(); st.session_state['lp_error'] = str(e); st.error(f"🛑 {str(e)}")
 
 if 'lp_html' in st.session_state:
     t1,t2,t3,t4,t5 = st.tabs(["📱 المعاينة","🤖 صور AI","📥 JSON","📤 YouCan","🎨 برومبتات"])
