@@ -903,10 +903,10 @@ if 'lp_html' in st.session_state:
                         )
                         if img_data:
                             generated[slot['key']] = img_data
-                                                else:
-                        fb_p = slot['prompt'] + ' no text no letters no words'
-                        enc_fb = urllib.parse.quote(fb_p)
-                        generated[slot['key']] = f'https://image.pollinations.ai/prompt/{enc_fb}?width=600&height=400&nologo=true&seed={random.randint(1,99999)}'
+                else:
+                            fb_p = slot['prompt'] + ' no text no letters no words'
+                            enc_fb = urllib.parse.quote(fb_p)
+                            generated[slot['key']] = f'https://image.pollinations.ai/prompt/{enc_fb}?width=600&height=400&nologo=true&seed={random.randint(1,99999)}'
                         prog.progress((i+1)/len(slots))
                         import gc; gc.collect(); time.sleep(5)
                     status.success(f"✅ {len(generated)} صورة!")
