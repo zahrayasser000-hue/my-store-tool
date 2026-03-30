@@ -914,36 +914,36 @@ if 'lp_html' in st.session_state:
             src = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=st.session_state.get('lp_ai_images'))
             yc = get_youcan_html(src)
             st.download_button("📥 تحميل YouCan JSON", generate_youcan_json(src), "youcan_page.lp", "application/json", key="yc_json_dl")
-        if 'lp_ai_images' in st.session_state:
-            st.success("✅ صور AI مدمجة base64 — جاهز لـ YouCan!")
-        else:
-            st.info("💡 ولّد صور AI أولاً لدمجها.")
-
-        section_map = {
-            'S1':'📌 TOPBAR','S2':'🏠 Hero','S3':'📊 Stats','S4':'😟 المشكلة',
-            'S5':'✅ الحل','S6':'🔄 قبل/بعد','S7':'👨‍⚕️ الأطباء','S8':'👨‍👩‍👧 الثقة',
-            'S9':'⭐ المميزات','S10':'🌿 المكونات','S11':'📋 طريقة الاستخدام',
-            'S12':'📐 الأبعاد','S13':'💬 المراجعات','S14':'💰 التسعير','S15':'🚀 Final CTA',
-            'FAQ':'❓ FAQ','GUARANTEE':'🛡️ الضمان',
-        }
-        sm2 = re.search(r'(<style>.*?</style>)', yc, re.DOTALL)
-        if sm2:
-            with st.expander("🎨 CSS (انسخ أولاً)", expanded=False):
-                st.code(sm2.group(1), language='html')
-        parts = re.split(r'(<!--\s*S\d+[^>]*-->)', yc)
-        cur = 'START'
-        for part in parts:
-            cm = re.match(r'<!--\s*(S\d+|FAQ|GUARANTEE)', part.strip())
-            if cm: cur = cm.group(1); continue
-            content = part.strip()
-            if not content or content.startswith('<style'): continue
-            label = section_map.get(cur, f'📦 {cur}')
-            with st.expander(label, expanded=False):
-                st.code(content, language='html')
-        st.download_button("📥 YouCan HTML كامل", yc, "youcan.html","text/html")
-                    # YouCan JSON Export
-        yc_json = generate_youcan_json(src)
-        st.download_button("📥 YouCan JSON (استيراد مباشر)", yc_json, "youcan_page.lp", "application/json", key="yc_html_dl")
+            if 'lp_ai_images' in st.session_state:
+                st.success("✅ صور AI مدمجة base64 — جاهز لـ YouCan!")
+            else:
+                st.info("💡 ولّد صور AI أولاً لدمجها.")
+    
+            section_map = {
+                'S1':'📌 TOPBAR','S2':'🏠 Hero','S3':'📊 Stats','S4':'😟 المشكلة',
+                'S5':'✅ الحل','S6':'🔄 قبل/بعد','S7':'👨‍⚕️ الأطباء','S8':'👨‍👩‍👧 الثقة',
+                'S9':'⭐ المميزات','S10':'🌿 المكونات','S11':'📋 طريقة الاستخدام',
+                'S12':'📐 الأبعاد','S13':'💬 المراجعات','S14':'💰 التسعير','S15':'🚀 Final CTA',
+                'FAQ':'❓ FAQ','GUARANTEE':'🛡️ الضمان',
+            }
+            sm2 = re.search(r'(<style>.*?</style>)', yc, re.DOTALL)
+            if sm2:
+                with st.expander("🎨 CSS (انسخ أولاً)", expanded=False):
+                    st.code(sm2.group(1), language='html')
+            parts = re.split(r'(<!--\s*S\d+[^>]*-->)', yc)
+            cur = 'START'
+            for part in parts:
+                cm = re.match(r'<!--\s*(S\d+|FAQ|GUARANTEE)', part.strip())
+                if cm: cur = cm.group(1); continue
+                content = part.strip()
+                if not content or content.startswith('<style'): continue
+                label = section_map.get(cur, f'📦 {cur}')
+                with st.expander(label, expanded=False):
+                    st.code(content, language='html')
+            st.download_button("📥 YouCan HTML كامل", yc, "youcan.html","text/html")
+                        # YouCan JSON Export
+            yc_json = generate_youcan_json(src)
+            st.download_button("📥 YouCan JSON (استيراد مباشر)", yc_json, "youcan_page.lp", "application/json", key="yc_html_dl")
 
     with t5:
         if 'lp_data' in st.session_state:
