@@ -756,7 +756,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
     try:
         import io
         from PIL import Image as PILImage
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-image-generation:generateContent?key={api_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key={api_key}"
         full_prompt = f"{prompt}. Professional commercial photo, 8k quality, no text no letters no words no writing."
         if ref_b64:
             payload = {
@@ -859,7 +859,7 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
                             generated[slot['key']] = img_data
                             st.session_state['lp_ai_images'] = dict(generated)
                         prog.progress((i+1)/len(slots))
-                        import gc; gc.collect(); time.sleep(5)
+                        import gc; gc.collect(); time.sleep(1)
                     status_txt.empty()
                     prog.empty()
                     st.session_state.lp_ai_images = generated
@@ -904,7 +904,7 @@ if 'lp_html' in st.session_state:
                         if img_data:
                             generated[slot['key']] = img_data
                         prog.progress((i+1)/len(slots))
-                        import gc; gc.collect(); time.sleep(5)
+                        import gc; gc.collect(); time.sleep(1)
                     status.success(f"✅ {len(generated)} صورة!")
                     st.session_state.lp_ai_images = generated
                     new_html = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=generated)
