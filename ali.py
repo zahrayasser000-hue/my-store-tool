@@ -840,10 +840,32 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
                     st.session_state.lp_data  = data
                     st.session_state.lp_colors = colors
                     st.session_state.lp_html = build_lp_html(data, colors)
-                    st.session_state.pop('lp_ai_images', None)
-                    st.session_state.pop('lp_html_ai', None)
-                    st.success("🎉 تم توليد 15 قسم! انتقل لتاب 'صور AI' لتوليد 30 صورة بـ Gemini ودمجها تلقائياً")
-            
+                                        # === AUTO GENERATE AI IMAGES ===
+                    st.info("🤖 جاري توليد الصور بالذكاء الاصطناعي ودمجها تلقائياً...")
+                    slots = extract_image_slots(data)
+                    generated = {}
+                    ref = product_image_b64 if product_image_b64 else None
+                    prog = st.progress(0)
+                    status_txt = st.empty()
+                    for i, slot in enumerate(slots):
+                        status_txt.text(f"⏳ توليد صورة {slot['key']} ({i+1}/{len(slots)})")
+                        img_data = generate_nb_image(
+                            global_api_key,
+                            f"Professional commercial photo. {slot['prompt']}. 8k ultra high quality. no text no letters no words no writing no captions.",
+                            ref_b64=ref
+                        )
+                        if img_data:
+                            generated[slot['key']] = img_data
+                            st.session_state['lp_ai_images'] = dict(generated)
+                        prog.progress((i+1)/len(slots))
+                        import gc; gc.collect(); time.sleep(5)
+                    status_txt.empty()
+                    prog.empty()
+                    st.session_state.lp_ai_images = generated
+                    new_html = build_lp_html(data, colors, image_map=generated)
+                    st.session_state.lp_html = new_html
+                    st.session_state.lp_html_ai = new_html
+                    st.success(f"🎉 تم توليد {len(generated)} صورة ودمجها تلقائياً في صفحة الهبوط!")
             except Exception as e:
                 st.error(f"🛑 {str(e)}")
 
