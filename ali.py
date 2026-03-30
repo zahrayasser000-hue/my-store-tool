@@ -66,14 +66,8 @@ def detect_colors(name, cat):
     return AUTO_COLORS["default"]
 
 def get_model(api_key):
-    if 'model_name' in st.session_state: return st.session_state.model_name
-    genai.configure(api_key=api_key, transport="rest")
-    try:
-        for m in genai.list_models():
-            if 'generateContent' in m.supported_generation_methods and 'flash' in m.name.lower():
-                st.session_state.model_name = m.name; return m.name
-    except: pass
-    st.session_state.model_name = "gemini-2.0-flash"; return "gemini-2.0-flash"
+    st.session_state.model_name = "gemini-2.0-flash"
+    return "gemini-2.0-flash"
 
 # ─── JSON GENERATION ──────────────────────────────────────────────────────────
 
