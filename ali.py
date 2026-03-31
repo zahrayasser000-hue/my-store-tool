@@ -774,14 +774,21 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
                 "contents": [{"parts": [{"text": full_prompt}]}],
                 "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}
             }
-        resp = requests.post(url, json=payload, timeout=90)
-        resp.raise_for_status()
+                for _retry in range(3):
+                resp = requests.post(url, json=payload, timeout=90)
+                if resp.status_code == 429:
+                    wait_t = 15 * (_retry + 1)
+                    st.warning(f'Rate limit hit, waiting {wait_t}s...')
+                    time.sleep(wait_t)
+                    continue
+                resp.raise_for_status()
+                break
         data = resp.json()
         for part in data.get("candidates", [{}])[0].get("content", {}).get("parts", []):
             if "inlineData" in part:
                 img_bytes = base64.b64decode(part["inlineData"]["data"])
                 _pil = PILImage.open(io.BytesIO(img_bytes))
-                _pil.thumbnail((400, 400))
+                _pil.thumbnail((300, 300))
                 _buf = io.BytesIO()
                 _pil.convert('RGB').save(_buf, format='JPEG', quality=65, optimize=True)
                 b = base64.b64encode(_buf.getvalue()).decode()
@@ -860,7 +867,7 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
                             generated[slot['key']] = img_data
                             st.session_state['lp_ai_images'] = dict(generated)
                         prog.progress((i+1)/len(slots))
-                        import gc; gc.collect(); time.sleep(1)
+                        import gc; gc.collect(); time.sleep(4)
                     status_txt.empty()
                     prog.empty()
                     st.session_state.lp_ai_images = generated
@@ -905,7 +912,7 @@ if 'lp_html' in st.session_state:
                         if img_data:
                             generated[slot['key']] = img_data
                         prog.progress((i+1)/len(slots))
-                        import gc; gc.collect(); time.sleep(1)
+                        import gc; gc.collect(); time.sleep(4)
                     status.success(f"✅ {len(generated)} صورة!")
                     st.session_state.lp_ai_images = generated
                     new_html = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=generated)
