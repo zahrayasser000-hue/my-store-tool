@@ -11,6 +11,7 @@ import time
 import uuid
 import requests
 import traceback
+import sys
 
 st.set_page_config(page_title="ALI Engine Pro", layout="wide", page_icon="🚀")
 st.markdown("""<style>
