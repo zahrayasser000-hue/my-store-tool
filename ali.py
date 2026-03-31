@@ -825,52 +825,160 @@ app_mode = st.sidebar.radio("🛠️ الأداة:", [
 # ══════════════════════════════════════════════════════════════════════════════
 # LANDING PAGE BUILDER
 # ══════════════════════════════════════════════════════════════════════════════
+if app_mode == "🏗️ منشئ صفحات الهبوط":
+    cols_info = st.columns(5)
+    cols_info[0].metric("الأقسام","15")
+    cols_info[1].metric("الصور","30+")
+    cols_info[2].metric("أطباء","2")
+    cols_info[3].metric("خطوات الاستخدام","4")
+    cols_info[4].metric("مكونات","4")
+
 if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 30 صورة)"):
     if not global_api_key or not global_product_name:
         st.error("الرجاء إدخال مفتاح API واسم المنتج.")
     else:
         with st.spinner("🤖 جاري بناء الصفحة..."):
             try:
-                raw = generate_lp_json(global_api_key, global_product_name, global_category)
-                try:
-                    data = json.loads(raw)
+                raw  = generate_lp_json(global_api_key, global_product_name, global_category)
+                try:    data = json.loads(raw)
                 except:
                     fixed = re.sub(r',\s*([}\]])', r'\1', raw)
-                    data = json.loads(fixed)
-                data['_product_name'] = global_product_name
-                colors = detect_colors(global_product_name, global_category)
-                st.session_state.lp_data = data
-                st.session_state.lp_colors = colors
-                st.session_state.lp_html = build_lp_html(data, colors)
-                st.info("🤖 جاري توليد الصور بالذكاء الاصطناعي ودمجها تلقائياً...")
-                slots = extract_image_slots(data)
-                generated = {}
-                ref = product_image_b64 if product_image_b64 else None
-                prog = st.progress(0)
-                status_txt = st.empty()
-                for i, slot in enumerate(slots):
-                    status_txt.text(f"⏳ توليد صورة {slot['key']} ({i+1}/{len(slots)})")
-                    img_data = generate_nb_image(
-                        global_api_key,
-                        f"Professional commercial photo. {slot['prompt']}. 8k ultra high quality. no text no letters no words no writing no captions.",
-                        ref_b64=ref
-                    )
-                    if img_data:
-                        generated[slot['key']] = img_data
-                        st.session_state['lp_ai_images'] = dict(generated)
-                    prog.progress((i+1)/len(slots))
-                    import gc; gc.collect(); time.sleep(4)
-                status_txt.empty()
-                prog.empty()
-                st.session_state.lp_ai_images = generated
-                new_html = build_lp_html(data, colors, image_map=generated)
-                st.session_state.lp_html = new_html
-                st.session_state.lp_html_ai = new_html
-                st.success(f"🎉 تم توليد {len(generated)} صورة ودمجها تلقائياً في صفحة الهبوط!")
+                    data  = json.loads(fixed)
+                    data['_product_name'] = global_product_name
+                    colors = detect_colors(global_product_name, global_category)
+                    st.session_state.lp_data  = data
+                    st.session_state.lp_colors = colors
+                    st.session_state.lp_html = build_lp_html(data, colors)
+                    # === AUTO GENERATE AI IMAGES ===
+                    st.info("🤖 جاري توليد الصور بالذكاء الاصطناعي ودمجها تلقائياً...")
+                    slots = extract_image_slots(data)
+                    generated = {}
+                    ref = product_image_b64 if product_image_b64 else None
+                    prog = st.progress(0)
+                    status_txt = st.empty()
+                    for i, slot in enumerate(slots):
+                        status_txt.text(f"⏳ توليد صورة {slot['key']} ({i+1}/{len(slots)})")
+                        img_data = generate_nb_image(
+                            global_api_key,
+                            f"Professional commercial photo. {slot['prompt']}. 8k ultra high quality. no text no letters no words no writing no captions.",
+                            ref_b64=ref
+                        )
+                        if img_data:
+                            generated[slot['key']] = img_data
+                            st.session_state['lp_ai_images'] = dict(generated)
+                        prog.progress((i+1)/len(slots))
+                        import gc; gc.collect(); time.sleep(1)
+                    status_txt.empty()
+                    prog.empty()
+                    st.session_state.lp_ai_images = generated
+                    new_html = build_lp_html(data, colors, image_map=generated)
+                    st.session_state.lp_html = new_html
+                    st.session_state.lp_html_ai = new_html
+                    st.success(f"🎉 تم توليد {len(generated)} صورة ودمجها تلقائياً في صفحة الهبوط!")
             except Exception as e:
-                traceback.print_exc()
-                st.session_state['lp_error'] = str(e)
-                st.error(f"🛑 {str(e)}")
+                traceback.print_exc(); st.session_state['lp_error'] = str(e); st.error(f"🛑 {str(e)}")
+
+if 'lp_html' in st.session_state:
+    t1,t2,t3,t4,t5 = st.tabs(["📱 المعاينة","🤖 صور AI","📥 JSON","📤 YouCan","🎨 برومبتات"])
+
+    with t1:
+            preview = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=st.session_state.get('lp_ai_images'))
+            st.download_button("⬇️ تحميل HTML", preview, "landing_page.html", "text/html", key="dl_html_main")
+            components.html(preview, height=6000, scrolling=True)
+
+    with t2:
+        st.markdown("### 🤖 توليد الصور بـ Gemini AI ودمجها")
+        if 'lp_data' not in st.session_state:
+            st.warning("ولّد الصفحة أولاً.")
+        else:
+            slots = extract_image_slots(st.session_state.lp_data)
+            c1,c2 = st.columns(2)
+            with c1: use_ref = st.checkbox("استخدام صورة المنتج مرجعاً", value=bool(product_image_b64))
+            with c2: st.metric("إجمالي الصور", len(slots))
+
+            if st.button("🚀 توليد جميع الصور ودمجها في HTML", key="gen_ai"):
+                if not global_api_key: st.error("أدخل مفتاح API")
+                else:
+                    prog = st.progress(0); status = st.empty()
+                    generated = {}
+                    ref = product_image_b64 if use_ref else None
+                    for i, slot in enumerate(slots):
+                        status.text(f"⏳ {slot['key']} ({i+1}/{len(slots)})")
+                        img_data = generate_nb_image(
+                            global_api_key,
+                            f"Professional commercial photo. {slot['prompt']}. 8k ultra high quality. no text no letters no words no writing no captions.",
+                            ref_b64=ref
+                        )
+                        if img_data:
+                            generated[slot['key']] = img_data
+                        prog.progress((i+1)/len(slots))
+                        import gc; gc.collect(); time.sleep(1)
+                    status.success(f"✅ {len(generated)} صورة!")
+                    st.session_state.lp_ai_images = generated
+                    new_html = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=generated)
+                    st.session_state.lp_html_ai = new_html
+                    st.success("✅ الصور مدمجة في HTML كـ base64!")
+                    st.download_button("⬇️ HTML + صور AI مدمجة", new_html, "lp_ai.html", "text/html", key="dl_ai_html")
+
+            if 'lp_ai_images' in st.session_state:
+                st.markdown("#### 🖼️ الصور المولدة")
+                cols3 = st.columns(3)
+                for i,(k,v) in enumerate(st.session_state.lp_ai_images.items()):
+                    with cols3[i%3]:
+                        if v: st.image(base64.b64decode(v.split(',')[1]) if v.startswith('data:') else v, caption=k)
+                        else: st.caption(k)
+
+    with t3:
+        if 'lp_data' in st.session_state:
+            d = {k:v for k,v in st.session_state.lp_data.items() if k!='_product_name'}
+            js = json.dumps(d, ensure_ascii=False, indent=2)
+            st.download_button("📥 تحميل JSON", js, "lp.json","application/json", key="dl_lp_json")
+            st.json(d)
+
+    with t4:
+            src = build_lp_html(st.session_state.lp_data, st.session_state.lp_colors, image_map=st.session_state.get('lp_ai_images'))
+            yc = get_youcan_html(src)
+            st.download_button("📥 تحميل YouCan JSON", generate_youcan_json(src), "youcan_page.lp", "application/json", key="yc_json_dl")
+            if 'lp_ai_images' in st.session_state:
+                st.success("✅ صور AI مدمجة base64 — جاهز لـ YouCan!")
+            else:
+                st.info("💡 ولّد صور AI أولاً لدمجها.")
+    
+            section_map = {
+                'S1':'📌 TOPBAR','S2':'🏠 Hero','S3':'📊 Stats','S4':'😟 المشكلة',
+                'S5':'✅ الحل','S6':'🔄 قبل/بعد','S7':'👨‍⚕️ الأطباء','S8':'👨‍👩‍👧 الثقة',
+                'S9':'⭐ المميزات','S10':'🌿 المكونات','S11':'📋 طريقة الاستخدام',
+                'S12':'📐 الأبعاد','S13':'💬 المراجعات','S14':'💰 التسعير','S15':'🚀 Final CTA',
+                'FAQ':'❓ FAQ','GUARANTEE':'🛡️ الضمان',
+            }
+            sm2 = re.search(r'(<style>.*?</style>)', yc, re.DOTALL)
+            if sm2:
+                with st.expander("🎨 CSS (انسخ أولاً)", expanded=False):
+                    st.code(sm2.group(1), language='html')
+            parts = re.split(r'(<!--\s*S\d+[^>]*-->)', yc)
+            cur = 'START'
+            for part in parts:
+                cm = re.match(r'<!--\s*(S\d+|FAQ|GUARANTEE)', part.strip())
+                if cm: cur = cm.group(1); continue
+                content = part.strip()
+                if not content or content.startswith('<style'): continue
+                label = section_map.get(cur, f'📦 {cur}')
+                with st.expander(label, expanded=False):
+                    st.code(content, language='html')
+            st.download_button("📥 YouCan HTML كامل", yc, "youcan.html","text/html")
+                        # YouCan JSON Export
+            yc_json = generate_youcan_json(src)
+            st.download_button("📥 YouCan JSON (استيراد مباشر)", yc_json, "youcan_page.lp", "application/json", key="yc_html_dl")
+
+    with t5:
+        if 'lp_data' in st.session_state:
+            slots = extract_image_slots(st.session_state.lp_data)
+            st.markdown(f"### 🎨 {len(slots)} برومبت صورة")
+            for slot in slots:
+                with st.expander(f"🖼️ {slot['key']} — {slot['section']}"):
+                    st.code(slot['prompt'])
+                    st.caption(f"Type: {slot['type']} | Keyword: {slot['keyword']}")
+            st.download_button("📥 CSV", pd.DataFrame(slots).to_csv(index=False), "prompts.csv","text/csv")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # SOP-1
