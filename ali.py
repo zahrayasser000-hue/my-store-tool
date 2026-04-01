@@ -772,9 +772,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
         else:
             payload = {
                 "contents": [{"parts": [{"text": full_prompt}]}],
-                "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}
-            }
-                           
+                "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}              
         for _retry in range(3):
             resp = requests.post(url, json=payload, timeout=90)
             if resp.status_code == 429:
