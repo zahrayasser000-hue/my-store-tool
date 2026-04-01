@@ -774,8 +774,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
                 "contents": [{"parts": [{"text": full_prompt}]}],
                 "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}
             }
-                            }
-                    }
+                           
         for _retry in range(3):
             resp = requests.post(url, json=payload, timeout=90)
             if resp.status_code == 429:
@@ -841,7 +840,7 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
     else:
         with st.spinner("🤖 جاري بناء الصفحة..."):
             try:
-                raw  = generate_lp_json(global_api_key, global_product_name, global_category)
+                                raw  = generate_lp_json(global_api_key, global_product_name, global_category)
                 try:    data = json.loads(raw)
                 except:
                     fixed = re.sub(r',\s*([}\]])', r'\1', raw)
@@ -852,34 +851,31 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
                 st.session_state.lp_colors = colors
                 st.session_state.lp_html = build_lp_html(data, colors)
                 # === AUTO GENERATE AI IMAGES ===
-                st.info("🤖 جاري توليد الصور...")
+                st.info("🤖 جاري توليد الصور بالذكاء الاصطناعي ودمجها تلقائياً...")
                 slots = extract_image_slots(data)
-                               # === AUTO GENERATE AI IMAGES ===
-                    st.info("🤖 جاري توليد الصور بالذكاء الاصطناعي ودمجها تلقائياً...")
-                    slots = extract_image_slots(data)
-                    generated = {}
-                    ref = product_image_b64 if product_image_b64 else None
-                    prog = st.progress(0)
-                    status_txt = st.empty()
-                    for i, slot in enumerate(slots):
-                        status_txt.text(f"⏳ توليد صورة {slot['key']} ({i+1}/{len(slots)})")
-                        img_data = generate_nb_image(
-                            global_api_key,
-                            f"Professional commercial photo. {slot['prompt']}. 8k ultra high quality. no text no letters no words no writing no captions.",
-                            ref_b64=ref
-                        )
-                        if img_data:
-                            generated[slot['key']] = img_data
-                            st.session_state['lp_ai_images'] = dict(generated)
-                        prog.progress((i+1)/len(slots))
-                        import gc; gc.collect(); time.sleep(1)
-                    status_txt.empty()
-                    prog.empty()
-                    st.session_state.lp_ai_images = generated
-                    new_html = build_lp_html(data, colors, image_map=generated)
-                    st.session_state.lp_html = new_html
-                    st.session_state.lp_html_ai = new_html
-                    st.success(f"🎉 تم توليد {len(generated)} صورة ودمجها تلقائياً في صفحة الهبوط!")
+                generated = {}
+                ref = product_image_b64 if product_image_b64 else None
+                prog = st.progress(0)
+                status_txt = st.empty()
+                for i, slot in enumerate(slots):
+                    status_txt.text(f"⏳ توليد صورة {slot['key']} ({i+1}/{len(slots)})")
+                    img_data = generate_nb_image(
+                        global_api_key,
+                        f"Professional commercial photo. {slot['prompt']}. 8k ultra high quality. no text no letters no words no writing no captions.",
+                        ref_b64=ref
+                    )
+                    if img_data:
+                        generated[slot['key']] = img_data
+                        st.session_state['lp_ai_images'] = dict(generated)
+                    prog.progress((i+1)/len(slots))
+                    import gc; gc.collect(); time.sleep(1)
+                status_txt.empty()
+                prog.empty()
+                st.session_state.lp_ai_images = generated
+                new_html = build_lp_html(data, colors, image_map=generated)
+                st.session_state.lp_html = new_html
+                st.session_state.lp_html_ai = new_html
+                st.success(f"🎉 تم توليد {len(generated)} صورة ودمجها تلقائياً في صفحة الهبوط!")
             except Exception as e:
                 traceback.print_exc(); st.session_state['lp_error'] = str(e); st.error(f"🛑 {str(e)}")
 
