@@ -774,15 +774,16 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
                 "contents": [{"parts": [{"text": full_prompt}]}],
                 "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}
             }
-                for _retry in range(3):
-                resp = requests.post(url, json=payload, timeout=90)
-                if resp.status_code == 429:
-                    wait_t = 15 * (_retry + 1)
-                    st.warning(f'Rate limit hit, waiting {wait_t}s...')
-                    time.sleep(wait_t)
-                    continue
-                resp.raise_for_status()
-                break
+                            }
+        for _retry in range(3):
+            resp = requests.post(url, json=payload, timeout=90)
+            if resp.status_code == 429:
+                wait_t = 15 * (_retry + 1)
+                st.warning(f'Rate limit hit, waiting {wait_t}s...')
+                time.sleep(wait_t)
+                continue
+            resp.raise_for_status()
+            break
         data = resp.json()
         for part in data.get("candidates", [{}])[0].get("content", {}).get("parts", []):
             if "inlineData" in part:
