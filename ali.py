@@ -775,6 +775,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
                 "generationConfig": {"responseModalities": ["TEXT", "IMAGE"]}
             }
                             }
+                    }
         for _retry in range(3):
             resp = requests.post(url, json=payload, timeout=90)
             if resp.status_code == 429:
@@ -845,12 +846,15 @@ if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 
                 except:
                     fixed = re.sub(r',\s*([}\]])', r'\1', raw)
                     data  = json.loads(fixed)
-                    data['_product_name'] = global_product_name
-                    colors = detect_colors(global_product_name, global_category)
-                    st.session_state.lp_data  = data
-                    st.session_state.lp_colors = colors
-                    st.session_state.lp_html = build_lp_html(data, colors)
-                    # === AUTO GENERATE AI IMAGES ===
+                data['_product_name'] = global_product_name
+                colors = detect_colors(global_product_name, global_category)
+                st.session_state.lp_data  = data
+                st.session_state.lp_colors = colors
+                st.session_state.lp_html = build_lp_html(data, colors)
+                # === AUTO GENERATE AI IMAGES ===
+                st.info("🤖 جاري توليد الصور...")
+                slots = extract_image_slots(data)
+                               # === AUTO GENERATE AI IMAGES ===
                     st.info("🤖 جاري توليد الصور بالذكاء الاصطناعي ودمجها تلقائياً...")
                     slots = extract_image_slots(data)
                     generated = {}
