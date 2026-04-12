@@ -248,8 +248,7 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
         from PIL import Image as PILImage
 
         url = (
-                        "gemini-2.0-flash-preview-image-generation:generateContent?key={}".format(api_key)
-            -flash-preview-image-generation:generateContent?key={}".format(api_key)
+                                 "gemini-2.0-flash:generateContent?key={}".format(api_key)
         )
         full_prompt = "{}. Professional commercial photo, 8k quality, no text no letters no words no writing.".format(prompt)
 
