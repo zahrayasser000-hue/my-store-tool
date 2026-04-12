@@ -54,6 +54,26 @@ html, body, [data-testid="stAppViewContainer"], [data-testid="stSidebar"] {
     padding: 15px 30px !important;
     width: 100%;
 }
+.template-box {
+    background: linear-gradient(135deg, #0f2027, #1a3a4a);
+    border: 2px solid #3b82f6;
+    border-radius: 14px;
+    padding: 18px 20px;
+    margin-bottom: 18px;
+    color: #fff;
+}
+.template-box h4 {
+    color: #93c5fd;
+    font-size: 1rem;
+    margin-bottom: 6px;
+    font-weight: 700;
+}
+.template-box p {
+    color: #94a3b8;
+    font-size: .82rem;
+    line-height: 1.6;
+    margin: 0;
+}
 </style>
 """,
     unsafe_allow_html=True,
@@ -138,89 +158,185 @@ def detect_colors(name, cat):
     return AUTO_COLORS["default"]
 
 
+# ─── TEMPLATE HELPERS ─────────────────────────────────────────────────────────
+
+def read_uploaded_template(uploaded_file):
+    """
+    Read an uploaded JSON or HTML file and return its raw string content.
+    Returns None if no file is provided.
+    """
+    if uploaded_file is None:
+        return None
+    try:
+        raw_bytes = uploaded_file.read()
+        # Reset pointer so callers can read again if needed
+        uploaded_file.seek(0)
+        return raw_bytes.decode("utf-8", errors="replace")
+    except Exception as exc:
+        st.warning("تعذّر قراءة ملف القالب: {}".format(str(exc)[:200]))
+        return None
+
+
+def build_template_prompt_block(template_content):
+    """
+    Build the extra instruction block injected into the LLM prompt
+    when a reference template is provided by the user.
+    """
+    if not template_content:
+        return ""
+
+    # Truncate very large templates to avoid blowing the context window.
+    # 12 000 characters is enough to capture structure without wasting tokens.
+    MAX_CHARS = 12000
+    truncated = template_content[:MAX_CHARS]
+    was_truncated = len(template_content) > MAX_CHARS
+
+    truncation_note = ""
+    if was_truncated:
+        truncation_note = (
+            "\n[ملاحظة: تم اقتطاع القالب بعد {} حرف للحفاظ على حدود السياق. "
+            "البنية الأساسية واضحة من الجزء المُقدَّم.]".format(MAX_CHARS)
+        )
+
+    block = (
+        "\n\n"
+        "═══════════════════════════════════════════════════════════\n"
+        "📌 قالب مرجعي مرفوع من المستخدم — اتبعه حرفياً\n"
+        "═══════════════════════════════════════════════════════════\n"
+        "المستخدم رفع قالبًا مرجعيًا ناجحًا (JSON أو HTML). يجب عليك:\n\n"
+        "1. الحفاظ على نفس البنية المعمارية بالضبط:\n"
+        "   - نفس مفاتيح JSON وترتيبها\n"
+        "   - نفس أنواع الكتل والأقسام\n"
+        "   - نفس إعدادات التصميم والألوان\n"
+        "   - نفس عدد العناصر في كل قسم (مثلاً: إذا كان القالب يحتوي على 4 مميزات، أبقِ 4 مميزات)\n\n"
+        "2. استبدال المحتوى النصي فقط:\n"
+        "   - العناوين والنصوص والوصف\n"
+        "   - نصوص المراجعات والتعليقات\n"
+        "   - أوصاف الصور (image_search fields)\n"
+        "   - أسماء الأطباء والمكونات والمميزات\n\n"
+        "3. ممنوع منعاً باتاً:\n"
+        "   - إضافة مفاتيح JSON جديدة غير موجودة في القالب\n"
+        "   - حذف مفاتيح موجودة في القالب\n"
+        "   - تغيير ترتيب الأقسام\n"
+        "   - تغيير أنواع البيانات (مثلاً من قائمة إلى نص)\n\n"
+        "القالب المرجعي:\n"
+        "---\n"
+        "{template}"
+        "{truncation_note}\n"
+        "---\n"
+        "═══════════════════════════════════════════════════════════\n"
+        "الآن، أنشئ JSON جديداً بنفس البنية أعلاه مع محتوى خاص بالمنتج: {{product}} في فئة {{category}}.\n"
+    ).format(template=truncated, truncation_note=truncation_note)
+
+    return block
+
+
 # ─── AI GENERATION (genai imported lazily inside) ─────────────────────────────
 
-def generate_lp_json(api_key, product, category):
+def generate_lp_json(api_key, product, category, template_content=None):
+    """
+    Generate the landing page JSON via Gemini.
+    If template_content is provided, the LLM is instructed to preserve
+    the exact structure of the template and only replace textual content.
+    """
     import google.generativeai as genai  # deferred – never runs at boot
     genai.configure(api_key=api_key, transport="rest")
     model = genai.GenerativeModel(get_model())
-    prompt = (
-        'أنت خبير تسويق رقمي ومتخصص في إنشاء صفحات هبوط عربية عالية التحويل.\n'
-        'المنتج: "{}"\nالفئة: "{}"\n\n'
-        'أنشئ JSON كامل ومفصل لصفحة هبوط احترافية. أخرج JSON فقط بدون أي نص إضافي.\n'
-        'الهيكل المطلوب:\n'
-        '{{\n'
-        '  "hero_headline": "عنوان رئيسي قوي ومقنع",\n'
-        '  "hero_subheadline": "عنوان فرعي تفصيلي",\n'
-        '  "hero_benefits": [{{"title":"ميزة 1"}},{{"title":"ميزة 2"}},{{"title":"ميزة 3"}}],\n'
-        '  "social_proof_number": "+5000",\n'
-        '  "social_proof_text": "عميل سعيد حول العالم",\n'
-        '  "trust_badges": ["شحن مجاني","ضمان 30 يوم","دفع آمن","جودة مضمونة"],\n'
-        '  "problem_title": "عنوان المشكلة",\n'
-        '  "problem_description": "وصف تفصيلي للمشكلة",\n'
-        '  "problem_points": ["نقطة مشكلة 1","نقطة مشكلة 2","نقطة مشكلة 3"],\n'
-        '  "solution_title": "عنوان الحل",\n'
-        '  "solution_description": "وصف تفصيلي للحل",\n'
-        '  "image_hero_person_search": "description in english",\n'
-        '  "image_hero_product_search": "description in english",\n'
-        '  "image_hero_lifestyle_search": "description in english",\n'
-        '  "image_problem_1_search": "description in english",\n'
-        '  "image_problem_2_search": "description in english",\n'
-        '  "image_solution_1_search": "description in english",\n'
-        '  "image_solution_2_search": "description in english",\n'
-        '  "image_before_search": "description in english",\n'
-        '  "image_after_search": "description in english",\n'
-        '  "image_family_1_search": "description in english",\n'
-        '  "image_family_2_search": "description in english",\n'
-        '  "family_headline": "عنوان قسم الثقة",\n'
-        '  "doctors": [\n'
-        '    {{"name":"د. اسم","title":"تخصص","quote":"اقتباس مقنع","image_search":"professional arab doctor white coat"}},\n'
-        '    {{"name":"د. اسم 2","title":"تخصص","quote":"اقتباس مقنع","image_search":"professional arab doctor hospital"}}\n'
-        '  ],\n'
-        '  "features": [\n'
-        '    {{"title":"ميزة 1","desc":"وصف","image_search":"feature english"}},\n'
-        '    {{"title":"ميزة 2","desc":"وصف","image_search":"feature english"}},\n'
-        '    {{"title":"ميزة 3","desc":"وصف","image_search":"feature english"}},\n'
-        '    {{"title":"ميزة 4","desc":"وصف","image_search":"feature english"}}\n'
-        '  ],\n'
-        '  "ingredients": [\n'
-        '    {{"name":"مكون 1","benefit":"فائدة","image_search":"ingredient english"}},\n'
-        '    {{"name":"مكون 2","benefit":"فائدة","image_search":"ingredient english"}},\n'
-        '    {{"name":"مكون 3","benefit":"فائدة","image_search":"ingredient english"}},\n'
-        '    {{"name":"مكون 4","benefit":"فائدة","image_search":"ingredient english"}}\n'
-        '  ],\n'
-        '  "how_to_use": ["خطوة 1","خطوة 2","خطوة 3","خطوة 4"],\n'
-        '  "how_to_use_images": [\n'
-        '    "hands step 1 product demonstration bright studio 8k",\n'
-        '    "hands step 2 product demonstration bright studio 8k",\n'
-        '    "hands step 3 product demonstration bright studio 8k",\n'
-        '    "hands step 4 product demonstration bright studio 8k"\n'
-        '  ],\n'
-        '  "dimensions": {{"height":"15 cm","width":"8 cm","weight":"200g","volume":"50ml","note":"ملاحظة"}},\n'
-        '  "image_dimensions_search": "product flat lay ruler white background 8k",\n'
-        '  "image_dimensions_2_search": "product packaging box close up clean background 8k",\n'
-        '  "stats": [{{"number":"98%","label":"نسبة الرضا"}},{{"number":"+5000","label":"عميل سعيد"}},{{"number":"4.9/5","label":"التقييم"}}],\n'
-        '  "reviews": [\n'
-        '    {{"name":"سارة م.","rating":5,"comment":"تعليق مقنع","image_search":"happy arab woman portrait neutral background 8k"}},\n'
-        '    {{"name":"احمد ع.","rating":5,"comment":"تعليق مقنع","image_search":"confident arab man portrait neutral background 8k"}},\n'
-        '    {{"name":"نورة ك.","rating":5,"comment":"تعليق مقنع","image_search":"smiling arab woman portrait neutral background 8k"}}\n'
-        '  ],\n'
-        '  "pricing": {{"original":"399","discounted":"199","currency":"SAR","discount_percent":"50%"}},\n'
-        '  "urgency_text": "العرض ينتهي خلال 24 ساعة!",\n'
-        '  "countdown_hours": 24,\n'
-        '  "faq": [\n'
-        '    {{"q":"متى سالاحظ النتائج؟","a":"اجابة تفصيلية"}},\n'
-        '    {{"q":"هل المنتج آمن؟","a":"اجابة تفصيلية"}},\n'
-        '    {{"q":"كيف اطلب؟","a":"اجابة تفصيلية"}},\n'
-        '    {{"q":"ما سياسة الارجاع؟","a":"اجابة تفصيلية"}}\n'
-        '  ],\n'
-        '  "guarantee_title": "ضمان استرجاع الاموال 30 يوماً",\n'
-        '  "guarantee_text": "نص الضمان التفصيلي",\n'
-        '  "call_to_action": "اطلب الآن",\n'
-        '  "footer_text": "جميع الحقوق محفوظة"\n'
-        '}}'
-    ).format(product, category)
-    r = model.generate_content(prompt, request_options={"timeout": 60.0})
+
+    # Build the optional template block
+    template_block = build_template_prompt_block(template_content)
+
+    # If a template was provided, inject it and adjust instructions accordingly
+    if template_block:
+        # Replace the placeholder tokens in the template block
+        template_block = template_block.replace("{product}", product).replace("{category}", category)
+
+        prompt = (
+            'أنت خبير تسويق رقمي ومتخصص في إنشاء صفحات هبوط عربية عالية التحويل.\n'
+            'المنتج: "{}"\nالفئة: "{}"\n'
+            '{}\n\n'
+            'أخرج JSON فقط بدون أي نص إضافي أو علامات markdown.'
+        ).format(product, category, template_block)
+    else:
+        # Standard prompt — no template provided
+        prompt = (
+            'أنت خبير تسويق رقمي ومتخصص في إنشاء صفحات هبوط عربية عالية التحويل.\n'
+            'المنتج: "{}"\nالفئة: "{}"\n\n'
+            'أنشئ JSON كامل ومفصل لصفحة هبوط احترافية. أخرج JSON فقط بدون أي نص إضافي.\n'
+            'الهيكل المطلوب:\n'
+            '{{\n'
+            '  "hero_headline": "عنوان رئيسي قوي ومقنع",\n'
+            '  "hero_subheadline": "عنوان فرعي تفصيلي",\n'
+            '  "hero_benefits": [{{"title":"ميزة 1"}},{{"title":"ميزة 2"}},{{"title":"ميزة 3"}}],\n'
+            '  "social_proof_number": "+5000",\n'
+            '  "social_proof_text": "عميل سعيد حول العالم",\n'
+            '  "trust_badges": ["شحن مجاني","ضمان 30 يوم","دفع آمن","جودة مضمونة"],\n'
+            '  "problem_title": "عنوان المشكلة",\n'
+            '  "problem_description": "وصف تفصيلي للمشكلة",\n'
+            '  "problem_points": ["نقطة مشكلة 1","نقطة مشكلة 2","نقطة مشكلة 3"],\n'
+            '  "solution_title": "عنوان الحل",\n'
+            '  "solution_description": "وصف تفصيلي للحل",\n'
+            '  "image_hero_person_search": "description in english",\n'
+            '  "image_hero_product_search": "description in english",\n'
+            '  "image_hero_lifestyle_search": "description in english",\n'
+            '  "image_problem_1_search": "description in english",\n'
+            '  "image_problem_2_search": "description in english",\n'
+            '  "image_solution_1_search": "description in english",\n'
+            '  "image_solution_2_search": "description in english",\n'
+            '  "image_before_search": "description in english",\n'
+            '  "image_after_search": "description in english",\n'
+            '  "image_family_1_search": "description in english",\n'
+            '  "image_family_2_search": "description in english",\n'
+            '  "family_headline": "عنوان قسم الثقة",\n'
+            '  "doctors": [\n'
+            '    {{"name":"د. اسم","title":"تخصص","quote":"اقتباس مقنع","image_search":"professional arab doctor white coat"}},\n'
+            '    {{"name":"د. اسم 2","title":"تخصص","quote":"اقتباس مقنع","image_search":"professional arab doctor hospital"}}\n'
+            '  ],\n'
+            '  "features": [\n'
+            '    {{"title":"ميزة 1","desc":"وصف","image_search":"feature english"}},\n'
+            '    {{"title":"ميزة 2","desc":"وصف","image_search":"feature english"}},\n'
+            '    {{"title":"ميزة 3","desc":"وصف","image_search":"feature english"}},\n'
+            '    {{"title":"ميزة 4","desc":"وصف","image_search":"feature english"}}\n'
+            '  ],\n'
+            '  "ingredients": [\n'
+            '    {{"name":"مكون 1","benefit":"فائدة","image_search":"ingredient english"}},\n'
+            '    {{"name":"مكون 2","benefit":"فائدة","image_search":"ingredient english"}},\n'
+            '    {{"name":"مكون 3","benefit":"فائدة","image_search":"ingredient english"}},\n'
+            '    {{"name":"مكون 4","benefit":"فائدة","image_search":"ingredient english"}}\n'
+            '  ],\n'
+            '  "how_to_use": ["خطوة 1","خطوة 2","خطوة 3","خطوة 4"],\n'
+            '  "how_to_use_images": [\n'
+            '    "hands step 1 product demonstration bright studio 8k",\n'
+            '    "hands step 2 product demonstration bright studio 8k",\n'
+            '    "hands step 3 product demonstration bright studio 8k",\n'
+            '    "hands step 4 product demonstration bright studio 8k"\n'
+            '  ],\n'
+            '  "dimensions": {{"height":"15 cm","width":"8 cm","weight":"200g","volume":"50ml","note":"ملاحظة"}},\n'
+            '  "image_dimensions_search": "product flat lay ruler white background 8k",\n'
+            '  "image_dimensions_2_search": "product packaging box close up clean background 8k",\n'
+            '  "stats": [{{"number":"98%","label":"نسبة الرضا"}},{{"number":"+5000","label":"عميل سعيد"}},{{"number":"4.9/5","label":"التقييم"}}],\n'
+            '  "reviews": [\n'
+            '    {{"name":"سارة م.","rating":5,"comment":"تعليق مقنع","image_search":"happy arab woman portrait neutral background 8k"}},\n'
+            '    {{"name":"احمد ع.","rating":5,"comment":"تعليق مقنع","image_search":"confident arab man portrait neutral background 8k"}},\n'
+            '    {{"name":"نورة ك.","rating":5,"comment":"تعليق مقنع","image_search":"smiling arab woman portrait neutral background 8k"}}\n'
+            '  ],\n'
+            '  "pricing": {{"original":"399","discounted":"199","currency":"SAR","discount_percent":"50%"}},\n'
+            '  "urgency_text": "العرض ينتهي خلال 24 ساعة!",\n'
+            '  "countdown_hours": 24,\n'
+            '  "faq": [\n'
+            '    {{"q":"متى سالاحظ النتائج؟","a":"اجابة تفصيلية"}},\n'
+            '    {{"q":"هل المنتج آمن؟","a":"اجابة تفصيلية"}},\n'
+            '    {{"q":"كيف اطلب؟","a":"اجابة تفصيلية"}},\n'
+            '    {{"q":"ما سياسة الارجاع؟","a":"اجابة تفصيلية"}}\n'
+            '  ],\n'
+            '  "guarantee_title": "ضمان استرجاع الاموال 30 يوماً",\n'
+            '  "guarantee_text": "نص الضمان التفصيلي",\n'
+            '  "call_to_action": "اطلب الآن",\n'
+            '  "footer_text": "جميع الحقوق محفوظة"\n'
+            '}}'
+        ).format(product, category)
+
+    r = model.generate_content(prompt, request_options={"timeout": 90.0})
     tb = chr(96) * 3
     clean = re.sub(tb + "(?:json|JSON)?", "", r.text, flags=re.IGNORECASE).replace(tb, "").strip()
     m = re.search(r"\{.*\}", clean, re.DOTALL)
@@ -248,7 +364,8 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
         from PIL import Image as PILImage
 
         url = (
-                                 "gemini-2.0-flash:generateContent?key={}".format(api_key)
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            "gemini-2.0-flash-preview-image-generation:generateContent?key={}".format(api_key)
         )
         full_prompt = "{}. Professional commercial photo, 8k quality, no text no letters no words no writing.".format(prompt)
 
@@ -987,13 +1104,65 @@ if app_mode == "🏗️ منشئ صفحات الهبوط":
     cols_info[3].metric("خطوات الاستخدام","4")
     cols_info[4].metric("مكونات",         "4")
 
+    st.markdown("---")
+
+    # ── TEMPLATE UPLOAD WIDGET ────────────────────────────────────────────────
+    st.markdown(
+        '<div class="template-box">'
+        "<h4>📎 قالب مرجعي (اختياري)</h4>"
+        "<p>ارفع ملف JSON أو HTML لصفحة هبوط ناجحة. سيحافظ الذكاء الاصطناعي على "
+        "نفس البنية والهيكل تماماً، ويستبدل المحتوى النصي فقط بمحتوى خاص بمنتجك.</p>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+
+    uploaded_template = st.file_uploader(
+        "رفع قالب مرجعي (JSON / HTML)",
+        type=["json", "html", "htm", "lp"],
+        key="template_uploader",
+        help="ارفع ملف JSON أو HTML لصفحة هبوط ناجحة لاستخدامه كهيكل مرجعي.",
+    )
+
+    # Show a status badge if a template is loaded
+    template_content = None
+    if uploaded_template is not None:
+        template_content = read_uploaded_template(uploaded_template)
+        if template_content:
+            file_size_kb = len(template_content.encode("utf-8")) / 1024
+            st.success(
+                "✅ تم تحميل القالب المرجعي: **{}** ({:.1f} KB) — "
+                "سيستخدم الذكاء الاصطناعي هيكله كمرجع صارم.".format(
+                    uploaded_template.name, file_size_kb
+                )
+            )
+            with st.expander("👁️ معاينة القالب المرجعي (أول 2000 حرف)", expanded=False):
+                st.code(template_content[:2000], language="json" if uploaded_template.name.endswith(".json") else "html")
+        else:
+            st.warning("⚠️ تعذّر قراءة الملف. سيتم المتابعة بدون قالب مرجعي.")
+            template_content = None
+    else:
+        st.info("💡 لم يُرفع قالب مرجعي — سيتم إنشاء هيكل جديد تلقائياً.")
+
+    st.markdown("---")
+
     if st.button("🚀 توليد صفحة الهبوط الكاملة (15 قسم + 30 صورة)"):
         if not global_api_key or not global_product_name:
             st.error("الرجاء إدخال مفتاح API واسم المنتج.")
         else:
-            with st.spinner("🤖 جاري بناء الصفحة..."):
+            # Store whether this generation used a template, for display later
+            st.session_state["used_template"] = template_content is not None
+
+            with st.spinner("🤖 جاري بناء الصفحة{}...".format(
+                " باستخدام القالب المرجعي" if template_content else ""
+            )):
                 try:
-                    raw = generate_lp_json(global_api_key, global_product_name, global_category)
+                    # Pass template_content to the generator (None = no template)
+                    raw = generate_lp_json(
+                        global_api_key,
+                        global_product_name,
+                        global_category,
+                        template_content=template_content,
+                    )
                     try:
                         lp_data = json.loads(raw)
                     except Exception:
@@ -1044,6 +1213,11 @@ if app_mode == "🏗️ منشئ صفحات الهبوط":
                     st.error("🛑 {}".format(str(exc)))
 
     if "lp_html" in st.session_state:
+
+        # Show a banner when the page was built from a template
+        if st.session_state.get("used_template"):
+            st.success("📎 هذه الصفحة تم بناؤها بناءً على القالب المرجعي المرفوع.")
+
         t1, t2, t3, t4, t5 = st.tabs(
             ["📱 المعاينة", "🤖 صور AI", "📥 JSON", "📤 YouCan", "🎨 برومبتات"]
         )
