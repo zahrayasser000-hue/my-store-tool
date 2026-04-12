@@ -249,7 +249,8 @@ def generate_nb_image(api_key, prompt, ref_b64=None):
 
         url = (
             "https://generativelanguage.googleapis.com/v1beta/models/"
-            "gemini-2.0-flash-preview-image-generation:generateContent?key={}".format(api_key)
+            "gemini-2.5
+            -flash-preview-image-generation:generateContent?key={}".format(api_key)
         )
         full_prompt = "{}. Professional commercial photo, 8k quality, no text no letters no words no writing.".format(prompt)
 
