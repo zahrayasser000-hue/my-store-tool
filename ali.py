@@ -71,7 +71,7 @@ st.markdown(
 # ─── PURE HELPERS (no I/O, no network) ────────────────────────────────────────
 
 def get_model():
-    return "gemini-1.5-flash"
+    return "gemini-2.5-flash"
 
 
 def get_ai_image(keyword, width=800, height=600, style="product", context=""):
