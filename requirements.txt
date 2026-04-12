@@ -1,6 +1,7 @@
-streamlit
+streamlit==1.45.0
 pandas
 google-generativeai
 PyPDF2
 Pillow
 openpyxl
+requests
