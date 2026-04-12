@@ -1,7 +1,14 @@
 streamlit==1.45.0
 pandas
 google-generativeai
-google-genai
+1  streamlit==1.45.0
+2  pandas
+3  google-generativeai
+4  google-genai          ← احذف هذا السطر
+5  PyPDF2
+6  Pillow
+7  openpyxl
+8  requests
 PyPDF2
 Pillow
 openpyxl
